@@ -24,7 +24,7 @@
                 "stdout"
             ]
         },
-        "app": {
+        "mrkr": {
             "level": "DEBUG",
             "handlers": [
                 "stdout"

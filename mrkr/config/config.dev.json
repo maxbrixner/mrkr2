@@ -33,8 +33,8 @@
         "compression_level": 5
     },
     "project": {
-        "title": "Mrkr 2",
-        "description": "This is the API documentation for Mrkr 2. Mrkr 2 also offer a frontend accessible using /app.",
+        "title": "Mrkr",
+        "description": "This is the API documentation for Mrkr. Mrkr also offers a frontend accessible using /app.",
         "version": "0.1.0",
         "author": "Max Brixner",
         "terms_of_service": null,

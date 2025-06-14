@@ -8,7 +8,7 @@
             "module": "uvicorn",
             "args": [
                 "--factory",
-                "app:create_app",
+                "mrkr:create_app",
                 "--reload",
                 "--host",
                 "0.0.0.0",

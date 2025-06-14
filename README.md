@@ -1,4 +1,4 @@
-# Mrkr 2
+# Mrkr
 
 A tool to label pages, blocks and text within images and PDF files
 
@@ -43,13 +43,13 @@ You can start the FastAPI server in several ways:
 - Using Python:
 
 ```bash
-python -m app
+python -m mrkr
 ```
 
 - Using Uvicorn:
 
 ```bash
-uvicorn --factory app:create_app --reload --host 0.0.0.0 --port 8000
+uvicorn --factory mrkr:create_app --reload --host 0.0.0.0 --port 8000
 ```
 
 - In Visual Studio Code:
