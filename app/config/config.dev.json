@@ -1,0 +1,73 @@
+{
+    "backend": {
+        "host": "0.0.0.0",
+        "port": 8000,
+        "root_path": ""
+    },
+    "cors": {
+        "allow_origins": [
+            "*"
+        ],
+        "allow_credentials": true,
+        "allow_methods": [
+            "*"
+        ],
+        "allow_headers": [
+            "*"
+        ],
+        "enabled": true,
+        "expose_headers": [
+            "*"
+        ],
+        "max_age": 600
+    },
+    "database": {
+        "url": "sqlite:///{{DBNAME}}",
+        "echo": false,
+        "pool_size": 5,
+        "max_overflow": 10
+    },
+    "gzip": {
+        "enabled": true,
+        "minimum_size": 1000,
+        "compression_level": 5
+    },
+    "project": {
+        "title": "Sample Project",
+        "description": "This is a **sample project**",
+        "version": "0.1.0",
+        "author": "John Doe",
+        "terms_of_service": "https://example.com/terms",
+        "summary": "This project is a sample application demonstrating the use of FastAPI.",
+        "swagger_path": "/docs"
+    },
+    "static_files": {
+        "enabled": true,
+        "headers": {
+            "X-Content-Type-Options": "nosniff",
+            "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self';",
+            "Referrer-Policy": "strict-origin-when-cross-origin",
+            "Cross-Origin-Resource-Policy": "same-origin",
+            "Cache-Control": "public, max-age=3600",
+            "Content-Type": "application/json"
+        },
+        "path": "/static",
+        "directory": "frontend/static",
+        "name": "static"
+    },
+    "templates": {
+        "enabled": true,
+        "directory": "frontend/templates",
+        "headers": {
+            "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+            "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self';",
+            "X-Content-Type-Options": "nosniff",
+            "X-Frame-Options": "DENY",
+            "Referrer-Policy": "strict-origin-when-cross-origin",
+            "Permissions-Policy": "geolocation=(), camera=(), microphone=(), fullscreen=(self)",
+            "Cache-Control": "no-cache",
+            "Cross-Origin-Opener-Policy": "same-origin",
+            "Cross-Origin-Embedder-Policy": "require-corp"
+        }
+    }
+}
