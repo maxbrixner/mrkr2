@@ -1,24 +1,29 @@
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mrkr</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+
 </head>
 
 <body>
-    <header>
-        <h1>Welcome to My Application</h1>
-    </header>
-    <nav>
-    </nav>
-    <main>
-        {% block content %}
-        <!-- Content will be injected here -->
-        {% endblock %}
-    </main>
-    <footer>
-        <p>&copy; 2023 My Application</p>
-    </footer>
+    {% block header %}
+    <!-- Content will be injected here -->
+    {% endblock %}
+
+    {% block main %}
+    <!-- Content will be injected here -->
+    {% endblock %}
+</body>
 
 </html>

@@ -27,7 +27,7 @@ async def label(
     GUI to label a file.
     """
     return templates.TemplateResponse(
-        "base.html",
+        "labeling.html",
         context={
             "request": request
         }
