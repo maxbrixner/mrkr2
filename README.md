@@ -36,9 +36,9 @@ tsc -p ./frontend/
 
 Or, in Visual Studio Code, press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> to build.
 
-### 3. Run the FastAPI App
+### 3. Run Mrkr
 
-You can start the FastAPI server in several ways:
+You can start the Mrkr server in several ways:
 
 - Using Python:
 
