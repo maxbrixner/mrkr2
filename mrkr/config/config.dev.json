@@ -33,12 +33,12 @@
         "compression_level": 5
     },
     "project": {
-        "title": "Sample Project",
-        "description": "This is a **sample project**",
+        "title": "Mrkr 2",
+        "description": "This is the API documentation for Mrkr 2. Mrkr 2 also offer a frontend accessible using /app.",
         "version": "0.1.0",
-        "author": "John Doe",
-        "terms_of_service": "https://example.com/terms",
-        "summary": "This project is a sample application demonstrating the use of FastAPI.",
+        "author": "Max Brixner",
+        "terms_of_service": null,
+        "summary": "A tool to label pages, blocks and text within images and PDF files",
         "swagger_path": "/docs"
     },
     "static_files": {

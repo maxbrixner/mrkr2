@@ -11,7 +11,7 @@ from contextlib import ExitStack
 
 # ---------------------------------------------------------------------------- #
 
-import app.services as services
+import mrkr.services as services
 from test._testcase import TestCase
 
 # ---------------------------------------------------------------------------- #

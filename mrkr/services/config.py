@@ -10,7 +10,7 @@ from functools import lru_cache
 
 # ---------------------------------------------------------------------------- #
 
-logger = logging.getLogger("app.services")
+logger = logging.getLogger("mrkr.services")
 
 # ---------------------------------------------------------------------------- #
 
@@ -45,7 +45,7 @@ class _CorsSchema(pydantic.BaseModel):
     allow_origins: List[str] = []
     enabled: bool = True
     expose_headers: List[str] = []
-    max_age: Optional[int] = 600
+    max_age: int = 600
 
 
 class _StaticFilesSchema(pydantic.BaseModel):

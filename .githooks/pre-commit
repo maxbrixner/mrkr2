@@ -41,7 +41,7 @@ done
 # pre-commit hook to run mypy for type checking
 # ---------------------------------------------------------------------------- #
 
-MYPY_OUTPUT=$(.venv/bin/mypy --disallow-untyped-defs --disallow-incomplete-defs --disable-error-code=import-untyped app test > /dev/null 2>&1)
+MYPY_OUTPUT=$(.venv/bin/mypy --disallow-untyped-defs --disallow-incomplete-defs --disable-error-code=import-untyped mrkr test > /dev/null 2>&1)
 MYPY_EXIT_CODE=$?
 
 if [ $MYPY_EXIT_CODE -ne 0 ]; then

@@ -4,9 +4,9 @@ import sqlmodel
 
 # ---------------------------------------------------------------------------- #
 
-import app.crud as crud
-import app.schemas as schemas
-import app.models as models
+import mrkr.crud as crud
+import mrkr.schemas as schemas
+import mrkr.models as models
 from test._testcase import TestCase
 
 # ---------------------------------------------------------------------------- #

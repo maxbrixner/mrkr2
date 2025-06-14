@@ -8,9 +8,9 @@ from contextlib import ExitStack
 
 # ---------------------------------------------------------------------------- #
 
-import app.core as core
-import app.services as services
-from app.core.exceptions import exception_handler, http_exception_handler
+import mrkr.core as core
+import mrkr.services as services
+from mrkr.core.exceptions import exception_handler, http_exception_handler
 from test._testcase import TestCase
 
 # ---------------------------------------------------------------------------- #
@@ -62,10 +62,10 @@ class TestLifespan(TestCase):
         """
         with ExitStack() as stack:
             mock_connect = stack.enter_context(
-                patch('app.database.Database.connect')
+                patch('mrkr.database.Database.connect')
             )
             mock_disconnect = stack.enter_context(
-                patch('app.database.Database.disconnect')
+                patch('mrkr.database.Database.disconnect')
             )
 
             with self.client:

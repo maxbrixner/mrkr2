@@ -10,11 +10,11 @@ from typing import AsyncGenerator
 
 # ---------------------------------------------------------------------------- #
 
-import app.database as database
+import mrkr.database as database
 
 # ---------------------------------------------------------------------------- #
 
-logger = logging.getLogger("app.core")
+logger = logging.getLogger("mrkr.core")
 
 # ---------------------------------------------------------------------------- #
 

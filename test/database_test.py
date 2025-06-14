@@ -8,7 +8,7 @@ from typing import Generator
 
 # ---------------------------------------------------------------------------- #
 
-import app.database as database
+import mrkr.database as database
 from test._testcase import TestCase
 
 # ---------------------------------------------------------------------------- #
@@ -36,7 +36,7 @@ class DatabaseTest(TestCase):
         """
         database.get_database.cache_clear()
         with patch(
-            "app.database.database.sqlmodel.create_engine",
+            "mrkr.database.database.sqlmodel.create_engine",
             return_value=sqlalchemy.create_engine(
                 "sqlite://",
                 connect_args={"check_same_thread": False},
@@ -59,7 +59,7 @@ class DatabaseTest(TestCase):
         """
         database.get_database.cache_clear()
         with patch(
-            "app.database.database.sqlmodel.create_engine",
+            "mrkr.database.database.sqlmodel.create_engine",
             return_value=sqlalchemy.create_engine(
                 "sqlite://",
                 connect_args={"check_same_thread": False},
@@ -78,7 +78,7 @@ class DatabaseTest(TestCase):
         """
         database.get_database.cache_clear()
         with patch(
-            "app.database.database.sqlmodel.create_engine",
+            "mrkr.database.database.sqlmodel.create_engine",
             return_value=sqlalchemy.create_engine(
                 "sqlite://",
                 connect_args={"check_same_thread": False},

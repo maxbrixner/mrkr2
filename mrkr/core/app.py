@@ -11,10 +11,10 @@ from starlette.exceptions import HTTPException as StarlettHTTPException
 
 # ---------------------------------------------------------------------------- #
 
-import app.services as services
-import app.core.exceptions as exceptions
-import app.core.lifespan as lifespan
-from app.api.v1 import router as routerv1
+import mrkr.services as services
+import mrkr.core.exceptions as exceptions
+import mrkr.core.lifespan as lifespan
+from mrkr.api.v1 import router as routerv1
 
 # ---------------------------------------------------------------------------- #
 
@@ -55,7 +55,7 @@ def create_app() -> fastapi.FastAPI:
         )
 
     if config.static_files.enabled:
-        from app.services.static import StaticFilesWithHeaders
+        from mrkr.services.static import StaticFilesWithHeaders
         app.mount(
             config.static_files.path,
             StaticFilesWithHeaders(
@@ -64,7 +64,7 @@ def create_app() -> fastapi.FastAPI:
         )
 
     if config.templates.enabled:
-        from app.services import TemplateHeaderMiddleware
+        from mrkr.services import TemplateHeaderMiddleware
         app.add_middleware(TemplateHeaderMiddleware)
 
     if config.gzip.enabled:

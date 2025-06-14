@@ -1,6 +1,6 @@
-# FastAPI Sample App
+# Mrkr 2
 
-A sample project demonstrating a FastAPI backend with TypeScript-based web components for the frontend.
+A tool to label pages, blocks and text within images and PDF files
 
 ## Getting Started 🚀
 

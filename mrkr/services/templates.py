@@ -10,11 +10,11 @@ from typing import Awaitable, Callable, Dict
 
 # ---------------------------------------------------------------------------- #
 
-import app.services as services
+import mrkr.services as services
 
 # ---------------------------------------------------------------------------- #
 
-logger = logging.getLogger("app.services")
+logger = logging.getLogger("mrkr.services")
 
 # ---------------------------------------------------------------------------- #
 

@@ -4,8 +4,8 @@ import sqlmodel
 
 # ---------------------------------------------------------------------------- #
 
-from app.models.user import *
-from app.schemas.user import *
+from mrkr.models.user import *
+from mrkr.schemas.user import *
 
 # ---------------------------------------------------------------------------- #
 

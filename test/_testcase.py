@@ -11,10 +11,10 @@ from typing import Generator
 
 # ---------------------------------------------------------------------------- #
 
-import app.core as core
-import app.database as database
-import app.services as services
-from app.services.config import _BackendSchema, _CorsSchema, _DatabaseSchema, \
+import mrkr.core as core
+import mrkr.database as database
+import mrkr.services as services
+from mrkr.services.config import _BackendSchema, _CorsSchema, _DatabaseSchema, \
     _ProjectSchema, _StaticFilesSchema, _TemplatesSchema, _GzipSchema
 
 # ---------------------------------------------------------------------------- #
@@ -84,12 +84,12 @@ class TestCase(unittest.IsolatedAsyncioTestCase):
         """
         # Patch configuration
         cls.config = create_test_configuration()
-        cls.patch_config = patch('app.services.get_configuration')
+        cls.patch_config = patch('mrkr.services.get_configuration')
         cls.mock_config = cls.patch_config.start()
         cls.mock_config.return_value = cls.config
 
         # Patch logger
-        cls.patch_logger = patch('app.services.setup_logger')
+        cls.patch_logger = patch('mrkr.services.setup_logger')
         cls.mock_logger = cls.patch_logger.start()
 
         # Create a FastAPI application instance

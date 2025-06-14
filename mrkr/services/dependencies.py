@@ -1,18 +1,17 @@
 # ---------------------------------------------------------------------------- #
 
 import fastapi
-import sqlmodel
 from typing import Annotated
 
 # ---------------------------------------------------------------------------- #
 
-from app.database import get_database_session
+import mrkr.services as services
 
 # ---------------------------------------------------------------------------- #
 
 
-DatabaseDependency = Annotated[
-    sqlmodel.Session, fastapi.Depends(get_database_session)
+ConfigDependency = Annotated[
+    services.ConfigSchema, fastapi.Depends(services.get_configuration)
 ]
 
 # ---------------------------------------------------------------------------- #

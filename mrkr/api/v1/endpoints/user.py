@@ -5,9 +5,9 @@ from typing import Dict
 
 # ---------------------------------------------------------------------------- #
 
-import app.schemas as schemas
-import app.crud as crud
-from app.database import DatabaseDependency
+import mrkr.schemas as schemas
+import mrkr.crud as crud
+from mrkr.database import DatabaseDependency
 
 # ---------------------------------------------------------------------------- #
 

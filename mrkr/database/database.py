@@ -10,11 +10,11 @@ from functools import lru_cache
 
 # ---------------------------------------------------------------------------- #
 
-import app.services as services
+import mrkr.services as services
 
 # ---------------------------------------------------------------------------- #
 
-logger = logging.getLogger("app.database")
+logger = logging.getLogger("mrkr.database")
 
 # ---------------------------------------------------------------------------- #
 
