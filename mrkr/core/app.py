@@ -15,6 +15,7 @@ import mrkr.services as services
 import mrkr.core.exceptions as exceptions
 import mrkr.core.lifespan as lifespan
 from mrkr.api.v1 import router as routerv1
+from mrkr.gui import router as routergui
 
 # ---------------------------------------------------------------------------- #
 
@@ -75,6 +76,7 @@ def create_app() -> fastapi.FastAPI:
         )
 
     app.include_router(routerv1)
+    app.include_router(routergui)
 
     app.add_exception_handler(
         Exception, exceptions.exception_handler)

@@ -55,7 +55,7 @@ fi
 # pre-commit hook to run unit tests
 # ---------------------------------------------------------------------------- #
 
-UNITTEST_OUTPUT=$(.venv/bin/python -m unittest discover --failfast --verbose --start-directory ./test --pattern "*_test.py" > /dev/null 2>&1)
+UNITTEST_OUTPUT=$(.venv/bin/python -m unittest discover --failfast --verbose --start-directory ./test --pattern "*_test.py")
 UNITTEST_EXIT_CODE=$?
 
 if [ $UNITTEST_EXIT_CODE -ne 0 ]; then

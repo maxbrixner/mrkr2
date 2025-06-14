@@ -1,22 +1,18 @@
 # ---------------------------------------------------------------------------- #
 
 import fastapi
-from fastapi.templating import Jinja2Templates
-from typing import Annotated
 
 # ---------------------------------------------------------------------------- #
 
-import mrkr.services as services
+import mrkr.schemas as schemas
+from mrkr.gui.endpoints import labeling_router
 
 # ---------------------------------------------------------------------------- #
 
 
-ConfigDependency = Annotated[
-    services.ConfigSchema, fastapi.Depends(services.get_configuration)
-]
+router = fastapi.APIRouter(prefix="/gui", tags=[schemas.Tags.gui])
 
-TemplatesDependency = Annotated[
-    Jinja2Templates, fastapi.Depends(services.get_templates)
-]
+router.include_router(labeling_router)
+
 
 # ---------------------------------------------------------------------------- #
