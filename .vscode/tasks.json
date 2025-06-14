@@ -1,0 +1,19 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "linting",
+            "command": ".venv/bin/mypy --disallow-untyped-defs --disallow-incomplete-defs --disable-error-code=import-untyped app test",
+            "problemMatcher": [],
+            "group": "test",
+        },
+        {
+            "type": "shell",
+            "label": "unittests",
+            "command": ".venv/bin/python -m unittest discover --failfast --verbose --start-directory ./test --pattern *_test.py",
+            "problemMatcher": [],
+            "group": "test",
+        }
+    ]
+}
