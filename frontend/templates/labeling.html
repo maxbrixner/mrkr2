@@ -3,6 +3,7 @@
 {% block scripts %}
 <script type="module" src="{{ url_for('static', path='/js/styled_link.js') }}"></script>
 <script type="module" src="{{ url_for('static', path='/js/styled_button.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/resizable_panes.js') }}"></script>
 {% endblock %}
 
 {% block header %}
@@ -21,8 +22,9 @@
 
 {% block main %}
 <main class="labeling-main">
-    <resizable-panes>
-        Hallo
+    <resizable-panes count="3" orientation="vertical">
+        <div slot="first">Hallo</div>
+        <div slot="second">Hallo2</div>
     </resizable-panes>
 </main>
 {% endblock %}

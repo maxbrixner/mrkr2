@@ -31,6 +31,7 @@ body {
         "header"
         "main";
     grid-template-rows: auto 1fr;
+    min-height: 100vh;
 }
 
 header.labeling-header {
@@ -45,14 +46,20 @@ header.labeling-header {
 }
 
 main.labeling-main {
-    padding: 1rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
 }
 
-resizable-panes {
-    width: 80%;
-    /* Example: make the component fill 80% of the body width */
-    max-width: 1200px;
-    /* Max width for larger screens */
-    height: 400px;
-    /* Example: set a custom height */
+/* Global style to prevent text selection during drag - applied to document body */
+body.no-select {
+    user-select: none;
+    -webkit-user-select: none;
+    /* Safari */
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* IE/Edge */
+    cursor: col-resize;
+    /* Maintain resize cursor during drag */
 }
