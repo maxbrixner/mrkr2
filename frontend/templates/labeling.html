@@ -1,4 +1,10 @@
 {% extends "base.html" %}
+
+{% block scripts %}
+<script type="module" src="{{ url_for('static', path='/js/styled_link.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/styled_button.js') }}"></script>
+{% endblock %}
+
 {% block header %}
 <header class="labeling-header">
     <h1>mrkr</h1>
@@ -7,9 +13,9 @@
         &nbsp;&nbsp;/&nbsp;&nbsp;
         <styled-link href="www.google.com">{{project}}</styled-link>
         &nbsp;&nbsp;/&nbsp;&nbsp;
-        <b>Labeling</b>
+        <b>{{task}}</b>
     </span>
-    <hamburger-button aria-label="Menu"></hamburger-button>
+    <styled-button>Options</styled-button>
 </header>
 {% endblock %}
 

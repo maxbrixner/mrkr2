@@ -1,11 +1,12 @@
 {
     "compilerOptions": {
-        "outFile": "../frontend/static/components.js",
-        "target": "ES6",
-        "module": "AMD",
+        "outDir": "../frontend/static/js",
+        "target": "es6",
+        "module": "es6",
         "strict": true,
         "rootDir": "../frontend/components",
-        "sourceMap": false
+        "sourceMap": false,
+        "removeComments": true
     },
     "include": [
         "../frontend/components/**/*.ts"

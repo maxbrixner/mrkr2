@@ -31,6 +31,7 @@ async def label(
         context={
             "request": request,
             "project": "Project #1",
+            "task": "Task #1",
         }
     )
 

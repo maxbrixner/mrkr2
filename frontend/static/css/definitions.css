@@ -1,0 +1,38 @@
+:root {
+    --primary-color: #4a90e2;
+    --secondary-color: #50e3c2;
+    --background-color: #ffffff;
+    --text-color: #333333;
+    --border-color: #dcdcdc;
+    --hover-color: #e0e0e0;
+    --active-color: #c8c8c8;
+    --error-color: #ff4d4d;
+    --success-color: #4caf50;
+    --warning-color: #ff9800;
+
+    /* Font sizes */
+    --font-size-small: 12px;
+    --font-size-medium: 14px;
+    --font-size-large: 16px;
+
+    /* Spacing */
+    --spacing-small: 4px;
+    --spacing-medium: 8px;
+    --spacing-large: 16px;
+
+    --border-radius-small: 2px;
+    --border-radius-medium: 4px;
+    --border-radius-large: 8px;
+
+    --styled-link-color: var(--text-color);
+    --styled-link-hover-color: var(--primary-color);
+
+    --styled-button-background: var(--background-color);
+    --styled-button-color: var(--text-color);
+    --styled-button-border-radius: var(--border-radius-medium);
+    --styled-button-border-color: var(--border-color);
+    --styled-button-border-color-hover: var(--primary-color);
+    --styled-button-border-width: 1px;
+    --styled-button-font-weight: 600;
+    --styled-button-padding: var(--spacing-medium) var(--spacing-large);
+}
