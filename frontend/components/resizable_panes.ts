@@ -1,13 +1,13 @@
 interface ResizablePanesAttributes {
   orientation?: 'horizontal' | 'vertical';
-  minSize?: number // must be in pixels
-  startSize?: number // must be a percentage
+  minsize?: number // must be in pixels
+  startsize?: number // must be a percentage
 }
 
 class ResizablePanes extends HTMLElement implements ResizablePanesAttributes {
   public orientation: 'horizontal' | 'vertical' = 'vertical';
-  public minSize: number = 100; // Default minimum size for panes in pixels
-  public startSize: number = 50; // Default starting size for the first pane in percentage
+  public minsize: number = 100; // Default minimum size for panes in pixels
+  public startsize: number = 50; // Default starting size for the first pane in percentage
   private _container: HTMLDivElement | null = null;
   private _firstPane: HTMLDivElement | null = null;
   private _secondPane: HTMLDivElement | null = null;
@@ -20,9 +20,52 @@ class ResizablePanes extends HTMLElement implements ResizablePanesAttributes {
     this.attachShadow({ mode: 'open' });
 
     this._style = document.createElement('style');
+    this.shadowRoot?.appendChild(this._style);
+
+    this._container = document.createElement('div');
+    this._container.classList.add('container');
+    this.shadowRoot?.appendChild(this._container);
+  }
+
+  static get observedAttributes() {
+    return ['orientation', 'minsize', 'startsize'];
+  }
+
+  private _updatePanes() {
+    if (!this._container) return;
+    this._container.innerHTML = '';
+    this._container.classList.remove('horizontal', 'vertical');
+    this._container.classList.add(this.orientation);
+
+    this._firstPane = document.createElement('div');
+    this._firstPane.classList.add('pane');
+    const firstSlot = document.createElement('slot')
+    firstSlot.name = `first`;
+    this._firstPane.appendChild(firstSlot);
+    this._container.appendChild(this._firstPane);
+
+    this._handle = document.createElement('div');
+    this._handle.classList.add('handle');
+    this._handle.classList.add(this.orientation);
+    this._container.appendChild(this._handle);
+
+    this._secondPane = document.createElement('div');
+    this._secondPane.classList.add('pane');
+    const secondSlot = document.createElement('slot')
+    secondSlot.name = `second`;
+    this._secondPane.appendChild(secondSlot);
+    this._container.appendChild(this._secondPane);
+
+    if (!this._style)
+      return;
+
+    console.log(this.startsize);
+
     this._style.textContent = `
         :host {
           display: block;
+          width: 100%;
+          height: 100%;
         }
 
         .container {
@@ -34,7 +77,7 @@ class ResizablePanes extends HTMLElement implements ResizablePanesAttributes {
         }
 
         .container.horizontal {
-          grid-template-rows: ${this.startSize}% min-content 1fr;
+          grid-template-rows: ${this.startsize}% min-content 1fr;
         }
         
         .container.horizontal.no-select {
@@ -42,7 +85,7 @@ class ResizablePanes extends HTMLElement implements ResizablePanesAttributes {
         }
 
         .container.vertical {
-          grid-template-columns: ${this.startSize}% min-content 1fr;
+          grid-template-columns: ${this.startsize}% min-content 1fr;
         }
 
         .container.vertical.no-select {
@@ -50,8 +93,10 @@ class ResizablePanes extends HTMLElement implements ResizablePanesAttributes {
         }
 
         .pane {
+          display: grid;
+          grid-template-rows: 1fr;
+          grid-template-columns: 1fr;
           overflow: auto;
-          padding: 16px;
         }
 
         .handle {
@@ -88,53 +133,24 @@ class ResizablePanes extends HTMLElement implements ResizablePanesAttributes {
         }
     }
     `;
-    this.shadowRoot?.appendChild(this._style);
-
-    this._container = document.createElement('div');
-    this._container.classList.add('container');
-    this.shadowRoot?.appendChild(this._container);
-  }
-
-  static get observedAttributes() {
-    return ['orientation', 'minSize'];
-  }
-
-  private _updatePanes() {
-    if (!this._container) return;
-    this._container.innerHTML = '';
-    this._container.classList.remove('horizontal', 'vertical');
-    this._container.classList.add(this.orientation);
-
-    this._firstPane = document.createElement('div');
-    this._firstPane.classList.add('pane');
-    const firstSlot = document.createElement('slot')
-    firstSlot.name = `first`;
-    this._firstPane.appendChild(firstSlot);
-    this._container.appendChild(this._firstPane);
-
-    this._handle = document.createElement('div');
-    this._handle.classList.add('handle');
-    this._handle.classList.add(this.orientation);
-    this._container.appendChild(this._handle);
-
-    this._secondPane = document.createElement('div');
-    this._secondPane.classList.add('pane');
-    const secondSlot = document.createElement('slot')
-    secondSlot.name = `second`;
-    this._secondPane.appendChild(secondSlot);
-    this._container.appendChild(this._secondPane);
   }
 
   attributeChangedCallback(propertyName: string, oldValue: string | null, newValue: string | null) {
+    console.log(`Attribute changed: ${propertyName}, oldValue: ${oldValue}, newValue: ${newValue}`);
     if (oldValue === newValue) return;
     if (propertyName === 'orientation') {
       this.orientation = newValue as 'horizontal' | 'vertical';
     }
+    if (propertyName === 'minsize') {
+      this.minsize = parseInt(newValue || '100', 10);
+    }
+    if (propertyName === 'startsize') {
+      this.startsize = parseInt(newValue || '50', 10);
+    }
+    this._updatePanes();
   }
 
   connectedCallback() {
-    this._updatePanes();
-
     if (!(this._handle && this._container && this._firstPane && this._secondPane)) {
       console.error('ResizablePanes: Could not find all necessary elements in Shadow DOM.');
       return;
@@ -170,16 +186,16 @@ class ResizablePanes extends HTMLElement implements ResizablePanesAttributes {
       let newFirstWidth = e.clientX - this._container.offsetLeft;
       let newSecondWidth = this._container.offsetWidth - newFirstWidth - this._handle.offsetWidth;
 
-      if (newFirstWidth < this.minSize) newFirstWidth = this.minSize;
-      if (newSecondWidth < this.minSize) newFirstWidth = this._container.offsetWidth - this.minSize - this._handle.offsetWidth;
+      if (newFirstWidth < this.minsize) newFirstWidth = this.minsize;
+      if (newSecondWidth < this.minsize) newFirstWidth = this._container.offsetWidth - this.minsize - this._handle.offsetWidth;
 
       this._container.style.gridTemplateColumns = `${newFirstWidth}px min-content 1fr`;
     } else {
       let newFirstHeight = e.clientY - this._container.offsetTop;
       let newSecondHeight = this._container.offsetHeight - newFirstHeight - this._handle.offsetHeight;
 
-      if (newFirstHeight < this.minSize) newFirstHeight = this.minSize;
-      if (newSecondHeight < this.minSize) newFirstHeight = this._container.offsetHeight - this.minSize - this._handle.offsetHeight;
+      if (newFirstHeight < this.minsize) newFirstHeight = this.minsize;
+      if (newSecondHeight < this.minsize) newFirstHeight = this._container.offsetHeight - this.minsize - this._handle.offsetHeight;
 
       this._container.style.gridTemplateRows = `${newFirstHeight}px min-content 1fr`;
     }
