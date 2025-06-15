@@ -29,7 +29,8 @@ async def label(
     return templates.TemplateResponse(
         "labeling.html",
         context={
-            "request": request
+            "request": request,
+            "project": "Project #1",
         }
     )
 

@@ -1,12 +1,22 @@
 {% extends "base.html" %}
 {% block header %}
 <header class="labeling-header">
-    <h1>Mrkr</h1>
-    <span>Projects&nbsp;&nbsp;/&nbsp;&nbsp;Tasks&nbsp;&nbsp;/&nbsp;&nbsp;<b>Labeling</b></span>
-    <span>Some Buttons</spam>
+    <h1>mrkr</h1>
+    <span>
+        <styled-link href="www.google.com">Projects</styled-link>
+        &nbsp;&nbsp;/&nbsp;&nbsp;
+        <styled-link href="www.google.com">{{project}}</styled-link>
+        &nbsp;&nbsp;/&nbsp;&nbsp;
+        <b>Labeling</b>
+    </span>
+    <hamburger-button aria-label="Menu"></hamburger-button>
 </header>
 {% endblock %}
 
 {% block main %}
-<main>Hallo</main>
+<main class="labeling-main">
+    <resizable-panes>
+        Hallo
+    </resizable-panes>
+</main>
 {% endblock %}

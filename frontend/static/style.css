@@ -21,16 +21,25 @@ body {
     grid-template-rows: auto 1fr;
 }
 
-header {
-    display: grid;
-}
-
 header.labeling-header {
     align-items: center;
     display: grid;
     gap: 2rem;
     grid-template-areas:
-        "logo" "path" "options";
+        "logo path options";
     grid-template-columns: min-content 1fr min-content;
     padding: 1rem;
+}
+
+main.labeling-main {
+    padding: 1rem;
+}
+
+resizable-panes {
+    width: 80%;
+    /* Example: make the component fill 80% of the body width */
+    max-width: 1200px;
+    /* Max width for larger screens */
+    height: 400px;
+    /* Example: set a custom height */
 }
