@@ -42,6 +42,7 @@
     --resizable-pane-handle-color: var(--border-color);
     --resizable-pane-handle-size: 1px;
     --resizable-pane-handle-color-hover: var(--primary-color);
+    --resizable-pane-background-color: var(--background-color);
 
     --document-viewer-background: var(--background-color);
     --document-viewer-spinner-color: var(--primary-color);

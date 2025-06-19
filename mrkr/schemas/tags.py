@@ -13,6 +13,7 @@ class Tags(str, enum.Enum):
     v1 = "v1"
     user = "user"
     utils = "utils"
+    document = "document"
 
     gui = "gui"
     labeling = "labeling"

@@ -13,7 +13,7 @@ from mrkr.providers import LocalFileProvider
 # ---------------------------------------------------------------------------- #
 
 
-router = fastapi.APIRouter(prefix="/document", tags=[schemas.Tags.user])
+router = fastapi.APIRouter(prefix="/document", tags=[schemas.Tags.document])
 
 # ---------------------------------------------------------------------------- #
 
