@@ -7,8 +7,7 @@ from typing import Dict
 
 import mrkr.schemas as schemas
 import mrkr.crud as crud
-from mrkr.database import DatabaseDependency
-from mrkr.providers import LocalFileProvider
+import mrkr.providers as providers
 
 # ---------------------------------------------------------------------------- #
 
@@ -24,7 +23,7 @@ async def document_metadata(document_id: int) -> schemas.FileMetadataSchema:
     """
     Return the number of pages in the document.
     """
-    with LocalFileProvider("demo/document1EN.pdf") as provider:
+    with providers.LocalFileProvider("demo/document1EN.pdf") as provider:
         metadata = provider.image_metadata
 
     return metadata
@@ -41,7 +40,7 @@ async def document_content(
     """
     Return the content of a specific page in the document.
     """
-    with LocalFileProvider("demo/document1EN.pdf") as provider:
+    with providers.LocalFileProvider("demo/document1EN.pdf") as provider:
         image = provider.read_as_base64_images(page=page, format="JPEG")
 
     return schemas.PageContentSchema(
@@ -49,5 +48,24 @@ async def document_content(
         mime="image/jpeg",
         page=page
     )
+
+# ---------------------------------------------------------------------------- #
+
+
+@router.get("/document/{document_id}/ocr",
+            summary="Get Document OCR")
+async def document_ocr(
+    document_id: int,
+) -> schemas.OcrResultSchema:
+    """
+    Return the OCR text of the document.
+    """
+    with providers.LocalFileProvider("demo/document1EN.pdf") as provider:
+        image = provider.read_as_images()
+
+        with providers.TesseractOcrProvider(images=image[0]) as ocr_provider:
+            ocr = ocr_provider.ocr()
+
+    return ocr
 
 # ---------------------------------------------------------------------------- #

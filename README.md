@@ -26,6 +26,12 @@ Create an env-file:
 cp .env.example .env
 ```
 
+You also need to install tesseract and the language packs you might want to use. As an example for ArchLinux:
+
+```bash
+sudo pacman -S tesseract tesseract-data-eng
+```
+
 ### 2. Compile TypeScript Components
 
 Compile the TypeScript components for the frontend:

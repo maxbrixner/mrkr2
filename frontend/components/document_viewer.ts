@@ -56,9 +56,9 @@ class DocumentViewer extends HTMLElement implements DocumentViewerAttributes {
                 display: grid;
                 grid-template-columns: 1fr;
                 grid-auto-rows: min-content;
-                padding: 1rem;
+                padding: 2rem;
                 box-sizing: border-box;
-                gap: 1rem;
+                gap: 2rem;
             }
 
             .loading::before {

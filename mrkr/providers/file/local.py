@@ -6,7 +6,7 @@ from typing import Any, List, Self
 
 # ---------------------------------------------------------------------------- #
 
-from mrkr.providers import BaseFileProvider
+from .base import BaseFileProvider
 
 # ---------------------------------------------------------------------------- #
 

@@ -45,13 +45,13 @@ class BaseFileProvider:
         folder, it should set _is_folder to true and return self. If the path
         is neither a file nor a folder, it should raise a FileNotFoundError.
         """
-        raise NotImplementedError
+        return self
 
     def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
         """
         Implement this method to close the file stream.
         """
-        raise NotImplementedError
+        pass
 
     def read(self) -> bytes:
         """
@@ -143,7 +143,7 @@ class BaseFileProvider:
         Reads an image file and returns it as an Image object.
         """
         try:
-            image = Image.open(self.path)
+            image = Image.open(io.BytesIO(self.read()))
             return image
         except Exception as e:
             raise Exception(
