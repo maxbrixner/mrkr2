@@ -25,8 +25,8 @@
 <main class="labeling-main">
     <resizable-panes orientation="vertical" minsize="400" startsize="60">
         <div slot="first">
-            <document-viewer metadataurl="{{ url_for('document_metadata', document_id=1) }}" title="Sample Document">
-                Hallo
+            <document-viewer metadataurl="{{ url_for('document_metadata', document_id=1) }}"
+                contenturl="{{ url_for('document_content', document_id=1) }}" title="Document">
             </document-viewer>
         </div>
         <div slot="second">Hallo2</div>

@@ -2,75 +2,18 @@
 
 import io
 import pdf2image
-import pydantic
 import logging
+import base64
 from PIL import Image
 from typing import Any, List, Optional, Self
 
 # ---------------------------------------------------------------------------- #
 
+import mrkr.schemas as schemas
+
+# ---------------------------------------------------------------------------- #
+
 logger = logging.getLogger("mrkr.providers.file")
-
-# ---------------------------------------------------------------------------- #
-
-
-class PageMetadata(pydantic.BaseModel):
-    aspect_ratio: float = pydantic.Field(
-        ...,
-        description="The aspect ratio of the page (width / height).",
-        examples=[0.7066508])
-    format: Optional[str] = pydantic.Field(
-        default=None,
-        description="The format of the image.",
-        examples=["JPEG"])
-    height: int = pydantic.Field(
-        ...,
-        description="The height of the page in pixels.",
-        examples=[842])
-    mode: str = pydantic.Field(
-        ...,
-        description="The color mode of the image (e.g., RGB).",
-        examples=["RGB"])
-    page: int = pydantic.Field(
-        ...,
-        description="The page number in the document (starting from 1).",
-        examples=[1])
-    width: int = pydantic.Field(
-        ...,
-        description="The width of the page in pixels.",
-        examples=[595])
-
-# ---------------------------------------------------------------------------- #
-
-
-class FileMetadata(pydantic.BaseModel):
-    path: str = pydantic.Field(
-        ...,
-        description="The path to the file.",
-        examples=["/path/to/document.pdf"])
-    pages: List[PageMetadata] = pydantic.Field(
-        ...,
-        description="Metadata for each page in the file.",
-        examples=[
-            [
-                {
-                    "aspect_ratio": 0.7066508,
-                    "page": 1,
-                    "width": 595,
-                    "height": 842,
-                    "format": "JPEG",
-                    "mode": "RGB"
-                },
-                {
-                    "aspect_ratio": 0.7066508,
-                    "page": 2,
-                    "width": 595,
-                    "height": 842,
-                    "format": "JPEG",
-                    "mode": "RGB"
-                }
-            ]
-        ])
 
 # ---------------------------------------------------------------------------- #
 
@@ -128,20 +71,45 @@ class BaseFileProvider:
         page: Optional[int] = None
     ) -> List[Image.Image]:
         """
-        Converts the file to an image or a list of images if the file is a PDF.
-        If the file is not a PDF, it raises an exception.
+        Converts the file to an image or a list of images.
         """
         logger.debug(f"Reading file as images for: '{self.path}'")
 
         if self.path.lower().endswith('.pdf'):
-            return self._convert_pdf_to_images(page)
+            images = self._convert_pdf_to_images(page=page)
         else:
-            return [self._read_image_file()]
+            images = [self._read_image_file()]
+
+        return images
+
+    def read_as_base64_images(
+        self,
+        page: Optional[int] = None,
+        format: str = "JPEG"
+    ) -> List[str]:
+        """
+        Converts the file to an image or a list of base64 encoded images.
+        """
+        logger.debug(
+            f"Reading file as base64 encoded images for: '{self.path}'")
+
+        images = self.read_as_images(page=page)
+
+        result = []
+        for image in images:
+            bytes = io.BytesIO()
+            image.save(bytes, format=format)
+            bytes.seek(0)
+            encoded_bytes = base64.b64encode(bytes.read())
+            base64_string = encoded_bytes.decode('utf-8')
+            result.append(base64_string)
+
+        return result
 
     @property
     def image_metadata(
         self
-    ) -> FileMetadata:
+    ) -> schemas.FileMetadataSchema:
         """
         Converts the file to an image or a list of images if the file is a PDF.
         If the file is not a PDF, it raises an exception.
@@ -153,7 +121,7 @@ class BaseFileProvider:
         pages = []
         for image in images:
             pages.append(
-                PageMetadata(
+                schemas.PageMetadataSchema(
                     page=images.index(image) + 1,
                     width=image.width,
                     height=image.height,
@@ -163,7 +131,7 @@ class BaseFileProvider:
                 )
             )
 
-        return FileMetadata(
+        return schemas.FileMetadataSchema(
             path=self.path,
             pages=pages
         )

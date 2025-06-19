@@ -1,6 +1,6 @@
 # ---------------------------------------------------------------------------- #
 
-from .base import BaseFileProvider, PageMetadata, FileMetadata
+from .base import BaseFileProvider
 from .file.local import LocalFileProvider
 
 # ---------------------------------------------------------------------------- #

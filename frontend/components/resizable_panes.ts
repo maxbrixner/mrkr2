@@ -95,6 +95,7 @@ class ResizablePanes extends HTMLElement implements ResizablePanesAttributes {
           grid-template-rows: 1fr;
           grid-template-columns: 1fr;
           overflow: auto;
+          scrollbar-gutter: stable;
         }
 
         .handle {
