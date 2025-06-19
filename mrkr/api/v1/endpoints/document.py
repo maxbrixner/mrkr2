@@ -61,9 +61,9 @@ async def document_ocr(
     Return the OCR text of the document.
     """
     with providers.LocalFileProvider("demo/document1EN.pdf") as provider:
-        image = provider.read_as_images()
+        images = provider.read_as_images()
 
-        with providers.TesseractOcrProvider(images=image[0]) as ocr_provider:
+        with providers.TesseractOcrProvider(images=images) as ocr_provider:
             ocr = ocr_provider.ocr()
 
     return ocr

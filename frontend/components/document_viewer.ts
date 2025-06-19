@@ -1,6 +1,7 @@
 interface DocumentViewerAttributes {
-    metadataurl: string;
-    contenturl: string;
+    metadataUrl: string;
+    contentUrl: string;
+    ocrUrl: string;
 }
 
 interface PageMetadataResponse {
@@ -23,13 +24,36 @@ interface PageContentResponse {
     mime: string;
 }
 
+interface OcrRelationshipResponse {
+    type: string,
+    id: string
+}
+
+interface OcrBlockResponse {
+    id: string,
+    type: string,
+    left: number,
+    top: number,
+    width: number,
+    height: number,
+    page: number,
+    confidence: number,
+    content: string,
+    relationships: OcrRelationshipResponse[]
+}
+
+interface OcrResponse {
+    blocks: OcrBlockResponse[];
+}
+
 function delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 class DocumentViewer extends HTMLElement implements DocumentViewerAttributes {
-    public metadataurl: string = '';
-    public contenturl: string = '';
+    public metadataUrl: string = '';
+    public contentUrl: string = '';
+    public ocrUrl: string = '';
     private _style: HTMLStyleElement | null = null;
     private _viewerElement: HTMLDivElement | null = null;
     private _metadata: FileMetadataResponse | null = null;
@@ -93,7 +117,7 @@ class DocumentViewer extends HTMLElement implements DocumentViewerAttributes {
     }
 
     static get observedAttributes() {
-        return ['metadataurl', 'contenturl'];
+        return ['metadata-url', 'content-url', 'ocr-url'];
     }
 
 
@@ -113,11 +137,12 @@ class DocumentViewer extends HTMLElement implements DocumentViewerAttributes {
 
     attributeChangedCallback(propertyName: string, oldValue: string | null, newValue: string | null) {
         if (oldValue === newValue) return;
-        if (propertyName === 'metadataurl')
-            this.metadataurl = newValue || '';
-        if (propertyName === 'contenturl')
-            this.contenturl = newValue || '';
-
+        if (propertyName === 'metadata-url')
+            this.metadataUrl = newValue || '';
+        if (propertyName === 'content-url')
+            this.contentUrl = newValue || '';
+        if (propertyName === 'ocr-url')
+            this.ocrUrl = newValue || '';
 
     }
 
@@ -161,16 +186,19 @@ class DocumentViewer extends HTMLElement implements DocumentViewerAttributes {
             }).catch(error => {
                 console.error(`Error fetching content for page ${page.page}:`, error);
             });
-
-
         }
 
+        this._query_ocr().then(ocr => {
+            console.log('OCR fetched successfully:', ocr);
+        }).catch(error => {
+            console.error('Error fetching OCR:', error);
+        });
 
     }
 
     private async _query_metadata(): Promise<FileMetadataResponse | null> {
         const [response] = await Promise.all([
-            fetch(this.metadataurl),
+            fetch(this.metadataUrl),
             delay(0)
         ]);
         if (!response.ok) {
@@ -190,7 +218,7 @@ class DocumentViewer extends HTMLElement implements DocumentViewerAttributes {
 
     private async _query_page(page: number): Promise<PageContentResponse | null> {
         const [response] = await Promise.all([
-            fetch(`${this.contenturl}/?page=${page}`),
+            fetch(`${this.contentUrl}/?page=${page}`),
             delay(0)
         ]);
         if (!response.ok) {
@@ -201,6 +229,24 @@ class DocumentViewer extends HTMLElement implements DocumentViewerAttributes {
 
         if (!content) {
             throw new Error(`Failed to fetch page ${page} content`);
+        }
+
+        return content;
+    }
+
+    private async _query_ocr(): Promise<OcrResponse | null> {
+        const [response] = await Promise.all([
+            fetch(this.ocrUrl),
+            delay(0)
+        ]);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+
+        const content: OcrResponse | null = await response.json();
+
+        if (!content) {
+            throw new Error(`Failed to fetch OCR content`);
         }
 
         return content;

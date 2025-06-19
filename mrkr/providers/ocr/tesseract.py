@@ -74,7 +74,11 @@ class TesseractOcrProvider(BaseOcrProvider):
         blocks = []
         for page, image in enumerate(self._images):
             ocr = self._ocr_image(page=page+1)
-            blocks += self._convert_result(result=ocr, dimensions=image.size)
+            blocks += self._convert_result(
+                result=ocr,
+                dimensions=image.size,
+                page=page + 1
+            )
 
         return schemas.OcrResultSchema(blocks=blocks)
 
@@ -160,7 +164,8 @@ class TesseractOcrProvider(BaseOcrProvider):
     def _convert_result(
         self,
         result: TesseractResult,
-        dimensions: tuple[int, int]
+        dimensions: tuple[int, int],
+        page: int
     ) -> List[schemas.OcrBlockSchema]:
         """
         Convert the Tesseract OCR result to the target schema.
@@ -192,6 +197,7 @@ class TesseractOcrProvider(BaseOcrProvider):
             block = schemas.OcrBlockSchema(
                 id=block_map[id],
                 type=type_map[result.level[i]],
+                page=page,
                 left=round(result.left[i] / dimensions[0], 5),
                 top=round(result.top[i] / dimensions[1], 5),
                 width=round(result.width[i] / dimensions[0], 5),

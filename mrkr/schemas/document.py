@@ -161,6 +161,12 @@ class OcrBlockSchema(pydantic.BaseModel):
                     "normalized to [0, 1].",
         examples=[0.2]
     )
+    page: int = pydantic.Field(
+        ...,
+        description="The page number where the block is located "
+                    "(starting from 1).",
+        examples=[1]
+    )
     confidence: Optional[float] = pydantic.Field(
         None,
         description="The confidence score of the OCR block as a percentage",
