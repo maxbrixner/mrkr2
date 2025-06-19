@@ -1,7 +1,6 @@
 # ---------------------------------------------------------------------------- #
 
-from .user import router as user_router
-from .utils import router as utils_router
-from .document import router as document_router
+from .base import BaseFileProvider, PageMetadata, FileMetadata
+from .file.local import LocalFileProvider
 
 # ---------------------------------------------------------------------------- #

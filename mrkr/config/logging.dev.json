@@ -5,7 +5,11 @@
         "simple": {
             "format": "%(levelname)-8s %(message)s"
         },
-        "detailed": {
+        "detailed_console": {
+            "format": "\u001B[35m[APP | %(levelname)-8s | %(name)-30s]\u001B[0m %(message)s",
+            "datefmt": "%Y-%m-%dT%H:%M:%S%z"
+        },
+        "detailed_file": {
             "format": "[APP | %(levelname)-8s | %(name)-30s] %(message)s",
             "datefmt": "%Y-%m-%dT%H:%M:%S%z"
         }
@@ -13,7 +17,7 @@
     "handlers": {
         "stdout": {
             "class": "logging.StreamHandler",
-            "formatter": "detailed",
+            "formatter": "detailed_console",
             "stream": "ext://sys.stdout"
         }
     },
