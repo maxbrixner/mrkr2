@@ -59,8 +59,6 @@ class ResizablePanes extends HTMLElement implements ResizablePanesAttributes {
     if (!this._style)
       return;
 
-    console.log(this.startsize);
-
     this._style.textContent = `
         :host {
           display: block;
@@ -100,43 +98,37 @@ class ResizablePanes extends HTMLElement implements ResizablePanesAttributes {
         }
 
         .handle {
-          background-color: var(--border-color);
+          background-color: var(--resizable-pane-handle-color, #000000);
           cursor: col-resize;
           transition: background-color 0.2s ease, box-shadow 0.2s ease;
         }
 
         .handle.vertical {
-          width: 1px;
+          width: var(--resizable-pane-handle-size, 1px);
           cursor: col-resize;
         }
 
         .handle.horizontal {
-          height: 1px;
+          height: var(--resizable-pane-handle-size, 1px);
           cursor: row-resize;
         }
 
         .handle:hover,
         .handle:active {
-          background-color: #000000; /* Darker gray on hover/active */
-          border-top: 1px solid #000000;
-          border-bottom: 1px solid #000000;
+          background-color: var(--resizable-pane-handle-color-hover, #000000);
         }
 
         .no-select {
             user-select: none;
             -webkit-user-select: none;
-            /* Safari */
             -moz-user-select: none;
-            /* Firefox */
             -ms-user-select: none;
-            /* IE/Edge */
         }
     }
     `;
   }
 
   attributeChangedCallback(propertyName: string, oldValue: string | null, newValue: string | null) {
-    console.log(`Attribute changed: ${propertyName}, oldValue: ${oldValue}, newValue: ${newValue}`);
     if (oldValue === newValue) return;
     if (propertyName === 'orientation') {
       this.orientation = newValue as 'horizontal' | 'vertical';
@@ -152,7 +144,6 @@ class ResizablePanes extends HTMLElement implements ResizablePanesAttributes {
 
   connectedCallback() {
     if (!(this._handle && this._container && this._firstPane && this._secondPane)) {
-      console.error('ResizablePanes: Could not find all necessary elements in Shadow DOM.');
       return;
     }
 

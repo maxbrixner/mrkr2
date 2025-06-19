@@ -4,6 +4,7 @@
 <script type="module" src="{{ url_for('static', path='/js/styled_link.js') }}"></script>
 <script type="module" src="{{ url_for('static', path='/js/styled_button.js') }}"></script>
 <script type="module" src="{{ url_for('static', path='/js/resizable_panes.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/document_viewer.js') }}"></script>
 {% endblock %}
 
 {% block header %}
@@ -22,9 +23,11 @@
 
 {% block main %}
 <main class="labeling-main">
-    <resizable-panes orientation="vertical" minsize="100" startsize="60">
+    <resizable-panes orientation="vertical" minsize="400" startsize="60">
         <div slot="first">
-            Hallo1
+            <document-viewer metadataurl="{{ url_for('document_metadata', document_id=1) }}" title="Sample Document">
+                Hallo
+            </document-viewer>
         </div>
         <div slot="second">Hallo2</div>
     </resizable-panes>

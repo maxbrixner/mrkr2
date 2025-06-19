@@ -14,7 +14,9 @@ h1 {
     font-weight: 600;
 }
 
-html {
+html,
+body {
+    height: 100%;
     padding: 0;
     margin: 0;
 }
@@ -32,6 +34,23 @@ body {
         "main";
     grid-template-rows: auto 1fr;
     min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
+}
+
+header {
+    grid-area: header;
+    position: sticky;
+    background-color: var(--surface-color);
+    top: 0;
+    min-width: var(--min-layout-width);
+}
+
+main {
+    grid-area: main;
+    min-width: var(--min-layout-width);
+    overflow: auto;
+    height: 100%;
 }
 
 header.labeling-header {
@@ -48,5 +67,5 @@ header.labeling-header {
 main.labeling-main {
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr;
+    grid-template-rows: 100%;
 }
