@@ -18,7 +18,7 @@ router = fastapi.APIRouter(prefix="/project", tags=[schemas.Tags.project])
 
 
 @router.post("/create", summary="Create Project")
-async def user_create(
+async def project_create(
     project: schemas.ProjectCreateSchema,
     session: DatabaseDependency
 ) -> Dict:

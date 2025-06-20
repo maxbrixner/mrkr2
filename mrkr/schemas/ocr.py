@@ -3,7 +3,7 @@
 import pydantic
 import enum
 import uuid
-from typing import List, Optional
+from typing import Any, List, Optional
 
 # ---------------------------------------------------------------------------- #
 
@@ -43,6 +43,10 @@ class OcrRelationshipSchema(pydantic.BaseModel):
         description="The ID of the related OCR block (as a UUID4).",
         examples=["123e4567-e89b-12d3-a456-426614174000"]
     )
+
+    @pydantic.field_serializer('id', when_used='always')
+    def serialize_uuid(self, value: uuid.UUID, _info: Any) -> str:
+        return str(value)
 
 # ---------------------------------------------------------------------------- #
 
@@ -109,6 +113,10 @@ class OcrBlockSchema(pydantic.BaseModel):
         ]
     )
 
+    @pydantic.field_serializer('id', when_used='always')
+    def serialize_uuid(self, value: uuid.UUID, _info: Any) -> str:
+        return str(value)
+
 # ---------------------------------------------------------------------------- #
 
 
@@ -135,5 +143,9 @@ class OcrResultSchema(pydantic.BaseModel):
             }]
         ]
     )
+
+    @pydantic.field_serializer('id', when_used='always')
+    def serialize_uuid(self, value: uuid.UUID, _info: Any) -> str:
+        return str(value)
 
 # ---------------------------------------------------------------------------- #

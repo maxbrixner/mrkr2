@@ -15,6 +15,7 @@ class Tags(str, enum.Enum):
     utils = "utils"
     document = "document"
     project = "project"
+    ocr = "ocr"
 
     gui = "gui"
     labeling = "labeling"

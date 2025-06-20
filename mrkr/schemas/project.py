@@ -24,7 +24,7 @@ class FileProviderLocalConfig(pydantic.BaseModel):
     folder: str = pydantic.Field(
         ...,
         description="The local folder where files are stored.",
-        examples=["/path/to/local/folder"]
+        examples=["/demo"]
     )
 
 # ---------------------------------------------------------------------------- #
@@ -67,9 +67,8 @@ class FileProviderS3Config(pydantic.BaseModel):
     suffix: str = pydantic.Field(
         ...,
         description="The suffix for the S3 bucket.",
-        examples=["/path/to/s3/folder"]
+        examples=["/demo"]
     )
-
 
 # ---------------------------------------------------------------------------- #
 
@@ -86,7 +85,7 @@ class ProjectFileProviderSchema(pydantic.BaseModel):
     config: FileProviderLocalConfig | FileProviderS3Config = pydantic.Field(
         ...,
         description="Configuration for the file provider.",
-        examples=[{"folder": "/path/to/local/folder"}]
+        examples=[{"folder": "/demo"}]
     )
 
 # ---------------------------------------------------------------------------- #
@@ -111,7 +110,6 @@ class OcrProviderTesseractConfig(pydantic.BaseModel):
         description="The language to use for OCR processing.",
         examples=["eng", "deu"]
     )
-
 
 # ---------------------------------------------------------------------------- #
 
@@ -180,7 +178,7 @@ class ProjectSchema(pydantic.BaseModel):
                 "type": "local",
                 "config": {
                     "alias": "local_provider",
-                    "folder": "/path/to/local/folder"
+                    "folder": "/demo"
                 }
             }
         ]
@@ -197,7 +195,6 @@ class ProjectSchema(pydantic.BaseModel):
             }
         ]
     )
-
 
 # ---------------------------------------------------------------------------- #
 
@@ -220,7 +217,7 @@ class ProjectCreateSchema(pydantic.BaseModel):
                     "type": "local",
                     "config": {
                         "alias": "local_provider",
-                        "folder": "/path/to/local/folder"
+                        "folder": "/demo"
                     }
             },
             "ocr_provider": {
@@ -231,6 +228,5 @@ class ProjectCreateSchema(pydantic.BaseModel):
             }
         }]
     )
-
 
 # ---------------------------------------------------------------------------- #

@@ -45,11 +45,6 @@ async def document_content(
     async with providers.LocalFileProvider("demo/document1EN.pdf") as provider:
         image = await provider.read_as_base64_images(page=page, format="JPEG")
 
-    # todo: remove this artificial delay
-    if page == 2:
-        import asyncio
-        await asyncio.sleep(3)
-
     return schemas.PageContentSchema(
         content=image[0],
         mime="image/jpeg",
@@ -59,22 +54,16 @@ async def document_content(
 # ---------------------------------------------------------------------------- #
 
 
-@router.get("/document/{document_id}/ocr",
-            summary="Get Document OCR")
-async def document_ocr(
-    document_id: int,
+@router.post("/document",
+             summary="Create Document")
+async def document_create(
+    document: schemas.DocumentCreateSchema,
     session: DatabaseDependency
-) -> schemas.OcrResultSchema:
+) -> Dict:
     """
-    Return the OCR text of the document.
+    Create a new document.
     """
-    async with providers.LocalFileProvider("demo/document1EN.pdf") as provider:
-        images = await provider.read_as_images()
-
-        async with providers.TesseractOcrProvider(
-                images=images) as ocr_provider:
-            ocr = await ocr_provider.ocr()
-
-    return ocr
+    crud.create_document(session=session, document=document)
+    return {"message": f"Document '{document.path}' created successfully."}
 
 # ---------------------------------------------------------------------------- #

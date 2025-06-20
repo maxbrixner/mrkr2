@@ -2,14 +2,16 @@
 
 import sqlmodel
 import datetime
-from sqlalchemy.dialects.postgresql import JSON
-from sqlalchemy import Column
 
 # ---------------------------------------------------------------------------- #
 
 
 class Document(sqlmodel.SQLModel, table=True):
     id: int = sqlmodel.Field(primary_key=True)
+    project_id: int = sqlmodel.Field(
+        foreign_key="project.id",
+        description="The ID of the project this document belongs to."
+    )
     path: str = sqlmodel.Field(
         description="The path to the document file."
     )

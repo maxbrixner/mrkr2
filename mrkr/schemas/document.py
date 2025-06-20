@@ -83,3 +83,21 @@ class PageContentSchema(pydantic.BaseModel):
 
 
 # ---------------------------------------------------------------------------- #
+
+
+class DocumentCreateSchema(pydantic.BaseModel):
+    """
+    Schema for creating a new document.
+    """
+    project_id: int = pydantic.Field(
+        ...,
+        description="The ID of the project this document belongs to.",
+        examples=[1]
+    )
+    path: str = pydantic.Field(
+        ...,
+        description="The path to the document file.",
+        examples=["/demo/document1EN.pdf"]
+    )
+
+# ---------------------------------------------------------------------------- #

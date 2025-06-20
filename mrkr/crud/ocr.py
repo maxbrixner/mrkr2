@@ -10,33 +10,34 @@ import mrkr.schemas as schemas
 # ---------------------------------------------------------------------------- #
 
 
-def create_project(
+def create_ocr(
     session: sqlmodel.Session,
-    project: schemas.ProjectCreateSchema
-) -> models.Project:
+    document: models.Document,
+    ocr: schemas.OcrResultSchema
+) -> models.Ocr:
     """
-    Create a new user in the database.
+    Write the OCR result to the database.
     """
-    database_project = models.Project(
-        name=project.name,
-        config=project.config.model_dump(),
+    database_ocr = models.Ocr(
+        document_id=document.id,
+        result=ocr.model_dump(),
     )
 
-    session.add(database_project)
+    session.add(database_ocr)
     session.commit()
-    session.refresh(database_project)
-    return database_project
+    session.refresh(database_ocr)
+    return database_ocr
 
 # ---------------------------------------------------------------------------- #
 
 
-def get_project(
+def get_ocr(
     session: sqlmodel.Session,
     id: int
-) -> models.Project | None:
+) -> models.Ocr | None:
     """
-    Retrieve a project from the database by its ID.
+    Retrieve an OCR result from the database by its ID.
     """
-    return session.get(models.Project, id)
+    return session.get(models.Ocr, id)
 
 # ---------------------------------------------------------------------------- #
