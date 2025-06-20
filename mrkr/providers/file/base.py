@@ -9,7 +9,6 @@ import functools
 from PIL import Image
 from typing import Any, List, Optional, Self
 
-# ---------------------------------------------------------------------------- #
 
 import mrkr.schemas as schemas
 
@@ -25,17 +24,27 @@ class BaseFileProvider:
     A provider that handles file operations.
     """
     path: str
-    _pdf_dpi: int
+    _config: schemas.FileProviderConfig
     _stream: io.BufferedReader | None
     _is_file: bool
     _is_folder: bool
 
-    def __init__(self, path: str, pdf_dpi: int = 200):
-        self.path = path
-        self._pdf_dpi = pdf_dpi
+    def __init__(self, config: schemas.FileProviderConfig) -> None:
+        """
+        Initializes the BaseFileProvider with a file path and optional PDF DPI.
+        """
+        self.path = ''
         self._stream = None
         self._is_file = False
         self._is_folder = False
+        self._config = config
+
+    def __call__(self, path: str) -> Self:
+        """
+        Sets the file path for the provider.
+        """
+        self.path = path
+        return self
 
     async def __aenter__(
         self
@@ -200,7 +209,7 @@ class BaseFileProvider:
                     functools.partial(
                         pdf2image.convert_from_bytes,
                         bytes,
-                        dpi=self._pdf_dpi
+                        dpi=self._config.pdf_dpi
                     )
                 )
                 return images
@@ -210,7 +219,7 @@ class BaseFileProvider:
                     functools.partial(
                         pdf2image.convert_from_bytes,
                         bytes,
-                        dpi=self._pdf_dpi,
+                        dpi=self._config.pdf_dpi,
                         first_page=page,
                         last_page=page
                     )

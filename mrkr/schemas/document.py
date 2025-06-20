@@ -62,7 +62,7 @@ class DocumentMetadataSchema(pydantic.BaseModel):
     path: str = pydantic.Field(
         ...,
         description="The path to the file.",
-        examples=["/path/to/document.pdf"])
+        examples=["document1EN.pdf"])
 
 # ---------------------------------------------------------------------------- #
 
@@ -97,7 +97,7 @@ class DocumentCreateSchema(pydantic.BaseModel):
     path: str = pydantic.Field(
         ...,
         description="The path to the document file.",
-        examples=["/demo/document1EN.pdf"]
+        examples=["document1EN.pdf"]
     )
 
 # ---------------------------------------------------------------------------- #

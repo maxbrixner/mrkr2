@@ -17,20 +17,33 @@ class FileProviderType(str, enum.Enum):
 # ---------------------------------------------------------------------------- #
 
 
-class FileProviderLocalConfig(pydantic.BaseModel):
+class FileProviderConfig(pydantic.BaseModel):
+    """
+    Base configuration for a file provider.
+    """
+    pdf_dpi: int = pydantic.Field(
+        default=200,
+        description="The DPI (dots per inch) for the conversion of PDF files.",
+        examples=[200]
+    )
+
+# ---------------------------------------------------------------------------- #
+
+
+class FileProviderLocalConfig(FileProviderConfig):
     """
     Configuration for a local file provider.
     """
     folder: str = pydantic.Field(
         ...,
         description="The local folder where files are stored.",
-        examples=["/demo"]
+        examples=["demo"]
     )
 
 # ---------------------------------------------------------------------------- #
 
 
-class FileProviderS3Config(pydantic.BaseModel):
+class FileProviderS3Config(FileProviderConfig):
     """
     Configuration for an AWS S3 file provider.
     """
@@ -67,7 +80,7 @@ class FileProviderS3Config(pydantic.BaseModel):
     suffix: str = pydantic.Field(
         ...,
         description="The suffix for the S3 bucket.",
-        examples=["/demo"]
+        examples=["demo"]
     )
 
 # ---------------------------------------------------------------------------- #
@@ -85,7 +98,7 @@ class ProjectFileProviderSchema(pydantic.BaseModel):
     config: FileProviderLocalConfig | FileProviderS3Config = pydantic.Field(
         ...,
         description="Configuration for the file provider.",
-        examples=[{"folder": "/demo"}]
+        examples=[{"folder": "demo", "pdf_dpi": 200}]
     )
 
 # ---------------------------------------------------------------------------- #
@@ -101,7 +114,16 @@ class OcrProviderType(str, enum.Enum):
 # ---------------------------------------------------------------------------- #
 
 
-class OcrProviderTesseractConfig(pydantic.BaseModel):
+class OcrProviderConfig(pydantic.BaseModel):
+    """
+    Base configuration for an OCR provider.
+    """
+    pass
+
+# ---------------------------------------------------------------------------- #
+
+
+class OcrProviderTesseractConfig(OcrProviderConfig):
     """
     Configuration for the Google Tesseract OCR provider.
     """
@@ -114,7 +136,7 @@ class OcrProviderTesseractConfig(pydantic.BaseModel):
 # ---------------------------------------------------------------------------- #
 
 
-class OcrProviderTextractConfig(pydantic.BaseModel):
+class OcrProviderTextractConfig(OcrProviderConfig):
     """
     Configuration for the AWS Textract OCR provider.
     """
@@ -177,8 +199,8 @@ class ProjectSchema(pydantic.BaseModel):
             {
                 "type": "local",
                 "config": {
-                    "alias": "local_provider",
-                    "folder": "/demo"
+                    "folder": "demo",
+                    "pdf_dpi": 200
                 }
             }
         ]
@@ -216,8 +238,8 @@ class ProjectCreateSchema(pydantic.BaseModel):
             "file_provider": {
                     "type": "local",
                     "config": {
-                        "alias": "local_provider",
-                        "folder": "/demo"
+                        "folder": "demo",
+                        "pdf_dpi": 200
                     }
             },
             "ocr_provider": {

@@ -27,26 +27,40 @@ async def ocr(
     """
     Return the OCR text of the document.
     """
-    # async with providers.LocalFileProvider("demo/document1EN.pdf") as provider:
-    #    images = await provider.read_as_images()#
-    #
-    #    async with providers.TesseractOcrProvider(
-    #            images=images) as ocr_provider:
-    #        ocr = await ocr_provider.ocr()
 
-    # document = crud.get_document(session, 2)
+    """
+    document = crud.get_document(session, 1)
 
-    # if not document:
-    #    raise fastapi.HTTPException(
-    #        status_code=fastapi.status.HTTP_404_NOT_FOUND,
-    #        detail="Document not found"
-    #    )
+    if not document:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="Document not found"
+        )
 
-    # crud.create_ocr(
-    #    session=session,
-    #    document=document,
-    #    ocr=ocr
-    # )
+    file_provider = providers.get_file_provider(
+        project_config=document.project.config)
+
+    ocr_provider = providers.get_ocr_provider(
+        project_config=document.project.config)
+
+    async with file_provider(document.path) as provider:
+        images = await provider.read_as_images()
+
+        async with ocr_provider(images=images) as ocr_provider:
+            ocr = await ocr_provider.ocr()
+
+    if not document:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="Document not found"
+        )
+
+    crud.create_ocr(
+        session=session,
+        document=document,
+        ocr=ocr
+    )
+    """
 
     ocr = crud.get_ocr(session, ocr_id)
 

@@ -46,9 +46,11 @@ class TesseractOcrProvider(BaseOcrProvider):
 
     _type_map: dict[int, schemas.OcrBlockType]
 
-    def __init__(self, images: Image.Image | List[Image.Image]):
-        super().__init__(images=images)
-
+    def __init__(self, config: schemas.OcrProviderTesseractConfig) -> None:
+        """
+        Initializes the TesseractOcrProvider with a configuration.
+        """
+        super().__init__(config=config)
         self._type_map = {
             1: schemas.OcrBlockType.page,
             2: schemas.OcrBlockType.block,

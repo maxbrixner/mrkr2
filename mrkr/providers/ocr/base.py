@@ -19,13 +19,23 @@ class BaseOcrProvider:
     """
     A provider that handles OCR operations on files.
     """
+    _config: schemas.OcrProviderConfig
     _images: List[Image.Image]
 
-    def __init__(self, images: Image.Image | List[Image.Image]):
+    def __init__(self, config: schemas.OcrProviderConfig) -> None:
+        """
+        Initializes the BaseOcrProvider with a configuration.
+        """
+        self._images = []
+        self._config = config
+
+    def __call__(self, images: Image.Image | List[Image.Image]) -> Self:
         if isinstance(images, Image.Image):
             self._images = [images]
         else:
             self._images = images
+
+        return self
 
     async def __aenter__(self) -> Self:
         """
