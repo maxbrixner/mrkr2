@@ -98,7 +98,7 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
             }
 
             .highlight:hover {
-                background-color: rgba(255, 255, 0, 0.2);
+                outline: 3px solid var(--document-viewer-block-hover-color);  
             }
 
             .highlight.pulsing {
@@ -116,7 +116,7 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
                 }
 
                 50% {
-                    outline: 5px solid var(--document-viewer-pulse-color);               
+                    outline: 3px solid var(--document-viewer-pulse-color);               
                 }
 
                 100% {

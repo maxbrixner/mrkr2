@@ -25,7 +25,7 @@
 
 {% block main %}
 <main class="labeling-main">
-    <resizable-panes orientation="vertical" minsize="400" startsize="60">
+    <resizable-panes orientation="vertical" minsize="400" startsize="50">
         <div slot="first">
             <document-viewer metadata-url="{{ url_for('document_metadata', document_id=1) }}"
                 content-url="{{ url_for('document_content', document_id=1) }}" title=" Document">

@@ -90,7 +90,7 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
                 }
 
                 50% {
-                    outline: 5px solid var(--label-viewer-pulse-color);               
+                    outline: 3px solid var(--label-viewer-pulse-color);               
                 }
 
                 100% {
