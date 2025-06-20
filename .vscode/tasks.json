@@ -14,6 +14,33 @@
             "command": ".venv/bin/python -m unittest discover --failfast --verbose --start-directory ./test --pattern *_test.py",
             "problemMatcher": [],
             "group": "test",
-        }
+        },
+        {
+            "type": "shell",
+            "label": "build dev database",
+            "command": "docker compose -f .deploy/docker.dev.yaml --env-file .env build",
+            "problemMatcher": [],
+            "group": "test",
+        },
+        {
+            "type": "shell",
+            "label": "run dev database",
+            "dependsOn": [
+                "build database"
+            ],
+            "command": "docker compose -f .deploy/docker.dev.yaml --env-file .env up -d",
+            "problemMatcher": [],
+            "group": "test",
+        },
+        {
+            "type": "shell",
+            "label": "stop dev database",
+            "dependsOn": [
+                "start database"
+            ],
+            "command": "docker compose -f .deploy/docker.dev.yaml --env-file .env down",
+            "problemMatcher": [],
+            "group": "test",
+        },
     ]
 }
