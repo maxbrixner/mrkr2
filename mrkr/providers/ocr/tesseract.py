@@ -4,6 +4,8 @@ import logging
 import pytesseract
 import pydantic
 import uuid
+import asyncio
+import functools
 from typing import Any, List, Optional, Self
 from PIL import Image
 
@@ -55,25 +57,30 @@ class TesseractOcrProvider(BaseOcrProvider):
             5: schemas.OcrBlockType.word
         }
 
-    def __enter__(self) -> Self:
+    async def __aenter__(self) -> Self:
         """
         Implement this method to initialize the OCR provider.
         """
         return self
 
-    def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
+    async def __aexit__(
+        self,
+        exc_type: Any,
+        exc_value: Any,
+        traceback: Any
+    ) -> None:
         """
         Implement this method to clean up resources used by the OCR provider.
         """
         pass
 
-    def ocr(self) -> schemas.OcrResultSchema:
+    async def ocr(self) -> schemas.OcrResultSchema:
         """
         Implement this method to perform OCR on the file and return the result.
         """
         blocks = []
         for page, image in enumerate(self._images):
-            ocr = self._ocr_image(page=page+1)
+            ocr = await self._ocr_image(page=page+1)
             blocks += self._convert_result(
                 result=ocr,
                 dimensions=image.size,
@@ -82,7 +89,7 @@ class TesseractOcrProvider(BaseOcrProvider):
 
         return schemas.OcrResultSchema(blocks=blocks)
 
-    def _ocr_image(self, page: int) -> TesseractResult:
+    async def _ocr_image(self, page: int) -> TesseractResult:
         """
         Perform OCR on a single image and return the result.
         """
@@ -91,10 +98,16 @@ class TesseractOcrProvider(BaseOcrProvider):
 
         logger.debug(f"Performing OCR on page {page}.")
 
-        output = pytesseract.image_to_data(
-            image=self._images[page-1],
-            output_type=pytesseract.Output.DICT,
-            config="--psm 1"
+        loop = asyncio.get_event_loop()
+
+        output = await loop.run_in_executor(
+            None,
+            functools.partial(
+                pytesseract.image_to_data,
+                image=self._images[page-1],
+                output_type=pytesseract.Output.DICT,
+                config="--psm 1"
+            )
         )
 
         result = TesseractResult(**output)

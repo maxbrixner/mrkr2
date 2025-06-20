@@ -1,6 +1,7 @@
 # ---------------------------------------------------------------------------- #
 
 import fastapi
+import asyncio
 from typing import Dict
 
 # ---------------------------------------------------------------------------- #
@@ -23,8 +24,8 @@ async def document_metadata(document_id: int) -> schemas.FileMetadataSchema:
     """
     Return the number of pages in the document.
     """
-    with providers.LocalFileProvider("demo/document1EN.pdf") as provider:
-        metadata = provider.image_metadata
+    async with providers.LocalFileProvider("demo/document1EN.pdf") as provider:
+        metadata = await provider.image_metadata
 
     return metadata
 
@@ -40,8 +41,8 @@ async def document_content(
     """
     Return the content of a specific page in the document.
     """
-    with providers.LocalFileProvider("demo/document1EN.pdf") as provider:
-        image = provider.read_as_base64_images(page=page, format="JPEG")
+    async with providers.LocalFileProvider("demo/document1EN.pdf") as provider:
+        image = await provider.read_as_base64_images(page=page, format="JPEG")
 
     # todo: remove this artificial delay
     if page == 2:
@@ -65,11 +66,12 @@ async def document_ocr(
     """
     Return the OCR text of the document.
     """
-    with providers.LocalFileProvider("demo/document1EN.pdf") as provider:
-        images = provider.read_as_images()
+    async with providers.LocalFileProvider("demo/document1EN.pdf") as provider:
+        images = await provider.read_as_images()
 
-        with providers.TesseractOcrProvider(images=images) as ocr_provider:
-            ocr = ocr_provider.ocr()
+        async with providers.TesseractOcrProvider(
+                images=images) as ocr_provider:
+            ocr = await ocr_provider.ocr()
 
     return ocr
 

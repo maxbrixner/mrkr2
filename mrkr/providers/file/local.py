@@ -2,6 +2,7 @@
 
 import pathlib
 import logging
+import asyncio
 from typing import Any, List, Self
 
 # ---------------------------------------------------------------------------- #
@@ -23,7 +24,7 @@ class LocalFileProvider(BaseFileProvider):
     def __init__(self, path: str):
         super().__init__(path)
 
-    def __enter__(self) -> Self:
+    async def __aenter__(self) -> Self:
         """
         Reads the file and returns a binary file stream if the path is a file,
         or sets _is_folder to true if the path is a folder.
@@ -43,14 +44,19 @@ class LocalFileProvider(BaseFileProvider):
 
         raise FileNotFoundError(f"Path {filename} not found.")
 
-    def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
+    async def __aexit__(
+        self,
+        exc_type: Any,
+        exc_value: Any,
+        traceback: Any
+    ) -> None:
         """
         Closes the file stream.
         """
         if self._stream:
             self._stream.close()
 
-    def read(self) -> bytes:
+    async def read(self) -> bytes:
         """
         Reads the file and returns its content as bytes.
         """
@@ -65,12 +71,16 @@ class LocalFileProvider(BaseFileProvider):
                 "the file."
             )
 
-        return self._stream.read()
+        loop = asyncio.get_event_loop()
+        content = await loop.run_in_executor(None, self._stream.read)
 
-    def list(self) -> List[str]:
+        return content
+
+    async def list(self) -> List[str]:
         """
         Lists the contents of the directory if the path is a folder.
         """
+        # todo: make this asnyc
         logger.debug(f"Listing files for path: '{self.path}'")
 
         if not self._is_folder:

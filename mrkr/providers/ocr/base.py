@@ -27,20 +27,25 @@ class BaseOcrProvider:
         else:
             self._images = images
 
-    def __enter__(self) -> Self:
+    async def __aenter__(self) -> Self:
         """
         Implement this method to initialize the OCR provider. Should return
         self.
         """
         return self
 
-    def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
+    async def __aexit__(
+        self,
+        exc_type: Any,
+        exc_value: Any,
+        traceback: Any
+    ) -> None:
         """
         Implement this method to clean up resources used by the OCR provider.
         """
         pass
 
-    def ocr(self) -> schemas.OcrResultSchema:
+    async def ocr(self) -> schemas.OcrResultSchema:
         """
         Implement this method to perform OCR on the file and return the result.
         """

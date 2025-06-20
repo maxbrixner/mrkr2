@@ -4,6 +4,8 @@ import io
 import pdf2image
 import logging
 import base64
+import asyncio
+import functools
 from PIL import Image
 from typing import Any, List, Optional, Self
 
@@ -35,7 +37,7 @@ class BaseFileProvider:
         self._is_file = False
         self._is_folder = False
 
-    def __enter__(
+    async def __aenter__(
         self
     ) -> Self:
         """
@@ -47,26 +49,31 @@ class BaseFileProvider:
         """
         return self
 
-    def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
+    async def __aexit__(
+        self,
+        exc_type: Any,
+        exc_value: Any,
+        traceback: Any
+    ) -> None:
         """
         Implement this method to close the file stream.
         """
         pass
 
-    def read(self) -> bytes:
+    async def read(self) -> bytes:
         """
         Implement this method to read the file and return its content as bytes.
         """
         raise NotImplementedError
 
-    def list(self) -> List[str]:
+    async def list(self) -> List[str]:
         """
         Implement this method to list the files in the directory if the path is
         a folder. If the path is a file, it should raise an exception.
         """
         raise NotImplementedError
 
-    def read_as_images(
+    async def read_as_images(
         self,
         page: Optional[int] = None
     ) -> List[Image.Image]:
@@ -76,41 +83,60 @@ class BaseFileProvider:
         logger.debug(f"Reading file as images for: '{self.path}'")
 
         if self.path.lower().endswith('.pdf'):
-            images = self._convert_pdf_to_images(page=page)
+            images = await self._convert_pdf_to_images(page=page)
         else:
             if not page or page == 1:
-                images = [self._read_image_file()]
+                images = [await self._read_image_file()]
             else:
                 return []
 
         return images
 
-    def read_as_base64_images(
+    async def read_as_base64_images(
         self,
         page: Optional[int] = None,
         format: str = "JPEG"
     ) -> List[str]:
         """
-        Converts the file to an image or a lisOcrBlockSchemat of base64 encoded images.
+        Converts the file to a list of base64 encoded images.
         """
         logger.debug(
             f"Reading file as base64 encoded images for: '{self.path}'")
 
-        images = self.read_as_images(page=page)
+        images = await self.read_as_images(page=page)
+
+        loop = asyncio.get_running_loop()
 
         result = []
         for image in images:
             bytes = io.BytesIO()
-            image.save(bytes, format=format)
+            await loop.run_in_executor(
+                None,
+                functools.partial(
+                    image.save,
+                    bytes,
+                    format=format
+                )
+            )
             bytes.seek(0)
-            encoded_bytes = base64.b64encode(bytes.read())
-            base64_string = encoded_bytes.decode('utf-8')
+            base64_string = await self._convert_to_base64(bytes.getvalue())
             result.append(base64_string)
 
         return result
 
+    async def _convert_to_base64(self, bytes: bytes) -> str:
+        """
+        Converts bytes to a base64 encoded string.
+        """
+        loop = asyncio.get_running_loop()
+        encoded_bytes = await loop.run_in_executor(
+            None, base64.b64encode, bytes)
+        text = await loop.run_in_executor(
+            None, encoded_bytes.decode, 'utf-8')
+        return text
+
     @property
-    def image_metadata(
+    async def image_metadata(
         self
     ) -> schemas.FileMetadataSchema:
         """
@@ -119,7 +145,7 @@ class BaseFileProvider:
         """
         logger.debug(f"Getting image metadata for: '{self.path}'")
 
-        images = self.read_as_images()
+        images = await self.read_as_images()
 
         pages = []
         for image in images:
@@ -139,21 +165,23 @@ class BaseFileProvider:
             pages=pages
         )
 
-    def _read_image_file(
+    async def _read_image_file(
         self
     ) -> Image.Image:
         """
         Reads an image file and returns it as an Image object.
         """
         try:
-            image = Image.open(io.BytesIO(self.read()))
+            loop = asyncio.get_running_loop()
+            bytes = await self.read()
+            image = await loop.run_in_executor(None, Image.open, io.BytesIO(bytes))
             return image
         except Exception as e:
             raise Exception(
                 f"Failed to read image file: {e}"
             )
 
-    def _convert_pdf_to_images(
+    async def _convert_pdf_to_images(
         self,
         page: Optional[int] = None
     ) -> List[Image.Image]:
@@ -163,18 +191,29 @@ class BaseFileProvider:
         logger.debug(f"Converting PDF to images for: '{self.path}'")
 
         try:
+            loop = asyncio.get_running_loop()
+            bytes = await self.read()
+
             if not page:
-                images = pdf2image.convert_from_bytes(
-                    self.read(),
-                    dpi=self._pdf_dpi
+                images = await loop.run_in_executor(
+                    None,
+                    functools.partial(
+                        pdf2image.convert_from_bytes,
+                        bytes,
+                        dpi=self._pdf_dpi
+                    )
                 )
                 return images
             else:
-                images = pdf2image.convert_from_bytes(
-                    self.read(),
-                    dpi=self._pdf_dpi,
-                    first_page=page,
-                    last_page=page
+                images = await loop.run_in_executor(
+                    None,
+                    functools.partial(
+                        pdf2image.convert_from_bytes,
+                        bytes,
+                        dpi=self._pdf_dpi,
+                        first_page=page,
+                        last_page=page
+                    )
                 )
                 return images
         except Exception as e:
