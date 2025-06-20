@@ -31,7 +31,7 @@ interface PageContentResponse {
     mime: string;
 }
 
-class DocumentViewer extends HTMLElement implements DocumentViewerAttributes {
+export class DocumentViewer extends HTMLElement implements DocumentViewerAttributes {
     public metadataUrl: string = '';
     public contentUrl: string = '';
     private _style: HTMLStyleElement | null = null;
@@ -89,6 +89,16 @@ class DocumentViewer extends HTMLElement implements DocumentViewerAttributes {
             .page {
                 background-color: var(--document-viewer-page-background, #ffffff);
                 box-shadow: var(--document-viewer-page-box-shadow, 0 2px 4px rgba(0, 0, 0, 0.1));
+            }
+
+            .highlight {
+                position: absolute;
+                z-index: 10;
+                cursor: pointer;
+            }
+
+            .highlight:hover {
+                background-color: rgba(255, 255, 0, 0.2);
             }
 
             @keyframes spin {
@@ -254,6 +264,35 @@ class DocumentViewer extends HTMLElement implements DocumentViewerAttributes {
         }
 
         return content;
+    }
+
+    public addHighlight(
+        page: number,
+        left: number,
+        top: number,
+        width: number,
+        height: number,
+        title: string,
+        listeners: { [type: string]: EventListenerOrEventListenerObject } = {}
+    ): Element | null {
+        if (!this._viewerElement || !this._pages[page]) return null;
+
+        const highlightElement = document.createElement("div");
+
+        highlightElement.classList.add("highlight");
+        highlightElement.style.left = `${left * 100 - .1}%`
+        highlightElement.style.top = `${top * 100 - .1}%`;
+        highlightElement.style.width = `${width * 100 + .2}%`;
+        highlightElement.style.height = `${height * 100 + .2}%`;
+        highlightElement.title = `${title}`;
+
+        this._pages[page].appendChild(highlightElement);
+
+        for (const type in listeners) {
+            highlightElement.addEventListener(type, listeners[type]);
+        }
+
+        return (highlightElement);
     }
 
 }

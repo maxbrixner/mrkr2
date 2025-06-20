@@ -1,3 +1,5 @@
+import { DocumentViewer } from './document_viewer.js';
+
 interface LabelViewerAttributes {
     ocrUrl: string;
 }
@@ -106,7 +108,6 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
 
     private _onPagesCreated = (event: Event) => {
         const detail = (event as CustomEvent).detail;
-        console.log('Pages created event received:', detail);
         this._populateViewer();
     }
 
@@ -121,10 +122,59 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
                 return;
             }
             console.log('OCR data fetched:', ocr);
-            this._ocr = ocr;
+            this._addOcrBlocks(ocr);
         }).catch(error => {
             console.error("Error fetching OCR data:", error);
         });
+    }
+
+    private _onHighlightClick(element: Element) {
+        return (event: Event) => {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    private _onOcrBlockClick(element: Element) {
+        return (event: Event) => {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    private _addOcrBlocks(ocr: OcrResponse) {
+        if (!this._viewerElement || !ocr) return;
+
+        this._viewerElement.classList.remove('loading');
+
+        const documentViewer = document.querySelector('document-viewer') as DocumentViewer | null;
+        if (!documentViewer)
+            console.warn("Document Viewer not found.");
+
+        for (const block of ocr.blocks) {
+            if (block.type !== "block") continue;
+
+            const blockElement = document.createElement("div");
+            blockElement.innerHTML = block.id;
+            blockElement.style.border = "1px solid rgba(0, 0, 0, 0.5)"; // Semi-transparent black border
+            blockElement.style.height = "100px";
+
+
+            if (documentViewer) {
+                const highlightElement = documentViewer.addHighlight(
+                    block.page,
+                    block.left,
+                    block.top,
+                    block.width,
+                    block.height,
+                    `Block ID: ${block.id}`,
+                    { "click": this._onHighlightClick(blockElement) }
+                );
+                if (highlightElement)
+                    blockElement.addEventListener("click", this._onOcrBlockClick(highlightElement));
+            }
+
+            this._viewerElement.appendChild(blockElement);
+        }
+
     }
 
     private async _queryOcr(): Promise<OcrResponse | null> {
@@ -149,25 +199,7 @@ customElements.define('label-viewer', LabelViewer);
 
 /*                    if (!ocr) return;
  
-                    for (const block of ocr.blocks) {
-                        if (block.type !== "block") continue;
-                        if (block.page !== page.page) continue; // Only add blocks for the current page
-                        console.log(`Adding OCR block to page ${block.page}:`, block);
- 
-                        const blockElement = document.createElement("div");
- 
-                        blockElement.style.position = "absolute";
-                        blockElement.style.left = `${block.left * 100 - .1}%`
-                        blockElement.style.top = `${block.top * 100 - .1}%`;
-                        blockElement.style.width = `${block.width * 100 + .2}%`;
-                        blockElement.style.height = `${block.height * 100 + .2}%`;
-                        blockElement.style.backgroundColor = "rgba(255, 255, 0, 0.5)"; // Semi-transparent yellow background
-                        blockElement.style.border = "1px solid rgba(0, 0, 0, 0.5)"; // Semi-transparent black border
-                        blockElement.style.zIndex = "10"; // Ensure it appears above the image
-                        blockElement.title = `Block ID: ${block.id}`;
-                        blockElement.style.cursor = "pointer"; // Change cursor to pointer for better UX
- 
-                        pageElement.appendChild(blockElement);
+
  
                     }
  */
