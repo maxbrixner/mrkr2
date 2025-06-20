@@ -17,6 +17,7 @@ def create_user(
     """
     Create a new user in the database.
     """
+    # todo: hash password
     database_user = models.User(
         username=user.username,
         email=user.email,
