@@ -61,7 +61,7 @@ class TemplateHeaderMiddleware(BaseHTTPMiddleware):
         self._custom_headers = config.templates.headers
         self._swagger_path = config.project.swagger_path
 
-        logger.info("Template headers middleware initialized")
+        logger.info("Template headers middleware initialized.")
 
     async def dispatch(
         self,
