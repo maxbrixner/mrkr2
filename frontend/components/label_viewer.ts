@@ -58,6 +58,15 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
                 gap: 2rem;
             }
 
+            .ocr-block {
+                background-color: var(--document-viewer-page-background, #ffffff);
+                box-shadow: var(--document-viewer-page-box-shadow, 0 2px 4px rgba(0, 0, 0, 0.1));
+            }
+
+            .ocr-block.pulsing {
+                animation: pulse .8s ease-in-out 0s 2 alternate;
+            }
+
             .loading::before {
                 content: "";
                 display: block;
@@ -67,12 +76,26 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
                 border: 4px solid var(--document-viewer-spinner-color, #000000);
                 border-top: 4px solid var(--document-viewer-spinner-color-top, #ffffff);
                 border-radius: 50%;
-                animation: spin 1s linear infinite;
+                animation: spin .8s linear infinite;
             }
 
             @keyframes spin {
                 0% { transform: rotate(0deg); }
                 100% { transform: rotate(360deg); }
+            }
+
+            @keyframes pulse {
+                0% {
+                    outline: 0px solid transparent;
+                }
+
+                50% {
+                    outline: 5px solid var(--label-viewer-pulse-color);               
+                }
+
+                100% {
+                    outline: 0px solid transparent;
+                }
             }
         `
 
@@ -121,22 +144,27 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
                 console.error("No OCR data found.");
                 return;
             }
-            console.log('OCR data fetched:', ocr);
             this._addOcrBlocks(ocr);
         }).catch(error => {
             console.error("Error fetching OCR data:", error);
         });
     }
 
-    private _onHighlightClick(element: Element) {
+    private _onHighlightClick(element: HTMLElement) {
         return (event: Event) => {
             element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            element.classList.remove('pulsing');
+            element.offsetHeight;
+            element.classList.add('pulsing');
         }
     }
 
-    private _onOcrBlockClick(element: Element) {
+    private _onOcrBlockClick(element: HTMLElement) {
         return (event: Event) => {
             element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            element.classList.remove('pulsing');
+            element.offsetHeight;
+            element.classList.add('pulsing');
         }
     }
 
@@ -154,9 +182,8 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
 
             const blockElement = document.createElement("div");
             blockElement.innerHTML = block.id;
-            blockElement.style.border = "1px solid rgba(0, 0, 0, 0.5)"; // Semi-transparent black border
             blockElement.style.height = "100px";
-
+            blockElement.classList.add("ocr-block");
 
             if (documentViewer) {
                 const highlightElement = documentViewer.addHighlight(
@@ -169,7 +196,7 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
                     { "click": this._onHighlightClick(blockElement) }
                 );
                 if (highlightElement)
-                    blockElement.addEventListener("click", this._onOcrBlockClick(highlightElement));
+                    blockElement.addEventListener("click", this._onOcrBlockClick(highlightElement as HTMLElement));
             }
 
             this._viewerElement.appendChild(blockElement);

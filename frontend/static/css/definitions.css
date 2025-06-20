@@ -47,4 +47,7 @@
     --document-viewer-background: var(--background-color);
     --document-viewer-spinner-color: var(--primary-color);
     --document-viewer-spinner-color-top: var(--background-color);
+    --document-viewer-pulse-color: var(--primary-color);
+
+    --label-viewer-pulse-color: var(--primary-color);
 }

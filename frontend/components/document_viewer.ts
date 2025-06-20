@@ -101,9 +101,27 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
                 background-color: rgba(255, 255, 0, 0.2);
             }
 
+            .highlight.pulsing {
+                animation: pulse .8s ease-in-out 0s 2 alternate;
+            }
+
             @keyframes spin {
                 0% { transform: rotate(0deg); }
                 100% { transform: rotate(360deg); }
+            }
+
+            @keyframes pulse {
+                0% {
+                    outline: 0px solid transparent;
+                }
+
+                50% {
+                    outline: 5px solid var(--document-viewer-pulse-color);               
+                }
+
+                100% {
+                    outline: 0px solid transparent;
+                }
             }
         `
         this._viewerElement = document.createElement('div');
