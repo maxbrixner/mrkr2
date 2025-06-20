@@ -43,6 +43,11 @@ async def document_content(
     with providers.LocalFileProvider("demo/document1EN.pdf") as provider:
         image = provider.read_as_base64_images(page=page, format="JPEG")
 
+    # todo: remove this artificial delay
+    if page == 2:
+        import asyncio
+        await asyncio.sleep(3)
+
     return schemas.PageContentSchema(
         content=image[0],
         mime="image/jpeg",

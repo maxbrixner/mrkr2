@@ -1,7 +1,14 @@
 interface DocumentViewerAttributes {
     metadataUrl: string;
     contentUrl: string;
-    ocrUrl: string;
+}
+
+interface PagesCreatedEventDetail {
+    // ...
+}
+
+interface PagesAddedEventDetail {
+    //...
 }
 
 interface PageMetadataResponse {
@@ -24,40 +31,13 @@ interface PageContentResponse {
     mime: string;
 }
 
-interface OcrRelationshipResponse {
-    type: string,
-    id: string
-}
-
-interface OcrBlockResponse {
-    id: string,
-    type: string,
-    left: number,
-    top: number,
-    width: number,
-    height: number,
-    page: number,
-    confidence: number,
-    content: string,
-    relationships: OcrRelationshipResponse[]
-}
-
-interface OcrResponse {
-    blocks: OcrBlockResponse[];
-}
-
-function delay(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 class DocumentViewer extends HTMLElement implements DocumentViewerAttributes {
     public metadataUrl: string = '';
     public contentUrl: string = '';
-    public ocrUrl: string = '';
     private _style: HTMLStyleElement | null = null;
     private _viewerElement: HTMLDivElement | null = null;
     private _metadata: FileMetadataResponse | null = null;
-    private _pages: HTMLDivElement[] = [];
+    private _pages: { [page: number]: HTMLDivElement } = {};
 
     constructor() {
         super();
@@ -97,6 +77,15 @@ class DocumentViewer extends HTMLElement implements DocumentViewerAttributes {
                 animation: spin 1s linear infinite;
             }
 
+            .page.loading::before {
+                margin: 4rem auto;
+            }
+
+            .error::before {
+                content: "error";
+                display: block;
+            }
+
             .page {
                 background-color: var(--document-viewer-page-background, #ffffff);
                 box-shadow: var(--document-viewer-page-box-shadow, 0 2px 4px rgba(0, 0, 0, 0.1));
@@ -107,100 +96,138 @@ class DocumentViewer extends HTMLElement implements DocumentViewerAttributes {
                 100% { transform: rotate(360deg); }
             }
         `
-        this.shadowRoot?.appendChild(this._style);
-
         this._viewerElement = document.createElement('div');
         this._viewerElement.classList.add('document-viewer', 'loading');
         const slot = document.createElement('slot');
         this._viewerElement.appendChild(slot);
+
+        this.shadowRoot?.appendChild(this._style);
         this.shadowRoot?.appendChild(this._viewerElement);
     }
 
     static get observedAttributes() {
-        return ['metadata-url', 'content-url', 'ocr-url'];
-    }
-
-
-
-    private _updateViewer() {
-        if (!this._viewerElement) return;
-        this._viewerElement.innerHTML = ''; // Clear previous content
-        this._viewerElement.classList.add('loading');
-
-        this._query_metadata().then(() => {
-            console.log('Metadata fetched successfully:', this._metadata);
-            this._add_pages();
-        }).catch(error => {
-            console.error('Error fetching metadata');
-        });
+        return ['metadata-url', 'content-url'];
     }
 
     attributeChangedCallback(propertyName: string, oldValue: string | null, newValue: string | null) {
         if (oldValue === newValue) return;
+
         if (propertyName === 'metadata-url')
             this.metadataUrl = newValue || '';
-        if (propertyName === 'content-url')
+        else if (propertyName === 'content-url')
             this.contentUrl = newValue || '';
-        if (propertyName === 'ocr-url')
-            this.ocrUrl = newValue || '';
-
+        else
+            console.warn(`Unknown attribute changed in Document Viewer: ${propertyName}`);
     }
 
     connectedCallback() {
-        this._updateViewer();
+        this._populateViewer();
     }
 
     disconnectedCallback() {
     }
 
-    private _add_pages() {
+    private _populateViewer() {
         if (!this._viewerElement) return;
-        if (!this._metadata || !this._metadata.pages) return;
+        this._viewerElement.innerHTML = '';
+        this._viewerElement.classList.add('loading');
 
-        for (const page of this._metadata.pages) {
-            const pageElement = document.createElement('div');
-            pageElement.classList.add('page', 'loading');
-            pageElement.style.aspectRatio = page.aspect_ratio.toString(); // Default aspect ratio for a standard page
-            pageElement.title = `Page ${page.page}`;
-            this._pages.push(pageElement);
-
-            const imageElement = document.createElement('img');
-
-            this._query_page(page.page).then(content => {
-                console.log(`Content for page ${page.page} fetched successfully`);
-                if (content) {
-                    if (!this._viewerElement) return;
-                    imageElement.src = `data:${content.mime};base64,${content.content}`;
-                    imageElement.alt = `Page ${page.page} content`;
-                    imageElement.style.width = '100%';
-                    imageElement.style.height = '100%';
-                    pageElement.appendChild(imageElement);
-                    pageElement.classList.remove('loading');
-                    this._viewerElement.appendChild(pageElement);
-                    this._viewerElement.classList.remove('loading');
-
-                } else {
-                    imageElement.textContent = `Page ${page.page} content not available`;
-                }
-
-            }).catch(error => {
-                console.error(`Error fetching content for page ${page.page}:`, error);
-            });
-        }
-
-        this._query_ocr().then(ocr => {
-            console.log('OCR fetched successfully:', ocr);
+        this._queryMetadata().then(metadata => {
+            if (!metadata) {
+                console.error('No metadata found.');
+                return;
+            }
+            this._createPages(metadata);
+            this._dispatchPagesCreatedEvent();
         }).catch(error => {
-            console.error('Error fetching OCR:', error);
+            console.error('Error fetching metadata:', error);
         });
-
     }
 
-    private async _query_metadata(): Promise<FileMetadataResponse | null> {
-        const [response] = await Promise.all([
-            fetch(this.metadataUrl),
-            delay(0)
-        ]);
+    private _createPages(metadata: FileMetadataResponse | null = null) {
+        if (!this._viewerElement) return;
+        if (!metadata || !metadata.pages) return;
+
+        for (const page of metadata.pages) {
+            const pageElement = document.createElement('div');
+
+            pageElement.classList.add('page', 'loading');
+
+            pageElement.style.padding = 'none';
+            pageElement.style.margin = '0 auto';
+            pageElement.style.width = '100%';
+            pageElement.style.gridRow = `${page.page}`;
+            pageElement.style.aspectRatio = `${page.aspect_ratio}`;
+            pageElement.style.position = 'relative';
+
+            pageElement.title = `Page ${page.page}`;
+
+            this._pages[page.page] = pageElement;
+
+            this._queryPage(page.page).then(content => {
+                if (!content) {
+                    console.error(`No content found for page ${page.page}`);
+                    pageElement.classList.remove('loading');
+                    return;
+                }
+                this._loadPageContent(pageElement, content);
+
+                if (page.page === 1) // add pages after first page is fully loaded to avoid flickering
+                    this._addPagesToViewer();
+            }).catch(error => {
+                console.error(`Error fetching content for page ${page}:`, error);
+                pageElement.classList.remove('loading');
+            });
+        }
+    }
+
+    private _loadPageContent(pageElement: HTMLDivElement, content: PageContentResponse) {
+        if (!this._viewerElement) return;
+
+        const imageElement = document.createElement('img');
+
+        imageElement.src = `data:${content.mime};base64,${content.content}`;
+        imageElement.alt = pageElement.title;
+
+        imageElement.style.width = '100%';
+        imageElement.style.height = 'auto';
+        imageElement.style.display = 'block';
+
+        pageElement.appendChild(imageElement);
+
+        pageElement.classList.remove('loading');
+    }
+
+    private _addPagesToViewer() {
+        if (!this._viewerElement) return;
+
+        this._viewerElement.classList.remove('loading');
+
+        for (const page in this._pages) {
+            this._viewerElement.appendChild(this._pages[page]);
+        }
+
+        this._dispatchPagesAddedEvent();
+    }
+
+    private _dispatchPagesCreatedEvent() {
+        this.dispatchEvent(new CustomEvent<PagesCreatedEventDetail>('pages-created', {
+            detail: {},
+            bubbles: true,
+            composed: true
+        }));
+    }
+
+    private _dispatchPagesAddedEvent() {
+        this.dispatchEvent(new CustomEvent<PagesAddedEventDetail>('pages-added', {
+            detail: {},
+            bubbles: true,
+            composed: true
+        }));
+    }
+
+    private async _queryMetadata(): Promise<FileMetadataResponse | null> {
+        const response = await fetch(this.metadataUrl);
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
@@ -211,16 +238,11 @@ class DocumentViewer extends HTMLElement implements DocumentViewerAttributes {
             throw new Error('Failed to fetch metadata');
         }
 
-        this._metadata = metadata;
-
         return metadata;
     }
 
-    private async _query_page(page: number): Promise<PageContentResponse | null> {
-        const [response] = await Promise.all([
-            fetch(`${this.contentUrl}/?page=${page}`),
-            delay(0)
-        ]);
+    private async _queryPage(page: number): Promise<PageContentResponse | null> {
+        const response = await fetch(`${this.contentUrl}/?page=${page}`);
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
@@ -229,24 +251,6 @@ class DocumentViewer extends HTMLElement implements DocumentViewerAttributes {
 
         if (!content) {
             throw new Error(`Failed to fetch page ${page} content`);
-        }
-
-        return content;
-    }
-
-    private async _query_ocr(): Promise<OcrResponse | null> {
-        const [response] = await Promise.all([
-            fetch(this.ocrUrl),
-            delay(0)
-        ]);
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-        }
-
-        const content: OcrResponse | null = await response.json();
-
-        if (!content) {
-            throw new Error(`Failed to fetch OCR content`);
         }
 
         return content;

@@ -5,6 +5,8 @@
 <script type="module" src="{{ url_for('static', path='/js/styled_button.js') }}"></script>
 <script type="module" src="{{ url_for('static', path='/js/resizable_panes.js') }}"></script>
 <script type="module" src="{{ url_for('static', path='/js/document_viewer.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/label_viewer.js') }}"></script>
+
 {% endblock %}
 
 {% block header %}
@@ -26,11 +28,12 @@
     <resizable-panes orientation="vertical" minsize="400" startsize="60">
         <div slot="first">
             <document-viewer metadata-url="{{ url_for('document_metadata', document_id=1) }}"
-                content-url="{{ url_for('document_content', document_id=1) }}"
-                ocr-url="{{ url_for('document_ocr', document_id=1) }}" title="Document">
+                content-url="{{ url_for('document_content', document_id=1) }}" title=" Document">
             </document-viewer>
         </div>
-        <div slot="second">Hallo2</div>
+        <div slot="second">
+            <label-viewer ocr-url="{{ url_for('document_ocr', document_id=1) }}"></label-viewer>
+        </div>
     </resizable-panes>
 </main>
 {% endblock %}

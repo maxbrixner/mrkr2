@@ -78,7 +78,10 @@ class BaseFileProvider:
         if self.path.lower().endswith('.pdf'):
             images = self._convert_pdf_to_images(page=page)
         else:
-            images = [self._read_image_file()]
+            if not page or page == 1:
+                images = [self._read_image_file()]
+            else:
+                return []
 
         return images
 
@@ -88,7 +91,7 @@ class BaseFileProvider:
         format: str = "JPEG"
     ) -> List[str]:
         """
-        Converts the file to an image or a list of base64 encoded images.
+        Converts the file to an image or a lisOcrBlockSchemat of base64 encoded images.
         """
         logger.debug(
             f"Reading file as base64 encoded images for: '{self.path}'")
