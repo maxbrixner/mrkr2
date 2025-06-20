@@ -6,6 +6,7 @@ import pydantic
 import uuid
 import asyncio
 import functools
+import datetime
 from typing import Any, List, Optional, Self
 from PIL import Image
 
@@ -87,7 +88,11 @@ class TesseractOcrProvider(BaseOcrProvider):
                 page=page + 1
             )
 
-        return schemas.OcrResultSchema(blocks=blocks)
+        return schemas.OcrResultSchema(
+            id=uuid.uuid4(),
+            blocks=blocks,
+            timestamp=datetime.datetime.now(tz=datetime.timezone.utc)
+        )
 
     async def _ocr_image(self, page: int) -> TesseractResult:
         """

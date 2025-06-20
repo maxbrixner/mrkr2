@@ -23,7 +23,9 @@ interface OcrBlockResponse {
 }
 
 interface OcrResponse {
+    id: string;
     blocks: OcrBlockResponse[];
+    timestamp: string;
 }
 
 class LabelViewer extends HTMLElement implements LabelViewerAttributes {

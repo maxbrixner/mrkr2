@@ -3,6 +3,7 @@
 import pydantic
 import enum
 import uuid
+import datetime
 from typing import List, Optional
 
 # ---------------------------------------------------------------------------- #
@@ -192,6 +193,11 @@ class OcrBlockSchema(pydantic.BaseModel):
 
 
 class OcrResultSchema(pydantic.BaseModel):
+    id: uuid.UUID = pydantic.Field(
+        ...,
+        description="The unique identifier for the OCR result (as a UUID4).",
+        examples=["123e4567-e89b-12d3-a456-426614174000"]
+    )
     blocks: List[OcrBlockSchema] = pydantic.Field(
         ...,
         description="A list of OCR blocks extracted from the document.",
@@ -208,6 +214,11 @@ class OcrResultSchema(pydantic.BaseModel):
                 "relationships": []
             }
         ]
+    )
+    timestamp: datetime.datetime = pydantic.Field(
+        ...,
+        description="The timestamp when the OCR result was created.",
+        examples=["2023-10-01T12:00:00Z"]
     )
 
 # ---------------------------------------------------------------------------- #
