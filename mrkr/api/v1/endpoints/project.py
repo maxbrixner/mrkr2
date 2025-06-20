@@ -12,30 +12,20 @@ from mrkr.database import DatabaseDependency
 # ---------------------------------------------------------------------------- #
 
 
-router = fastapi.APIRouter(prefix="/user", tags=[schemas.Tags.user])
+router = fastapi.APIRouter(prefix="/project", tags=[schemas.Tags.project])
 
 # ---------------------------------------------------------------------------- #
 
 
-@router.post("/login", summary="User Login")
-async def user_login() -> None:
-    """
-    Login a user (not yet implemented).
-    """
-    raise NotImplementedError("Login not implemented yet.")
-
-# ---------------------------------------------------------------------------- #
-
-
-@router.post("/create", summary="Create User")
+@router.post("/create", summary="Create Project")
 async def user_create(
-    user: schemas.UserCreateSchema,
+    project: schemas.ProjectCreateSchema,
     session: DatabaseDependency
 ) -> Dict:
     """
-    Create a new user.
+    Create a new project.
     """
-    crud.create_user(session=session, user=user)
-    return {"message": f"User '{user.username}' created successfully."}
+    crud.create_project(session=session, project=project)
+    return {"message": f"Project '{project.name}' created successfully."}
 
 # ---------------------------------------------------------------------------- #

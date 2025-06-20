@@ -20,7 +20,7 @@ interface PageMetadataResponse {
     width: number;
 }
 
-interface FileMetadataResponse {
+interface DocumentMetadataResponse {
     pages: PageMetadataResponse[];
     path: string;
 }
@@ -36,7 +36,7 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
     public contentUrl: string = '';
     private _style: HTMLStyleElement | null = null;
     private _viewerElement: HTMLDivElement | null = null;
-    private _metadata: FileMetadataResponse | null = null;
+    private _metadata: DocumentMetadataResponse | null = null;
     private _pages: { [page: number]: HTMLDivElement } = {};
 
     constructor() {
@@ -172,7 +172,7 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         });
     }
 
-    private _createPages(metadata: FileMetadataResponse | null = null) {
+    private _createPages(metadata: DocumentMetadataResponse | null = null) {
         if (!this._viewerElement) return;
         if (!metadata || !metadata.pages) return;
 
@@ -254,13 +254,13 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         }));
     }
 
-    private async _queryMetadata(): Promise<FileMetadataResponse | null> {
+    private async _queryMetadata(): Promise<DocumentMetadataResponse | null> {
         const response = await fetch(this.metadataUrl);
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
 
-        const metadata: FileMetadataResponse | null = await response.json();
+        const metadata: DocumentMetadataResponse | null = await response.json();
 
         if (!metadata) {
             throw new Error('Failed to fetch metadata');

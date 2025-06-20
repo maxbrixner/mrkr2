@@ -138,7 +138,7 @@ class BaseFileProvider:
     @property
     async def image_metadata(
         self
-    ) -> schemas.FileMetadataSchema:
+    ) -> schemas.DocumentMetadataSchema:
         """
         Converts the file to an image or a list of images if the file is a PDF.
         If the file is not a PDF, it raises an exception.
@@ -160,7 +160,7 @@ class BaseFileProvider:
                 )
             )
 
-        return schemas.FileMetadataSchema(
+        return schemas.DocumentMetadataSchema(
             path=self.path,
             pages=pages
         )

@@ -9,6 +9,7 @@ from typing import Dict
 import mrkr.schemas as schemas
 import mrkr.crud as crud
 import mrkr.providers as providers
+from mrkr.database import DatabaseDependency
 
 # ---------------------------------------------------------------------------- #
 
@@ -20,7 +21,7 @@ router = fastapi.APIRouter(prefix="/document", tags=[schemas.Tags.document])
 
 @router.get("/document/{document_id}/metadata",
             summary="Get Document Metadata")
-async def document_metadata(document_id: int) -> schemas.FileMetadataSchema:
+async def document_metadata(document_id: int) -> schemas.DocumentMetadataSchema:
     """
     Return the number of pages in the document.
     """
@@ -62,6 +63,7 @@ async def document_content(
             summary="Get Document OCR")
 async def document_ocr(
     document_id: int,
+    session: DatabaseDependency
 ) -> schemas.OcrResultSchema:
     """
     Return the OCR text of the document.

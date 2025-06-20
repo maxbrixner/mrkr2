@@ -10,23 +10,21 @@ import mrkr.schemas as schemas
 # ---------------------------------------------------------------------------- #
 
 
-def create_user(
+def create_project(
     session: sqlmodel.Session,
-    user: schemas.UserCreateSchema
-) -> models.User:
+    project: schemas.ProjectCreateSchema
+) -> models.Project:
     """
     Create a new user in the database.
     """
-    database_user = models.User(
-        username=user.username,
-        email=user.email,
-        password=user.password,
-        disabled=False
+    database_project = models.Project(
+        name=project.name,
+        config=project.config.model_dump(),
     )
 
-    session.add(database_user)
+    session.add(database_project)
     session.commit()
-    session.refresh(database_user)
-    return database_user
+    session.refresh(database_project)
+    return database_project
 
 # ---------------------------------------------------------------------------- #
