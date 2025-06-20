@@ -7,7 +7,7 @@ from typing import Dict
 
 import mrkr.schemas as schemas
 import mrkr.crud as crud
-from mrkr.database import DatabaseDependency
+import mrkr.database as database
 
 # ---------------------------------------------------------------------------- #
 
@@ -30,7 +30,7 @@ async def user_login() -> None:
 @router.post("/create", summary="Create User")
 async def user_create(
     user: schemas.UserCreateSchema,
-    session: DatabaseDependency
+    session: database.DatabaseDependency
 ) -> Dict:
     """
     Create a new user.

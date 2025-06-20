@@ -15,9 +15,9 @@
     <span>
         <styled-link href="www.google.com">Projects</styled-link>
         &nbsp;&nbsp;/&nbsp;&nbsp;
-        <styled-link href="www.google.com">{{project}}</styled-link>
+        <styled-link href="www.google.com">{{document.project.name}}</styled-link>
         &nbsp;&nbsp;/&nbsp;&nbsp;
-        <b>{{task}}</b>
+        <b>Document #{{document.id}}</b>
     </span>
     <styled-button>Options</styled-button>
 </header>
@@ -27,12 +27,13 @@
 <main class="labeling-main">
     <resizable-panes orientation="vertical" minsize="400" startsize="50">
         <div slot="first">
-            <document-viewer metadata-url="{{ url_for('document_metadata', document_id=1) }}"
-                content-url="{{ url_for('document_content', document_id=1) }}" title=" Document">
+            <document-viewer metadata-url="{{ url_for('document_metadata', document_id=document.id) }}"
+                content-url="{{ url_for('document_content', document_id=document.id) }}" title=" Document">
             </document-viewer>
         </div>
         <div slot="second">
-            <label-viewer ocr-url="{{ url_for('ocr', ocr_id=1) }}"></label-viewer>
+            <!-- todo: what if ocr_id null? -->
+            <label-viewer ocr-url="{{ url_for('ocr', ocr_id=ocr_id) }}"></label-viewer>
         </div>
     </resizable-panes>
 </main>

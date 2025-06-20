@@ -7,7 +7,7 @@ from typing import Dict
 
 import mrkr.schemas as schemas
 import mrkr.crud as crud
-from mrkr.database import DatabaseDependency
+import mrkr.database as database
 
 # ---------------------------------------------------------------------------- #
 
@@ -20,7 +20,7 @@ router = fastapi.APIRouter(prefix="/project", tags=[schemas.Tags.project])
 @router.post("/create", summary="Create Project")
 async def project_create(
     project: schemas.ProjectCreateSchema,
-    session: DatabaseDependency
+    session: database.DatabaseDependency
 ) -> Dict:
     """
     Create a new project.

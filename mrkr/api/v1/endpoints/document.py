@@ -9,7 +9,7 @@ from typing import Dict
 import mrkr.schemas as schemas
 import mrkr.crud as crud
 import mrkr.providers as providers
-from mrkr.database import DatabaseDependency
+import mrkr.database as database
 
 # ---------------------------------------------------------------------------- #
 
@@ -58,7 +58,7 @@ async def document_content(
              summary="Create Document")
 async def document_create(
     document: schemas.DocumentCreateSchema,
-    session: DatabaseDependency
+    session: database.DatabaseDependency
 ) -> Dict:
     """
     Create a new document.

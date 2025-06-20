@@ -9,8 +9,7 @@ from typing import Dict
 import mrkr.schemas as schemas
 import mrkr.crud as crud
 import mrkr.providers as providers
-from mrkr.database import DatabaseDependency
-
+import mrkr.database as database
 # ---------------------------------------------------------------------------- #
 
 
@@ -23,7 +22,7 @@ router = fastapi.APIRouter(prefix="/ocr", tags=[schemas.Tags.ocr])
             summary="Get OCR")
 async def ocr(
     ocr_id: int,
-    session: DatabaseDependency
+    session: database.DatabaseDependency
 ) -> schemas.OcrResultSchema:
     """
     Return the OCR text of the document.
