@@ -61,8 +61,28 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
             }
 
             .ocr-block {
+                padding: 1rem;
                 background-color: var(--document-viewer-page-background, #ffffff);
                 box-shadow: var(--document-viewer-page-box-shadow, 0 2px 4px rgba(0, 0, 0, 0.1));
+            }
+
+            .ocr-block-content {
+                width: 100%;
+                field-sizing: content;
+                border: none;
+                background: transparent;
+                font-family: var(--document-viewer-font-family, Arial, sans-serif);
+                font-size: var(--document-viewer-font-size, 16px);
+                color: var(--document-viewer-font-color, #000000);
+                resize: none;
+                outline: none;
+                box-sizing: border-box;
+                padding: 0.5rem;
+                line-height: 1.5;
+                white-space: pre-wrap;
+                word-break: break-word;
+                overflow: auto;
+                transition: background-color 0.3s ease;
             }
 
             .ocr-block.pulsing {
@@ -146,10 +166,73 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
                 console.error("No OCR data found.");
                 return;
             }
+            this._ocr = ocr;
             this._addOcrBlocks(ocr);
         }).catch(error => {
             console.error("Error fetching OCR data:", error);
         });
+    }
+
+    private _getBlockContent(block: OcrBlockResponse): string | null {
+        if (!this._ocr) return null;
+        if (!block.type || block.type !== "block") return null;
+        if (!block.relationships || block.relationships.length === 0) return null;
+
+        const children = this._getBlockChildren(block);
+
+        let text = "t";
+        for (const child of children) {
+            if (child.type === "word") {
+                text += child.content + " ";
+            }
+        }
+        return text
+    }
+
+    private _getOcrContent(block: OcrBlockResponse, text: string): string {
+        console.log("aufruf mit block", block.id, block.type, block.content, "|" + text + "|");
+        if (!this._ocr) return '';
+
+        if (block.content && block.content.length > 0) {
+            console.log("hat content:", block.content);
+            text += (block.content + " ");
+        }
+
+        const lineBreak = "\n";
+
+        const children = this._getBlockChildren(block);
+        for (const child of children) {
+            console.log("child:", child.id, child.type, child.content);
+            if (child.type === "paragraph" && text.length > 0 && !text.endsWith(lineBreak)) {
+                text += `${lineBreak}${lineBreak}`;
+            } else if (child.type === "line" && text.length > 0 && !text.endsWith(lineBreak)) {
+                text += `${lineBreak}`;
+            }
+            text = this._getOcrContent(child, text);
+        }
+
+        console.log("text:", text);
+        return text;
+    }
+
+    private _getBlockById(id: string): OcrBlockResponse | null {
+        if (!this._ocr) return null;
+        return this._ocr.blocks.find(block => block.id === id) || null;
+    }
+
+    private _getBlockChildren(block: OcrBlockResponse): OcrBlockResponse[] {
+        if (!this._ocr) return [];
+        const result = [];
+        for (const other_block of this._ocr.blocks) {
+            if (other_block.id === block.id) continue;
+
+            for (const relationship of other_block.relationships) {
+                if (relationship.type === "child" && relationship.id === block.id) {
+                    result.push(other_block);
+                }
+            }
+        }
+        return (result);
     }
 
     private _onHighlightClick(element: HTMLElement) {
@@ -183,9 +266,13 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
             if (block.type !== "block") continue;
 
             const blockElement = document.createElement("div");
-            blockElement.innerHTML = block.id;
-            blockElement.style.height = "100px";
             blockElement.classList.add("ocr-block");
+
+            const inputElement = document.createElement("textarea");
+            inputElement.classList.add("ocr-block-content");
+            inputElement.value = this._getOcrContent(block, "").trim();
+
+            blockElement.appendChild(inputElement);
 
             if (documentViewer) {
                 const highlightElement = documentViewer.addHighlight(
