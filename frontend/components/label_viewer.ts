@@ -190,11 +190,9 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
     }
 
     private _getOcrContent(block: OcrBlockResponse, text: string): string {
-        console.log("aufruf mit block", block.id, block.type, block.content, "|" + text + "|");
         if (!this._ocr) return '';
 
         if (block.content && block.content.length > 0) {
-            console.log("hat content:", block.content);
             text += (block.content + " ");
         }
 
@@ -202,16 +200,14 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
 
         const children = this._getBlockChildren(block);
         for (const child of children) {
-            console.log("child:", child.id, child.type, child.content);
             if (child.type === "paragraph" && text.length > 0 && !text.endsWith(lineBreak)) {
-                text += `${lineBreak}${lineBreak}`;
+                text = text.trim() + `${lineBreak}${lineBreak}`;
             } else if (child.type === "line" && text.length > 0 && !text.endsWith(lineBreak)) {
-                text += `${lineBreak}`;
+                text = text.trim() + `${lineBreak}`;
             }
             text = this._getOcrContent(child, text);
         }
 
-        console.log("text:", text);
         return text;
     }
 
@@ -244,7 +240,7 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
         }
     }
 
-    private _onOcrBlockClick(element: HTMLElement) {
+    private _onOcrBlockFocus(element: HTMLElement) {
         return (event: Event) => {
             element.scrollIntoView({ behavior: 'smooth', block: 'center' });
             element.classList.remove('pulsing');
@@ -285,7 +281,7 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
                     { "click": this._onHighlightClick(blockElement) }
                 );
                 if (highlightElement)
-                    blockElement.addEventListener("click", this._onOcrBlockClick(highlightElement as HTMLElement));
+                    blockElement.addEventListener("focusin", this._onOcrBlockFocus(highlightElement as HTMLElement));
             }
 
             this._viewerElement.appendChild(blockElement);
