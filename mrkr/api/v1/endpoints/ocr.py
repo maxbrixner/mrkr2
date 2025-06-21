@@ -40,7 +40,7 @@ async def ocr_retrieve(
 # ---------------------------------------------------------------------------- #
 
 
-@router.post("/{project_id}",
+@router.post("/run/{project_id}",
              summary="Schedule OCR")
 async def ocr_schedule(
     project_id: int,

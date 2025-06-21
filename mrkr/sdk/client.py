@@ -150,6 +150,18 @@ class MrkrClient():
 
         return response.json().get("project_id", None)
 
+    def scan_project(
+        self,
+        project_id: int
+    ) -> None:
+        """
+        Scan a project.
+        """
+        self._call_api(
+            method="POST",
+            endpoint=f"/project/scan/{project_id}"
+        )
+
     def schedule_ocr(
         self,
         project_id: int
@@ -159,7 +171,7 @@ class MrkrClient():
         """
         self._call_api(
             method="POST",
-            endpoint=f"/ocr/{project_id}"
+            endpoint=f"/ocr/run/{project_id}"
         )
 
 # ---------------------------------------------------------------------------- #

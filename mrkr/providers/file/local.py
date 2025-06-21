@@ -3,7 +3,7 @@
 import pathlib
 import logging
 import asyncio
-from typing import Any, List, Self
+from typing import Any, AsyncGenerator, Self
 
 # ---------------------------------------------------------------------------- #
 
@@ -79,16 +79,17 @@ class LocalFileProvider(BaseFileProvider):
 
         return content
 
-    async def list(self) -> List[str]:
+    async def list(self) -> AsyncGenerator[str]:
         """
         Lists the contents of the directory if the path is a folder.
         """
-        # todo: make this asnyc
         logger.debug(f"Listing files for path: '{self.filename}'")
 
         if not self._is_folder:
             raise Exception(f"Object '{self.filename}' is not a folder.")
 
-        return [str(item) for item in pathlib.Path(self.filename).iterdir()]
+        for item in pathlib.Path(self.filename).iterdir():
+            if item.is_file():
+                yield str(item.relative_to(self.filename))
 
 # ---------------------------------------------------------------------------- #

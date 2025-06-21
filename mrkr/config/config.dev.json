@@ -34,8 +34,8 @@
     },
     "project": {
         "title": "Mrkr",
-        "description": "This is the API documentation for Mrkr. Mrkr also offers a frontend accessible using /app.",
-        "version": "0.1.0",
+        "description": "This is the API documentation for Mrkr. Mrkr also offers a frontend accessible using /gui.",
+        "version": "2.0.0",
         "author": "Max Brixner",
         "terms_of_service": null,
         "summary": "A tool to label pages, blocks and text within images and PDF files",

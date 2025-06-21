@@ -36,7 +36,7 @@ async def project_create(
 
 
 @router.post("/scan/{project_id}", summary="Scan Project")
-async def project_scan(
+async def project_scan_schedule(
     project_id: int,
     session: database.DatabaseDependency
 ) -> Dict:
@@ -54,10 +54,11 @@ async def project_scan(
     file_provider = providers.get_file_provider(
         project_config=project.config)
 
-    async with file_provider("/") as provider:
-        files = await provider.list()
+    # todo: do this somewhere else and take care of already present files ...
+    # also do this with a worker and a queue in postgres
 
-        for file in files:
+    async with file_provider("/") as provider:
+        async for file in provider.list():
             crud.create_document(
                 session=session,
                 document=schemas.DocumentCreateSchema(
@@ -66,11 +67,8 @@ async def project_scan(
                 )
             )
 
-    # Here you would implement the logic to scan the project
-    # For now, we just return a success message
     return {
-        "message": f"Project '{project.name}' scanned successfully.",
-        "project_id": project.id
+        "message": f"Scan scheduled for project {project_id}."
     }
 
 # ---------------------------------------------------------------------------- #

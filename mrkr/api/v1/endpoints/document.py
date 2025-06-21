@@ -18,7 +18,7 @@ router = fastapi.APIRouter(prefix="/document", tags=[schemas.Tags.document])
 # ---------------------------------------------------------------------------- #
 
 
-@router.get("/document/{document_id}/metadata",
+@router.get("/metadata/{document_id}",
             summary="Get Document Metadata")
 async def document_metadata(
     document_id: int,
@@ -46,7 +46,7 @@ async def document_metadata(
 # ---------------------------------------------------------------------------- #
 
 
-@router.get("/document/{document_id}/content",
+@router.get("/content/{document_id}",
             summary="Get Document Content")
 async def document_content(
     document_id: int,
@@ -79,7 +79,7 @@ async def document_content(
 # ---------------------------------------------------------------------------- #
 
 
-@router.post("/document",
+@router.post("/create",
              summary="Create Document")
 async def document_create(
     document: schemas.DocumentCreateSchema,

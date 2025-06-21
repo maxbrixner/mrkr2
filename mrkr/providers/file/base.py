@@ -7,7 +7,7 @@ import base64
 import asyncio
 import functools
 from PIL import Image
-from typing import Any, List, Optional, Self
+from typing import Any, AsyncGenerator, List, Optional, Self
 
 
 import mrkr.schemas as schemas
@@ -75,12 +75,13 @@ class BaseFileProvider:
         """
         raise NotImplementedError
 
-    async def list(self) -> List[str]:
+    async def list(self) -> AsyncGenerator[str]:
         """
         Implement this method to list the files in the directory if the path is
         a folder. If the path is a file, it should raise an exception.
         """
         raise NotImplementedError
+        yield ""  # Placeholder for AsyncGenerator
 
     async def read_as_images(
         self,
