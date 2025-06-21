@@ -55,7 +55,9 @@ class LocalFileProvider(BaseFileProvider):
 
     @property
     def filename(self) -> pathlib.Path:
-        return pathlib.Path(self._config.folder) / pathlib.Path(self.path)
+        return pathlib.Path(
+            self._config.path.strip("/")
+        ) / pathlib.Path(self.path.strip("/"))
 
     async def read(self) -> bytes:
         """

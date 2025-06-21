@@ -20,7 +20,7 @@ async def utils_health() -> schemas.HealthSchema:
     Return the health of the api.
     """
     return schemas.HealthSchema(
-        health=schemas.HealthEnum.HEALTHY,
+        health=schemas.HealthEnum.healthy,
         message="API is healthy",
     )
 

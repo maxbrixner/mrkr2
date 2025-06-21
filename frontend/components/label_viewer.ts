@@ -9,7 +9,7 @@ interface OcrRelationshipResponse {
     id: string
 }
 
-interface OcrBlockResponse {
+interface OcrItemResponse {
     id: string,
     type: string,
     left: number,
@@ -24,7 +24,7 @@ interface OcrBlockResponse {
 
 interface OcrResponse {
     id: string;
-    blocks: OcrBlockResponse[];
+    blocks: OcrItemResponse[];
     timestamp: string;
 }
 
@@ -173,7 +173,7 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
         });
     }
 
-    private _getBlockContent(block: OcrBlockResponse): string | null {
+    private _getBlockContent(block: OcrItemResponse): string | null {
         if (!this._ocr) return null;
         if (!block.type || block.type !== "block") return null;
         if (!block.relationships || block.relationships.length === 0) return null;
@@ -189,7 +189,7 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
         return text
     }
 
-    private _getOcrContent(block: OcrBlockResponse, text: string): string {
+    private _getOcrContent(block: OcrItemResponse, text: string): string {
         if (!this._ocr) return '';
 
         if (block.content && block.content.length > 0) {
@@ -211,12 +211,12 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
         return text;
     }
 
-    private _getBlockById(id: string): OcrBlockResponse | null {
+    private _getBlockById(id: string): OcrItemResponse | null {
         if (!this._ocr) return null;
         return this._ocr.blocks.find(block => block.id === id) || null;
     }
 
-    private _getBlockChildren(block: OcrBlockResponse): OcrBlockResponse[] {
+    private _getBlockChildren(block: OcrItemResponse): OcrItemResponse[] {
         if (!this._ocr) return [];
         const result = [];
         for (const other_block of this._ocr.blocks) {

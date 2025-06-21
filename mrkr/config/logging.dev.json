@@ -6,11 +6,11 @@
             "format": "%(levelname)-8s %(message)s"
         },
         "detailed_console": {
-            "format": "\u001B[35m[APP | %(levelname)-8s | %(name)-30s]\u001B[0m %(message)s",
+            "format": "\u001B[35m[MRKR | %(levelname)-8s | %(name)-30s]\u001B[0m %(message)s",
             "datefmt": "%Y-%m-%dT%H:%M:%S%z"
         },
         "detailed_file": {
-            "format": "[APP | %(levelname)-8s | %(name)-30s] %(message)s",
+            "format": "[MRKR | %(levelname)-8s | %(name)-30s] %(message)s",
             "datefmt": "%Y-%m-%dT%H:%M:%S%z"
         }
     },

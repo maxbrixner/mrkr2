@@ -21,6 +21,11 @@ class FileProviderConfig(pydantic.BaseModel):
     """
     Base configuration for a file provider.
     """
+    path: str = pydantic.Field(
+        ...,
+        description="The path within ine file provider.",
+        examples=["demo"]
+    )
     pdf_dpi: int = pydantic.Field(
         default=200,
         description="The DPI (dots per inch) for the conversion of PDF files.",
@@ -34,11 +39,7 @@ class FileProviderLocalConfig(FileProviderConfig):
     """
     Configuration for a local file provider.
     """
-    folder: str = pydantic.Field(
-        ...,
-        description="The local folder where files are stored.",
-        examples=["demo"]
-    )
+    pass
 
 # ---------------------------------------------------------------------------- #
 
@@ -77,11 +78,7 @@ class FileProviderS3Config(FileProviderConfig):
         description="The AWS secret access key for S3.",
         examples=["EXAMPLEKEY"]
     )
-    suffix: str = pydantic.Field(
-        ...,
-        description="The suffix for the S3 bucket.",
-        examples=["demo"]
-    )
+
 
 # ---------------------------------------------------------------------------- #
 
@@ -98,7 +95,7 @@ class ProjectFileProviderSchema(pydantic.BaseModel):
     config: FileProviderLocalConfig | FileProviderS3Config = pydantic.Field(
         ...,
         description="Configuration for the file provider.",
-        examples=[{"folder": "demo", "pdf_dpi": 200}]
+        examples=[{"path": "demo", "pdf_dpi": 200}]
     )
 
 # ---------------------------------------------------------------------------- #
@@ -199,7 +196,7 @@ class ProjectSchema(pydantic.BaseModel):
             {
                 "type": "local",
                 "config": {
-                    "folder": "demo",
+                    "path": "demo",
                     "pdf_dpi": 200
                 }
             }
@@ -238,7 +235,7 @@ class ProjectCreateSchema(pydantic.BaseModel):
             "file_provider": {
                     "type": "local",
                     "config": {
-                        "folder": "demo",
+                        "path": "demo",
                         "pdf_dpi": 200
                     }
             },

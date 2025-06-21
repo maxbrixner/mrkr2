@@ -2,6 +2,7 @@
 
 import sqlmodel
 import datetime
+from typing import List
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy import Column
 
@@ -23,5 +24,8 @@ class Project(sqlmodel.SQLModel, table=True):
         sa_column=Column(JSON),
         description="The project configuration."
     )
+
+    documents: List["Document"] = sqlmodel.Relationship(  # type:ignore
+        back_populates="project")
 
 # ---------------------------------------------------------------------------- #

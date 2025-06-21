@@ -10,8 +10,8 @@ class HealthEnum(str, enum.Enum):
     """
     Enum for health check status.
     """
-    HEALTHY = "healthy"
-    UNHEALTHY = "unhealthy"
+    healthy = "healthy"
+    unhealthy = "unhealthy"
 
 # ---------------------------------------------------------------------------- #
 

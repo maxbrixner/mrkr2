@@ -44,7 +44,7 @@ class TesseractOcrProvider(BaseOcrProvider):
     on images.
     """
 
-    _type_map: dict[int, schemas.OcrBlockType]
+    _type_map: dict[int, schemas.OcrItemType]
 
     def __init__(self, config: schemas.OcrProviderTesseractConfig) -> None:
         """
@@ -52,11 +52,11 @@ class TesseractOcrProvider(BaseOcrProvider):
         """
         super().__init__(config=config)
         self._type_map = {
-            1: schemas.OcrBlockType.page,
-            2: schemas.OcrBlockType.block,
-            3: schemas.OcrBlockType.paragraph,
-            4: schemas.OcrBlockType.line,
-            5: schemas.OcrBlockType.word
+            1: schemas.OcrItemType.page,
+            2: schemas.OcrItemType.block,
+            3: schemas.OcrItemType.paragraph,
+            4: schemas.OcrItemType.line,
+            5: schemas.OcrItemType.word
         }
 
     async def __aenter__(self) -> Self:
@@ -91,7 +91,8 @@ class TesseractOcrProvider(BaseOcrProvider):
 
         return schemas.OcrResultSchema(
             id=uuid.uuid4(),
-            blocks=blocks
+            blocks=blocks,
+            labels=[]
         )
 
     async def _ocr_image(self, page: int) -> TesseractResult:
@@ -142,18 +143,18 @@ class TesseractOcrProvider(BaseOcrProvider):
         Generate a unique ID for a line based on its attributes.
         """
         match self._type_map[result.level[line]]:
-            case schemas.OcrBlockType.page:
+            case schemas.OcrItemType.page:
                 return None
-            case schemas.OcrBlockType.block:
+            case schemas.OcrItemType.block:
                 return f"{result.page_num[line]}_0_0_0_0"
-            case schemas.OcrBlockType.paragraph:
+            case schemas.OcrItemType.paragraph:
                 return f"{result.page_num[line]}_" \
                     f"{result.block_num[line]}_0_0_0"
-            case schemas.OcrBlockType.line:
+            case schemas.OcrItemType.line:
                 return f"{result.page_num[line]}_" \
                     f"{result.block_num[line]}_" \
                     f"{result.par_num[line]}_0_0"
-            case schemas.OcrBlockType.word:
+            case schemas.OcrItemType.word:
                 return f"{result.page_num[line]}_" \
                     f"{result.block_num[line]}_" \
                     f"{result.par_num[line]}_" \
@@ -184,16 +185,16 @@ class TesseractOcrProvider(BaseOcrProvider):
         result: TesseractResult,
         dimensions: tuple[int, int],
         page: int
-    ) -> List[schemas.OcrBlockSchema]:
+    ) -> List[schemas.OcrItemSchema]:
         """
         Convert the Tesseract OCR result to the target schema.
         """
         type_map = {
-            1: schemas.OcrBlockType.page,
-            2: schemas.OcrBlockType.block,
-            3: schemas.OcrBlockType.paragraph,
-            4: schemas.OcrBlockType.line,
-            5: schemas.OcrBlockType.word
+            1: schemas.OcrItemType.page,
+            2: schemas.OcrItemType.block,
+            3: schemas.OcrItemType.paragraph,
+            4: schemas.OcrItemType.line,
+            5: schemas.OcrItemType.word
         }
         block_map = self._create_block_map(result=result)
 
@@ -212,7 +213,7 @@ class TesseractOcrProvider(BaseOcrProvider):
             else:
                 relationships = []
 
-            block = schemas.OcrBlockSchema(
+            block = schemas.OcrItemSchema(
                 id=block_map[id],
                 type=type_map[result.level[i]],
                 page=page,
@@ -222,7 +223,9 @@ class TesseractOcrProvider(BaseOcrProvider):
                 height=round(result.height[i] / dimensions[1], 5),
                 confidence=result.conf[i] if result.conf[i] != -1 else None,
                 content=result.text[i] if len(result.text[i]) > 0 else None,
-                relationships=relationships
+                relationships=relationships,
+                labels=[],
+                user_content=None
             )
 
             blocks.append(block)

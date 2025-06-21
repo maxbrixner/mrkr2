@@ -230,4 +230,16 @@ class BaseFileProvider:
                 f"Failed to convert PDF to images: {e}"
             )
 
+    def is_file(self) -> bool:
+        """
+        Returns True if the path is a file, False otherwise.
+        """
+        return self._is_file
+
+    def is_folder(self) -> bool:
+        """
+        Returns True if the path is a folder, False otherwise.
+        """
+        return self._is_folder
+
 # ---------------------------------------------------------------------------- #

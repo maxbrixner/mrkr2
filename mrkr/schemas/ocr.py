@@ -8,7 +8,23 @@ from typing import Any, List, Optional
 # ---------------------------------------------------------------------------- #
 
 
-class OcrBlockType(str, enum.Enum):
+class Label(pydantic.BaseModel):
+    alias: str
+    start: Optional[int] = pydantic.Field(
+        None,
+        description="The start index of the label in the text.",
+        examples=[5]
+    )
+    end: Optional[int] = pydantic.Field(
+        None,
+        description="The end index of the label in the text.",
+        examples=[10]
+    )
+
+# ---------------------------------------------------------------------------- #
+
+
+class OcrItemType(str, enum.Enum):
     # Textract knows: 'KEY_VALUE_SET'|'PAGE'|'LINE'|'WORD'|'TABLE'|'CELL'|
     # 'SELECTION_ELEMENT'|'MERGED_CELL'|'TITLE'|'QUERY'|'QUERY_RESULT'|
     # 'SIGNATURE'|'TABLE_TITLE'|'TABLE_FOOTER'|'LAYOUT_TEXT'|'LAYOUT_TITLE'|
@@ -51,13 +67,13 @@ class OcrRelationshipSchema(pydantic.BaseModel):
 # ---------------------------------------------------------------------------- #
 
 
-class OcrBlockSchema(pydantic.BaseModel):
+class OcrItemSchema(pydantic.BaseModel):
     id: uuid.UUID = pydantic.Field(
         ...,
         description="The unique identifier for the OCR block (as a UUID4).",
         examples=["123e4567-e89b-12d3-a456-426614174000"]
     )
-    type: OcrBlockType = pydantic.Field(
+    type: OcrItemType = pydantic.Field(
         ...,
         description="The type of the OCR block.",
         examples=["page"]
@@ -112,6 +128,25 @@ class OcrBlockSchema(pydantic.BaseModel):
             }
         ]
     )
+    user_content: Optional[str] = pydantic.Field(
+        None,
+        description="User-provided content for the OCR block, "
+                    "if any was added.",
+        examples=["User test content"]
+    )
+    labels: List[Label] = pydantic.Field(
+        [],
+        description="A list of labels applied to the OCR block.",
+        examples=[
+            [
+                {"alias": "Address", "start": 0, "end": 10},
+                {"alias": "Name", "start": 12, "end": 20}
+            ],
+            [
+                {"alias": "Cover letter"},
+            ]
+        ]
+    )
 
     @pydantic.field_serializer('id', when_used='always')
     def serialize_uuid(self, value: uuid.UUID, _info: Any) -> str:
@@ -126,7 +161,7 @@ class OcrResultSchema(pydantic.BaseModel):
         description="The unique identifier for the OCR result (as a UUID4).",
         examples=["123e4567-e89b-12d3-a456-426614174000"]
     )
-    blocks: List[OcrBlockSchema] = pydantic.Field(
+    blocks: List[OcrItemSchema] = pydantic.Field(
         ...,
         description="A list of OCR blocks extracted from the document.",
         examples=[
@@ -141,6 +176,13 @@ class OcrResultSchema(pydantic.BaseModel):
                 "content": None,
                 "relationships": []
             }]
+        ]
+    )
+    labels: List[Label] = pydantic.Field(
+        [],
+        description="A list of labels applied to the OCR result.",
+        examples=[
+            [{"alias": "Customer Letter"}, {"alias": "Invoice"}]
         ]
     )
 
