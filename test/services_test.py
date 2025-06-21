@@ -4,6 +4,7 @@ import unittest
 import os
 import pathlib
 import tempfile
+import logging
 from fastapi import Request, Response
 from fastapi.templating import Jinja2Templates
 from unittest.mock import patch
@@ -74,6 +75,23 @@ class LoggingTest(TestCase):
             mock_logger.assert_called_once()
 
         self.patch_logger.start()
+
+    def test_colon_level_formatter(self) -> None:
+        """
+        Test case for the ColonLevelFormatter.
+        """
+        formatter = services.ColonLevelFormatter()
+        record = logging.LogRecord(
+            name="test",
+            level=logging.INFO,
+            pathname="test.py",
+            lineno=1,
+            msg="Test message",
+            args=(),
+            exc_info=None
+        )
+        formatted_message = formatter.format(record)
+        assert record.levelname == "INFO:"
 
 # ---------------------------------------------------------------------------- #
 

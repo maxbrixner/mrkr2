@@ -2,11 +2,14 @@
 
 import requests
 import logging
-from typing import Any, Dict, Optional, Self
+import time
+import functools
+from typing import Any, Callable, Dict, Optional, Self
 
 # ---------------------------------------------------------------------------- #
 
 import mrkr.schemas as schemas
+from mrkr.services import ColonLevelFormatter
 
 # ---------------------------------------------------------------------------- #
 
@@ -21,6 +24,8 @@ class MrkrClient():
     cert: str | tuple[str, str] | None
     proxies: dict | None
     timeout: float
+    retry_attemps: int
+    retry_delay: float
 
     def __init__(
         self,
@@ -29,6 +34,8 @@ class MrkrClient():
         cert: str | tuple[str, str] | None = None,
         proxies: dict | None = None,
         timeout: float = 10.0,
+        retry_attempts: int = 3,
+        retry_delay: float = 1.0,
         log_level: str | int = logging.INFO
     ) -> None:
         """
@@ -38,6 +45,8 @@ class MrkrClient():
         self.cert = cert
         self.proxies = proxies
         self.timeout = timeout
+        self.retry_attempts = retry_attempts
+        self.retry_delay = retry_delay
 
         self._setup_logger(level=log_level)
 
@@ -67,26 +76,54 @@ class MrkrClient():
         self._logger.setLevel(level=level)
         handler = logging.StreamHandler()
         handler.setLevel(level=level)
-        formatter = logging.Formatter(
-            "\u001B[36m[MRKR | %(levelname)-8s | %(name)-30s]"
-            "\u001B[0m %(message)s")
+        formatter = ColonLevelFormatter(
+            "\u001B[35m%(levelname)-9s\u001B[0m %(message)s")
         handler.setFormatter(formatter)
         self._logger.addHandler(handler)
 
+    @staticmethod
+    def _retry(func: Callable) -> Callable:
+        """
+        Decorator to retry method calls (e.g. API calls) in case of failure.
+        """
+        @functools.wraps(func)
+        def wrapper(self: Self, *args: Any, **kwargs: Any) -> Any:
+            attempt = 0
+            last_exception = None
+            while attempt < self.retry_attempts:
+                try:
+                    return func(self, *args, **kwargs)
+                except Exception as exception:
+                    self._logger.warning(
+                        f"Attempt {attempt + 1} failed.")
+                    attempt += 1
+                    time.sleep(self.retry_delay)
+                    last_exception = exception
+
+            if last_exception:
+                self._logger.error(
+                    f"Failed after {self.retry_attempts} attempts.")
+                raise last_exception
+        return wrapper
+
+    @_retry
     def _call_api(
         self,
         method: str,
         endpoint: str,
         params: Optional[Dict] = None,
-        json: Optional[Dict] = None,
+        json: Optional[Dict] = None
     ) -> requests.Response:
         """
-        Query the API with a GET request.
+        Query the API.
         """
         url = f"{self.base_url}/{endpoint.lstrip("/")}"
 
         self._logger.debug(
-            f"Calling API: {method.upper()} {url} with params: {params}.")
+            f"Calling API: {method.upper()} {url}"
+            if params is None else
+            f"{method.upper()} {url} with params {params}"
+        )
 
         match method.lower():
             case "get":
@@ -111,11 +148,9 @@ class MrkrClient():
 
         if response.status_code == 200:
             self._logger.debug(
-                f"API response: {response.status_code} - {response.text}")
+                f"API responded successfully.")
             return response
         else:
-            self._logger.error(
-                f"API call failed: {response.status_code} - {response.text}")
             raise Exception(
                 f"Failed to query {url}. "
                 f"Response status: {response.status_code}. "
@@ -155,7 +190,8 @@ class MrkrClient():
         project_id: int
     ) -> None:
         """
-        Scan a project.
+        Scan a project, i.e. ask the file provider to scan the files
+        associated with the project and update the database.
         """
         self._call_api(
             method="POST",
@@ -167,7 +203,9 @@ class MrkrClient():
         project_id: int
     ) -> None:
         """
-        Schedule an OCR run for a project.
+        Schedule an OCR run for a project, i.e. ask the ocr provider to
+        run OCR on the files associated with the project that to not have
+        an OCR result yet.
         """
         self._call_api(
             method="POST",

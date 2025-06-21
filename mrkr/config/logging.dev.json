@@ -2,8 +2,9 @@
     "version": 1,
     "disable_existing_loggers": false,
     "formatters": {
-        "simple": {
-            "format": "%(levelname)-8s %(message)s"
+        "simple_console": {
+            "()": "mrkr.services.ColonLevelFormatter",
+            "format": "\u001B[35m%(levelname)-9s\u001B[0m %(message)s"
         },
         "detailed_console": {
             "format": "\u001B[35m[MRKR | %(levelname)-8s | %(name)-30s]\u001B[0m %(message)s",
@@ -17,7 +18,7 @@
     "handlers": {
         "stdout": {
             "class": "logging.StreamHandler",
-            "formatter": "detailed_console",
+            "formatter": "simple_console",
             "stream": "ext://sys.stdout"
         }
     },
