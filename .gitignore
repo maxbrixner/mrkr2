@@ -1,11 +1,19 @@
+# Virtual environment
 .venv
+
+# Secrets
 .env
 
+# Python caches
 __pycache__
 .mypy_cache
 
+# SQLite database
 *.db
+*.sqlite3
 
+# Compiled JavaScript files
 frontend/static/js/*.js
 
-test.py
+# Temporary SDK test files
+test_sdk.py
