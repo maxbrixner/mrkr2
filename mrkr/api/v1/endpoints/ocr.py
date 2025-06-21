@@ -71,11 +71,11 @@ async def ocr_schedule(
             async with ocr_provider(images=images) as ocr_provider:
                 ocr = await ocr_provider.ocr()
 
-        crud.create_ocr(
-            session=session,
-            document=document,
-            ocr=ocr
-        )
+                crud.create_ocr(
+                    session=session,
+                    document=document,
+                    ocr=ocr
+                )
 
     return {
         "message": f"OCR scheduled for project {project_id}."
