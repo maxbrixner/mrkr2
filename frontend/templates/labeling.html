@@ -7,6 +7,7 @@
 <script type="module" src="{{ url_for('static', path='/js/document_viewer.js') }}"></script>
 <script type="module" src="{{ url_for('static', path='/js/label_viewer.js') }}"></script>
 <script type="module" src="{{ url_for('static', path='/js/label_button.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/tab_container.js') }}"></script>
 {% endblock %}
 
 {% block header %}
@@ -26,15 +27,21 @@
 {% block main %}
 <main class="labeling-main">
     <resizable-panes orientation="vertical" minsize="400" startsize="50">
-        <div slot="first">
-            <document-viewer metadata-url="{{ url_for('document_metadata', document_id=document.id) }}"
-                content-url="{{ url_for('document_content', document_id=document.id) }}" title=" Document">
-            </document-viewer>
-        </div>
-        <div slot="second">
+        <document-viewer slot="first" metadata-url="{{ url_for('document_metadata', document_id=document.id) }}"
+            content-url="{{ url_for('document_content', document_id=document.id) }}" title=" Document">
+        </document-viewer>
+        <tab-container slot="second">
+            <div slot="Document">
+                Hallo
+            </div>
+            <div slot="Page">
+                Hallo2
+            </div>
             <!-- todo: what if ocr_id null? -->
-            <label-viewer ocr-url="{{ url_for('ocr_retrieve', ocr_id=ocr_id) }}"></label-viewer>
-        </div>
+            <label-viewer slot="Blocks" ocr-url="{{ url_for('ocr_retrieve', ocr_id=ocr_id) }}">
+
+            </label-viewer>
+        </tab-container>
     </resizable-panes>
 </main>
 {% endblock %}

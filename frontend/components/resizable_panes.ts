@@ -62,8 +62,7 @@ class ResizablePanes extends HTMLElement implements ResizablePanesAttributes {
     this._style.textContent = `
         :host {
           display: block;
-          width: 100%;
-          height: 100%;
+          overflow: hidden;
         }
 
         .container {
@@ -94,8 +93,7 @@ class ResizablePanes extends HTMLElement implements ResizablePanesAttributes {
           display: grid;
           grid-template-rows: 1fr;
           grid-template-columns: 1fr;
-          overflow: auto;
-          scrollbar-gutter: stable;
+          overflow: hidden;
           background-color: var(--resizable-pane-background-color, #f0f0f0);
         }
 

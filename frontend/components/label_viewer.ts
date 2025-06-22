@@ -45,12 +45,12 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
                 display: block;
                 width: 100%;
                 height: 100%;
-                overflow: hidden;
                 box-sizing: border-box;
+                overflow: hidden;
             }
 
             .label-viewer {
-                background-color: var(--document-viewer-background, #ffffff);
+                background-color: var(--label-viewer-background-color, #ffffff);
                 width: 100%;
                 height: 100%;
                 display: grid;
@@ -59,12 +59,16 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
                 padding: 2rem;
                 box-sizing: border-box;
                 gap: 2rem;
+                scrollbar-gutter: stable;
+                scrollbar-width: thin;
+                overflow-y: auto;
             }
 
             .ocr-block {
                 padding: 1rem;
                 background-color: var(--document-viewer-page-background, #ffffff);
-                box-shadow: var(--document-viewer-page-box-shadow, 0 2px 4px rgba(0, 0, 0, 0.1));
+                border: 1px solid var(--document-viewer-page-border-color, #000000);
+                /*box-shadow: var(--document-viewer-page-box-shadow, 0 2px 4px rgba(0, 0, 0, 0.1));*/
             }
 
             .ocr-block-content {

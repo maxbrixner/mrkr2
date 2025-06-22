@@ -49,8 +49,8 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
                 display: block;
                 width: 100%;
                 height: 100%;
-                overflow: hidden;
                 box-sizing: border-box;
+                overflow: hidden;
             }
 
             .document-viewer {
@@ -63,6 +63,9 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
                 padding: 2rem;
                 box-sizing: border-box;
                 gap: 2rem;
+                scrollbar-gutter: stable;
+                scrollbar-width: thin;
+                overflow-y: auto;
             }
 
             .loading::before {
@@ -87,6 +90,7 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
             }
 
             .page {
+                user-select: none;
                 background-color: var(--document-viewer-page-background, #ffffff);
                 box-shadow: var(--document-viewer-page-box-shadow, 0 2px 4px rgba(0, 0, 0, 0.1));
             }

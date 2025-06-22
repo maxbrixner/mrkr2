@@ -44,11 +44,19 @@
     --resizable-pane-handle-color-hover: var(--primary-color);
     --resizable-pane-background-color: var(--background-color);
 
+    --tab-container-background-color: var(--surface-color);
+    --tab-container-tabbar-background-color: var(--background-color);
+    --tab-container-tab-active-background-color: var(--surface-color);
+    --tab-container-tab-active-border-color: var(--border-color);
+    --tab-container-tabbar-border-color: var(--border-color);
+
     --document-viewer-background: var(--background-color);
     --document-viewer-spinner-color: var(--primary-color);
     --document-viewer-spinner-color-top: var(--background-color);
     --document-viewer-pulse-color: var(--primary-color);
     --document-viewer-block-hover-color: var(--primary-color);
+    --document-viewer-page-border-color: var(--border-color);
 
+    --label-viewer-background-color: var(--surface-color);
     --label-viewer-pulse-color: var(--primary-color);
 }
