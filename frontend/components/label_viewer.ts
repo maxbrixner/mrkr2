@@ -1,4 +1,5 @@
 import { DocumentViewer } from './document_viewer.js';
+import { LabelButton } from './label_button.js';
 
 interface LabelViewerAttributes {
     ocrUrl: string;
@@ -284,6 +285,18 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
                     blockElement.addEventListener("focusin", this._onOcrBlockFocus(highlightElement as HTMLElement));
             }
 
+            const labelButton = document.createElement("label-button");
+            labelButton.setAttribute("color", "#007bff");
+            labelButton.setAttribute("shortcut", "1");
+
+            const labelDiv = document.createElement("div");
+            labelDiv.slot = "label";
+            labelDiv.textContent = `Test Label`;
+            labelButton.appendChild(labelDiv);
+
+            blockElement.appendChild(labelButton);
+
+
             this._viewerElement.appendChild(blockElement);
         }
 
@@ -292,7 +305,7 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
     private async _queryOcr(): Promise<OcrResponse | null> {
         const response = await fetch(this.ocrUrl);
         if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
+            throw new Error(`Response status: ${response.status} `);
         }
 
         const content: OcrResponse | null = await response.json();
