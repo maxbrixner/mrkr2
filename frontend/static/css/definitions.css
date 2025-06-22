@@ -10,8 +10,7 @@
     --error-color: #ff4d4d;
     --success-color: #4caf50;
     --warning-color: #ff9800;
-
-    --min-layout-width: 1000px;
+    --scrollbar-thumb: #8b8b8b;
 
     /* Font sizes */
     --font-size-small: 12px;
@@ -56,7 +55,9 @@
     --document-viewer-pulse-color: var(--primary-color);
     --document-viewer-block-hover-color: var(--primary-color);
     --document-viewer-page-border-color: var(--border-color);
+    --document-viewer-scrollbar-color: var(--scrollbar-thumb) var(--background-color);
 
     --label-viewer-background-color: var(--surface-color);
     --label-viewer-pulse-color: var(--primary-color);
+    --label-viewer-scrollbar-color: var(--scrollbar-thumb) var(--surface-color);
 }

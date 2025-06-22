@@ -66,6 +66,7 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
                 scrollbar-gutter: stable;
                 scrollbar-width: thin;
                 overflow-y: auto;
+                scrollbar-color: var(--document-viewer-scrollbar-color, inherit);
             }
 
             .loading::before {

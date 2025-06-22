@@ -62,6 +62,7 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
                 scrollbar-gutter: stable;
                 scrollbar-width: thin;
                 overflow-y: auto;
+                scrollbar-color: var(--label-viewer-scrollbar-color, inherit);
             }
 
             .ocr-block {

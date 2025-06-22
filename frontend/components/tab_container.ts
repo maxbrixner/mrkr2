@@ -43,7 +43,7 @@ class TabContainer extends HTMLElement implements TabContainerAttributes {
                 margin: 0;
                 padding: .6rem 1rem;
                 font-size: .8rem;
-                font-weight: 500;
+                font-weight: 400;
                 user-select: none;
             }
             .tab.active {
