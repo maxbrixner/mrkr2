@@ -61,7 +61,7 @@ class Database():
         self._engine = None
         logger.info("Database connection disposed.")
 
-    def get_session(self) -> Generator[sqlmodel.Session]:
+    def get_session(self) -> Generator[sqlmodel.Session, None, None]:
         """
         Get a session from the database engine.
         """
@@ -110,7 +110,7 @@ def get_database() -> Database:
 # ---------------------------------------------------------------------------- #
 
 
-def get_database_session() -> Generator[sqlmodel.Session]:
+def get_database_session() -> Generator[sqlmodel.Session, None, None]:
     """
     Get a database session from the Database class. This function is used to
     create a new session for each request.

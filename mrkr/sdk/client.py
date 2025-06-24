@@ -41,7 +41,7 @@ class MrkrClient():
         """
         Initialize the MrkrClient.
         """
-        self.base_url = f"{url.rstrip("/")}/api/{api_version}"
+        self.base_url = f"{url.rstrip('/')}/api/{api_version}"
         self.cert = cert
         self.proxies = proxies
         self.timeout = timeout
@@ -117,7 +117,7 @@ class MrkrClient():
         """
         Query the API.
         """
-        url = f"{self.base_url}/{endpoint.lstrip("/")}"
+        url = f"{self.base_url}/{endpoint.lstrip('/')}"
 
         self._logger.debug(
             f"Calling API: {method.upper()} {url}"

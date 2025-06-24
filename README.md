@@ -42,7 +42,15 @@ tsc -p ./frontend/
 
 Or, in Visual Studio Code, press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> to build.
 
-### 3. Run Mrkr
+### 3. Start the Test Database
+
+To begin, add a database password to the .env file. Once that's done, use Docker Compose to initiate the test database. The configuration for this can be found in the ``.deploy`` folder.
+
+In Visual Studio Code, you can press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>R</kbd> to access the task runner and execute the tasks ``build dev database`` and ``run dev database``.
+
+Feel free to configure any PostgreSQL database  of your choice (or any other database that supports JSON data types).
+
+### 4. Run Mrkr
 
 You can start the Mrkr server in several ways:
 

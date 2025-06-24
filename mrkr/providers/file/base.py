@@ -75,7 +75,7 @@ class BaseFileProvider:
         """
         raise NotImplementedError
 
-    async def list(self) -> AsyncGenerator[str]:
+    async def list(self) -> AsyncGenerator[str, None]:
         """
         Implement this method to list the files in the directory if the path is
         a folder. If the path is a file, it should raise an exception.

@@ -79,7 +79,7 @@ class LocalFileProvider(BaseFileProvider):
 
         return content
 
-    async def list(self) -> AsyncGenerator[str]:
+    async def list(self) -> AsyncGenerator[str, None]:
         """
         Lists the contents of the directory if the path is a folder.
         """
