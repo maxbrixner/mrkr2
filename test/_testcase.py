@@ -121,7 +121,7 @@ class TestCase(unittest.IsolatedAsyncioTestCase):
         self.session = sqlmodel.Session(self.engine)
 
         # Override the database session and configuration dependencies
-        def get_session_override() -> Generator[sqlmodel.Session]:
+        def get_session_override() -> Generator[sqlmodel.Session, None, None]:
             yield self.session
 
         def get_config_override() -> services.ConfigSchema:
