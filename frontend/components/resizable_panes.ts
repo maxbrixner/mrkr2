@@ -4,7 +4,7 @@ interface ResizablePanesAttributes {
   startsize?: number // must be a percentage
 }
 
-class ResizablePanes extends HTMLElement implements ResizablePanesAttributes {
+export class ResizablePanes extends HTMLElement implements ResizablePanesAttributes {
   public orientation: 'horizontal' | 'vertical' = 'vertical';
   public minsize: number = 100; // Default minimum size for panes in pixels
   public startsize: number = 50; // Default starting size for the first pane in percentage

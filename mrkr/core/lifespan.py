@@ -20,7 +20,7 @@ logger = logging.getLogger("mrkr.core")
 
 
 @asynccontextmanager
-async def lifespan(app: fastapi.FastAPI) -> AsyncGenerator:
+async def lifespan(app: fastapi.FastAPI) -> AsyncGenerator[None, None]:
     """
     Context manager for FastAPI lifespan events. Handles application startup
     and shutdown logic.

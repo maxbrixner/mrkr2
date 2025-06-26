@@ -1,6 +1,7 @@
 interface DocumentViewerAttributes {
-    metadataUrl: string;
-    contentUrl: string;
+    metadataUrl?: string;
+    contentUrl?: string;
+    showPages?: 'instantly' | 'first-loaded' | 'all-loaded';
 }
 
 interface PagesCreatedEventDetail {
@@ -32,8 +33,10 @@ interface PageContentResponse {
 }
 
 export class DocumentViewer extends HTMLElement implements DocumentViewerAttributes {
-    public metadataUrl: string = '';
-    public contentUrl: string = '';
+    public metadataUrl?: string = undefined;
+    public contentUrl?: string = undefined;
+    // todo: make something of this
+    public showPages: "instantly" | "first-loaded" | "all-loaded" = "all-loaded";
     private _style: HTMLStyleElement | null = null;
     private _viewerElement: HTMLDivElement | null = null;
     private _metadata: DocumentMetadataResponse | null = null;
@@ -44,6 +47,7 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         this.attachShadow({ mode: 'open' });
 
         this._style = document.createElement('style');
+        // todo: we do not need the document-viewer div - we can just use the host?
         this._style.textContent = `
             :host {
                 display: block;
@@ -139,41 +143,53 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
     }
 
     static get observedAttributes() {
-        return ['metadata-url', 'content-url'];
+        return ['metadata-url', 'content-url', 'show-pages'];
     }
 
     attributeChangedCallback(propertyName: string, oldValue: string | null, newValue: string | null) {
         if (oldValue === newValue) return;
+        console.log("a", propertyName, oldValue, newValue);
 
-        if (propertyName === 'metadata-url')
-            this.metadataUrl = newValue || '';
-        else if (propertyName === 'content-url')
-            this.contentUrl = newValue || '';
-        else
-            console.warn(`Unknown attribute changed in Document Viewer: ${propertyName}`);
+        if (propertyName === 'metadata-url') {
+            this.metadataUrl = newValue || undefined;
+        } else if (propertyName === 'content-url') {
+            this.contentUrl = newValue || undefined;
+        } else if (propertyName === 'show-pages') {
+            if (newValue !== 'instantly' && newValue !== 'first-loaded' &&
+                newValue !== 'all-loaded') {
+                return;
+            }
+            this.showPages = newValue || 'all-loaded';
+        }
+
+        this._populateViewer();
     }
 
     connectedCallback() {
-        this._populateViewer();
     }
 
     disconnectedCallback() {
     }
 
     private _populateViewer() {
+        if (!this.metadataUrl || !this.contentUrl) {
+            return;
+        }
+
+        console.log("aaaa")
+
         if (!this._viewerElement) return;
         this._viewerElement.innerHTML = '';
         this._viewerElement.classList.add('loading');
 
         this._queryMetadata().then(metadata => {
             if (!metadata) {
-                console.error('No metadata found.');
                 return;
             }
             this._createPages(metadata);
             this._dispatchPagesCreatedEvent();
         }).catch(error => {
-            console.error('Error fetching metadata:', error);
+            throw new Error(`Error fetching metadata: ${error.message}`);
         });
     }
 
@@ -199,7 +215,7 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
 
             this._queryPage(page.page).then(content => {
                 if (!content) {
-                    console.error(`No content found for page ${page.page}`);
+                    // todo: handle this by showing the user
                     pageElement.classList.remove('loading');
                     return;
                 }
@@ -208,8 +224,10 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
                 if (page.page === 1) // add pages after first page is fully loaded to avoid flickering
                     this._addPagesToViewer();
             }).catch(error => {
-                console.error(`Error fetching content for page ${page}:`, error);
                 pageElement.classList.remove('loading');
+                // todo: handle this by showing the user
+                throw new Error(`Error fetching content for page ${page}: 
+                    ${error.message}`);
             });
         }
     }
@@ -260,6 +278,9 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
     }
 
     private async _queryMetadata(): Promise<DocumentMetadataResponse | null> {
+        if (!this.metadataUrl) {
+            throw new Error('Metadata URL is not set');
+        }
         const response = await fetch(this.metadataUrl);
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);

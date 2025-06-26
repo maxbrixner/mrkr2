@@ -1,7 +1,7 @@
 interface TabContainerAttributes {
 }
 
-class TabContainer extends HTMLElement implements TabContainerAttributes {
+export class TabContainer extends HTMLElement implements TabContainerAttributes {
     private _ContainerElement: HTMLDivElement;
     private _TabBarElement: HTMLDivElement;
     private _TabContentElement: HTMLDivElement;
@@ -45,6 +45,7 @@ class TabContainer extends HTMLElement implements TabContainerAttributes {
                 font-size: .8rem;
                 font-weight: 400;
                 user-select: none;
+                font-family: inherit;
             }
             .tab.active {
                 border-color: var(--tab-container-tab-active-border-color, #000000);
@@ -63,7 +64,6 @@ class TabContainer extends HTMLElement implements TabContainerAttributes {
             }
         `;
         this.shadowRoot?.appendChild(style);
-        console.log("TabContainer: constructor");
         this._ContainerElement = document.createElement('div');
         this._ContainerElement.classList.add('container');
         this._TabBarElement = document.createElement('div');

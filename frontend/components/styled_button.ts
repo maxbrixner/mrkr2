@@ -31,6 +31,7 @@ class StyledButton extends HTMLElement implements StyledButtonAttributes {
                 border-style: solid;
                 font-weight: var(--styled-button-font-weight, normal);
                 padding: var(--styled-button-padding, 0.5rem 1rem);
+                font-family: inherit;
             }
             button:hover,
             button:focus {
