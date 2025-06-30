@@ -8,22 +8,6 @@ from typing import Any, List, Optional
 # ---------------------------------------------------------------------------- #
 
 
-class Label(pydantic.BaseModel):
-    alias: str
-    start: Optional[int] = pydantic.Field(
-        None,
-        description="The start index of the label in the text.",
-        examples=[5]
-    )
-    end: Optional[int] = pydantic.Field(
-        None,
-        description="The end index of the label in the text.",
-        examples=[10]
-    )
-
-# ---------------------------------------------------------------------------- #
-
-
 class OcrItemType(str, enum.Enum):
     # Textract knows: 'KEY_VALUE_SET'|'PAGE'|'LINE'|'WORD'|'TABLE'|'CELL'|
     # 'SELECTION_ELEMENT'|'MERGED_CELL'|'TITLE'|'QUERY'|'QUERY_RESULT'|
@@ -56,7 +40,7 @@ class OcrRelationshipSchema(pydantic.BaseModel):
     )
     id: uuid.UUID = pydantic.Field(
         ...,
-        description="The ID of the related OCR block (as a UUID4).",
+        description="The ID of the related OCR item (as a UUID4).",
         examples=["123e4567-e89b-12d3-a456-426614174000"]
     )
 
@@ -70,81 +54,62 @@ class OcrRelationshipSchema(pydantic.BaseModel):
 class OcrItemSchema(pydantic.BaseModel):
     id: uuid.UUID = pydantic.Field(
         ...,
-        description="The unique identifier for the OCR block (as a UUID4).",
+        description="The unique identifier for the OCR item (as a UUID4).",
         examples=["123e4567-e89b-12d3-a456-426614174000"]
     )
     type: OcrItemType = pydantic.Field(
         ...,
-        description="The type of the OCR block.",
+        description="The type of the OCR item.",
         examples=["page"]
     )
     left: float = pydantic.Field(
         ...,
-        description="The left coordinate of the block in the image, "
+        description="The left coordinate of the item in the image, "
                     "normalized to [0, 1].",
         examples=[0.1]
     )
     top: float = pydantic.Field(
         ...,
-        description="The top coordinate of the block in the image, "
+        description="The top coordinate of the item in the image, "
                     "normalized to [0, 1].",
         examples=[0.1]
     )
     width: float = pydantic.Field(
         ...,
-        description="The width of the block in the image, "
+        description="The width of the item in the image, "
                     "normalized to [0, 1].",
         examples=[0.8]
     )
     height: float = pydantic.Field(
         ...,
-        description="The height of the block in the image, "
+        description="The height of the item in the image, "
                     "normalized to [0, 1].",
         examples=[0.2]
     )
     page: int = pydantic.Field(
         ...,
-        description="The page number where the block is located "
+        description="The page number where the item is located "
                     "(starting from 1).",
         examples=[1]
     )
     confidence: Optional[float] = pydantic.Field(
         None,
-        description="The confidence score of the OCR block as a percentage",
+        description="The confidence score of the OCR item as a percentage",
         examples=[95]
     )
     content: Optional[str] = pydantic.Field(
         None,
-        description="The text content of the OCR block.",
+        description="The text content of the OCR item.",
         examples=["Test content"]
     )
     relationships: List[OcrRelationshipSchema] = pydantic.Field(
         [],
-        description="A list of relationships to other OCR blocks.",
+        description="A list of relationships to other OCR items.",
         examples=[
             {
                 "type": "child",
                 "id": "123e4567-e89b-12d3-a456-426614174000"
             }
-        ]
-    )
-    user_content: Optional[str] = pydantic.Field(
-        None,
-        description="User-provided content for the OCR block, "
-                    "if any was added.",
-        examples=["User test content"]
-    )
-    labels: List[Label] = pydantic.Field(
-        [],
-        description="A list of labels applied to the OCR block.",
-        examples=[
-            [
-                {"alias": "Address", "start": 0, "end": 10},
-                {"alias": "Name", "start": 12, "end": 20}
-            ],
-            [
-                {"alias": "Cover letter"},
-            ]
         ]
     )
 
@@ -161,9 +126,9 @@ class OcrResultSchema(pydantic.BaseModel):
         description="The unique identifier for the OCR result (as a UUID4).",
         examples=["123e4567-e89b-12d3-a456-426614174000"]
     )
-    blocks: List[OcrItemSchema] = pydantic.Field(
+    items: List[OcrItemSchema] = pydantic.Field(
         ...,
-        description="A list of OCR blocks extracted from the document.",
+        description="A list of OCR items extracted from the document.",
         examples=[
             [{
                 "id": "123e4567-e89b-12d3-a456-426614174000",
@@ -176,13 +141,6 @@ class OcrResultSchema(pydantic.BaseModel):
                 "content": None,
                 "relationships": []
             }]
-        ]
-    )
-    labels: List[Label] = pydantic.Field(
-        [],
-        description="A list of labels applied to the OCR result.",
-        examples=[
-            [{"alias": "Customer Letter"}, {"alias": "Invoice"}]
         ]
     )
 

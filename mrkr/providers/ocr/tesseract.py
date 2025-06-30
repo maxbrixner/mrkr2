@@ -80,10 +80,10 @@ class TesseractOcrProvider(BaseOcrProvider):
         """
         Implement this method to perform OCR on the file and return the result.
         """
-        blocks = []
+        items = []
         for page, image in enumerate(self._images):
             ocr = await self._ocr_image(page=page+1)
-            blocks += self._convert_result(
+            items += self._convert_result(
                 result=ocr,
                 dimensions=image.size,
                 page=page + 1
@@ -91,8 +91,7 @@ class TesseractOcrProvider(BaseOcrProvider):
 
         return schemas.OcrResultSchema(
             id=uuid.uuid4(),
-            blocks=blocks,
-            labels=[]
+            items=items
         )
 
     async def _ocr_image(self, page: int) -> TesseractResult:
@@ -162,21 +161,21 @@ class TesseractOcrProvider(BaseOcrProvider):
             case _:
                 return None
 
-    def _create_block_map(
+    def _create_item_map(
         self,
         result: TesseractResult
     ) -> dict[str, uuid.UUID]:
         """
-        Create a map of relationships between blocks based on their IDs.
+        Create a map of relationships between items based on their IDs.
         """
         relationship_map = {}
         for i in range(len(result.level)):
-            block_id = self._get_line_id(result=result, line=i)
+            item_id = self._get_line_id(result=result, line=i)
 
-            if block_id not in relationship_map:
-                relationship_map[block_id] = uuid.uuid4()
+            if item_id not in relationship_map:
+                relationship_map[item_id] = uuid.uuid4()
             else:
-                raise Exception("Duplicate block ID found.")
+                raise Exception("Duplicate item ID found.")
 
         return relationship_map
 
@@ -196,9 +195,9 @@ class TesseractOcrProvider(BaseOcrProvider):
             4: schemas.OcrItemType.line,
             5: schemas.OcrItemType.word
         }
-        block_map = self._create_block_map(result=result)
+        item_map = self._create_item_map(result=result)
 
-        blocks = []
+        items = []
         for i in range(len(result.level)):
             id = self._get_line_id(result=result, line=i)
             parent_id = self._get_parent_id(result=result, line=i)
@@ -207,14 +206,14 @@ class TesseractOcrProvider(BaseOcrProvider):
                 relationships = [
                     schemas.OcrRelationshipSchema(
                         type=schemas.OcrRelationshipType.child,
-                        id=block_map[parent_id]
+                        id=item_map[parent_id]
                     )
                 ]
             else:
                 relationships = []
 
-            block = schemas.OcrItemSchema(
-                id=block_map[id],
+            item = schemas.OcrItemSchema(
+                id=item_map[id],
                 type=type_map[result.level[i]],
                 page=page,
                 left=round(result.left[i] / dimensions[0], 5),
@@ -224,12 +223,10 @@ class TesseractOcrProvider(BaseOcrProvider):
                 confidence=result.conf[i] if result.conf[i] != -1 else None,
                 content=result.text[i] if len(result.text[i]) > 0 else None,
                 relationships=relationships,
-                labels=[],
-                user_content=None
             )
 
-            blocks.append(block)
+            items.append(item)
 
-        return blocks
+        return items
 
 # ---------------------------------------------------------------------------- #

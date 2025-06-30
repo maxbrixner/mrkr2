@@ -1,4 +1,4 @@
-import { DocumentViewer } from './document_viewer.js';
+/*import { DocumentViewer } from './document_viewer.js';
 import { LabelButton } from './label_button.js';
 
 interface LabelViewerAttributes {
@@ -25,7 +25,7 @@ interface OcrItemResponse {
 
 interface OcrResponse {
     id: string;
-    blocks: OcrItemResponse[];
+    items: OcrItemResponse[];
     timestamp: string;
 }
 
@@ -69,7 +69,6 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
                 padding: 1rem;
                 background-color: var(--document-viewer-page-background, #ffffff);
                 border: 1px solid var(--document-viewer-page-border-color, #000000);
-                /*box-shadow: var(--document-viewer-page-box-shadow, 0 2px 4px rgba(0, 0, 0, 0.1));*/
             }
 
             .ocr-block-content {
@@ -324,7 +323,7 @@ class LabelViewer extends HTMLElement implements LabelViewerAttributes {
 
 }
 
-customElements.define('label-viewer', LabelViewer);
+customElements.define('label-viewer', LabelViewer);*/
 
 
 /*                    if (!ocr) return;

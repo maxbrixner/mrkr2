@@ -9,6 +9,7 @@ import functools
 from PIL import Image
 from typing import Any, AsyncGenerator, List, Optional, Self
 
+# ---------------------------------------------------------------------------- #
 
 import mrkr.schemas as schemas
 

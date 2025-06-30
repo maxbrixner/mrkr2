@@ -33,7 +33,7 @@ interface OcrItemResponse {
 
 interface OcrResponse {
     id: string;
-    blocks: OcrItemResponse[];
+    items: OcrItemResponse[];
     timestamp: string;
 }
 

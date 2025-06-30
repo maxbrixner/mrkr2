@@ -2,7 +2,7 @@
 
 import pydantic
 import enum
-from typing import List
+from typing import Optional
 
 # ---------------------------------------------------------------------------- #
 
@@ -185,10 +185,59 @@ class ProjectOcrProviderSchema(pydantic.BaseModel):
 # ---------------------------------------------------------------------------- #
 
 
+class LabelSetupType(str, enum.Enum):
+    """
+    Enum for label setup types.
+    """
+    blockwise = "blockwise"
+
+# ---------------------------------------------------------------------------- #
+
+
+class BaseLabelSetupConfigSchema(pydantic.BaseModel):
+    pass
+
+# ---------------------------------------------------------------------------- #
+
+
+class BlockwiseLabelSetupConfig(BaseLabelSetupConfigSchema):
+    pass
+
+# ---------------------------------------------------------------------------- #
+
+
+class ProjectLabelSetupSchema(pydantic.BaseModel):
+    """
+    Schema for the label setup of a project.
+    """
+    type: LabelSetupType = pydantic.Field(
+        ...,
+        description="The type of label setup.",
+        examples=["blockwise"]
+    )
+    config: Optional[BlockwiseLabelSetupConfig] = pydantic.Field(
+        ...,
+        description="Configuration for the label setup.",
+        examples=[{}]
+    )
+
+# ---------------------------------------------------------------------------- #
+
+
 class ProjectSchema(pydantic.BaseModel):
     """
     Schema for a project.
     """
+    label_setup: ProjectLabelSetupSchema = pydantic.Field(
+        ...,
+        description="Label setup configuration for the project.",
+        examples=[
+            {
+                "type": "blockwise",
+                "config": {}
+            }
+        ]
+    )
     file_provider: ProjectFileProviderSchema = pydantic.Field(
         ...,
         description="File provider for the project.",
@@ -232,17 +281,21 @@ class ProjectCreateSchema(pydantic.BaseModel):
         ...,
         description="Configuration for the project.",
         examples=[{
+            "label_setup": {
+                "type": "blockwise",
+                "config": {}
+            },
             "file_provider": {
-                    "type": "local",
-                    "config": {
-                        "path": "demo",
-                        "pdf_dpi": 200
-                    }
+                "type": "local",
+                "config": {
+                    "path": "demo",
+                    "pdf_dpi": 200
+                }
             },
             "ocr_provider": {
                 "type": "tesseract",
                 "config": {
-                        "language": "eng"
+                    "language": "eng"
                 }
             }
         }]
