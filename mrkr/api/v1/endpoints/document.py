@@ -58,9 +58,6 @@ async def document_content(
     """
     document = crud.get_document(session=session, id=document_id)
 
-    import asyncio
-    await asyncio.sleep(page)
-
     if not document:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,

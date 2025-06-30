@@ -145,10 +145,6 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
                 animation: spin 1s linear infinite;
             }
 
-            .page.loading::before {
-                margin: 4rem auto;
-            }
-
             .error::before {
                 content: "error";
                 display: block;
@@ -158,6 +154,20 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
                 user-select: none;
                 background-color: var(--document-viewer-page-background, #ffffff);
                 box-shadow: var(--document-viewer-page-box-shadow, 0 2px 4px rgba(0, 0, 0, 0.1));
+                position: relative;
+                padding: none;
+                margin: 0 auto;
+                width: 100%;
+            }
+
+            .page > img {
+                width: 100%;
+                height: auto;
+                display: block
+            }
+
+            .page.loading::before {
+                margin: 4rem auto;
             }
 
             .highlight {
@@ -202,6 +212,11 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         this.shadowRoot?.appendChild(this._viewerElement);
     }
 
+    /**
+     * Populates the viewer with pages based on the metadata and content URLs.
+     * This method fetches the metadata and content for each page, creates
+     * the page elements, and adds them to the viewer.
+     */
     private _populateViewer() {
         if (!this.metadataUrl || !this.contentUrl || !this.showPages) {
             return;
@@ -227,6 +242,11 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         });
     }
 
+    /**
+     * Creates page elements based on the metadata.
+     * Each page element is created with the appropriate styles and attributes,
+     * and the content is fetched asynchronously.
+     */
     private _createPages(metadata: DocumentMetadataResponse | null = null) {
         if (!this._viewerElement) return;
         if (!metadata || !metadata.pages) return;
@@ -234,14 +254,16 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         for (const page of metadata.pages) {
             const pageElement = document.createElement('div');
 
-            pageElement.classList.add('page', 'loading');
+            pageElement.classList.add('page');
 
-            pageElement.style.padding = 'none';
-            pageElement.style.margin = '0 auto';
-            pageElement.style.width = '100%';
+            if (this.showPages === 'instantly')
+                pageElement.classList.add('loading');
+
+            if (page.page > 1 && this.showPages === 'first-loaded')
+                pageElement.classList.add('loading');
+
             pageElement.style.gridRow = `${page.page}`;
             pageElement.style.aspectRatio = `${page.aspect_ratio}`;
-            pageElement.style.position = 'relative';
 
             pageElement.title = `Page ${page.page}`;
 
@@ -269,6 +291,11 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         }
     }
 
+    /**
+     * Loads the content of a page into the page element.
+     * This method creates an image element, sets its source to the base64
+     * content, and appends it to the page element.
+     */
     private _loadPageContent(pageElement: HTMLDivElement, content: PageContentResponse) {
         if (!this._viewerElement) return;
 
@@ -277,15 +304,17 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         imageElement.src = `data:${content.mime};base64,${content.content}`;
         imageElement.alt = pageElement.title;
 
-        imageElement.style.width = '100%';
-        imageElement.style.height = 'auto';
-        imageElement.style.display = 'block';
-
         pageElement.appendChild(imageElement);
 
         pageElement.classList.remove('loading');
     }
 
+    /**
+     * Adds all created pages to the viewer element.
+     * This method removes the loading class from the viewer element and appends
+     * each page element to the viewer. It also dispatches a custom event to notify
+     * that pages have been added.
+     */
     private _addPagesToViewer() {
         if (!this._viewerElement) return;
 
@@ -298,6 +327,11 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         this._dispatchPagesAddedEvent();
     }
 
+    /**
+     * Dispatches a custom event indicating that pages have been created.
+     * This event can be used by other components to react to the creation of pages.
+     * It bubbles up through the DOM and can be composed to cross shadow DOM boundaries.
+     */
     private _dispatchPagesCreatedEvent() {
         this.dispatchEvent(new CustomEvent<PagesCreatedEventDetail>('pages-created', {
             detail: {},
@@ -306,6 +340,11 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         }));
     }
 
+    /**
+     * Dispatches a custom event indicating that pages have been added to the viewer.
+     * This event can be used by other components to react to the addition of pages.
+     * It bubbles up through the DOM and can be composed to cross shadow DOM boundaries.
+     */
     private _dispatchPagesAddedEvent() {
         this.dispatchEvent(new CustomEvent<PagesAddedEventDetail>('pages-added', {
             detail: {},
@@ -314,6 +353,11 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         }));
     }
 
+    /**
+     * Queries the metadata from the metadata URL.
+     * This method fetches the metadata and returns it as a JSON object.
+     * If the metadata URL is not set or the response is not OK, it throws an error.
+     */
     private async _queryMetadata(): Promise<DocumentMetadataResponse | null> {
         if (!this.metadataUrl) {
             throw new Error('Metadata URL is not set');
@@ -332,6 +376,11 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         return metadata;
     }
 
+    /**
+     * Queries the content of a specific page from the content URL.
+     * This method fetches the content for the specified page and returns it as a JSON object.
+     * If the content URL is not set or the response is not OK, it throws an error.
+     */
     private async _queryPage(page: number): Promise<PageContentResponse | null> {
         const response = await fetch(`${this.contentUrl}/?page=${page}`);
         if (!response.ok) {
@@ -347,6 +396,12 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         return content;
     }
 
+    /**
+     * Adds a highlight to a specific page.
+     * This method creates a highlight element with the specified position and size,
+     * sets its title, and appends it to the specified page element.
+     * It also adds event listeners to the highlight element if provided.
+     */
     public addHighlight(
         page: number,
         left: number,
