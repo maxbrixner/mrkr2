@@ -117,7 +117,7 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
                 margin: 0;
                 padding: .6rem 1rem;
                 font-size: .8rem;
-                font-weight: 400;
+                font-weight: 500;
                 user-select: none;
                 font-family: inherit;
             }
