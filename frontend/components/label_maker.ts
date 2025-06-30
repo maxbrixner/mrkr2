@@ -89,11 +89,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 this._documentViewer.setAttribute('content-url',
                     this.documentContentUrl);
         } else if (propertyName === 'show-pages') {
-            if (newValue !== 'instantly' && newValue !== 'first-loaded' &&
-                newValue !== 'all-loaded') {
-                return;
-            }
-            this.showPages = newValue || "all-loaded";
+            this.showPages = newValue as 'instantly' | 'first-loaded' | 'all-loaded';
             if (this.showPages)
                 this._documentViewer.setAttribute('show-pages',
                     this.showPages);
@@ -136,8 +132,8 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         this.shadowRoot.appendChild(style);
 
         this._resizablePanes.setAttribute('orientation', 'vertical');
-        this._resizablePanes.setAttribute('minsize', '400');
-        this._resizablePanes.setAttribute('startsize', '50');
+        this._resizablePanes.setAttribute('minsize', '400px');
+        this._resizablePanes.setAttribute('startsize', '50%');
 
         this._documentViewer.slot = 'first';
         this._resizablePanes.appendChild(this._documentViewer);
