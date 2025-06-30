@@ -1,16 +1,90 @@
+/* -------------------------------------------------------------------------- */
+
 interface TabContainerAttributes {
 }
 
+/* -------------------------------------------------------------------------- */
+
 export class TabContainer extends HTMLElement implements TabContainerAttributes {
-    private _ContainerElement: HTMLDivElement;
-    private _TabBarElement: HTMLDivElement;
-    private _TabContentElement: HTMLDivElement;
+    private _ContainerElement: HTMLDivElement = document.createElement('div');
+    private _TabBarElement: HTMLDivElement = document.createElement('div');
+    private _TabContentElement: HTMLDivElement = document.createElement('div');
     private _slots: HTMLSlotElement[] = [];
     private _tabs: HTMLButtonElement[] = [];
 
+    /**
+     * Creates an instance of the TabContainer component.
+     */
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
+
+        this._populateShadowRoot();
+    }
+
+    /**
+     * Returns an array of attribute names that this component observes.
+     */
+    static get observedAttributes() {
+        return [];
+    }
+
+    /**
+     * Handles changes to the attributes of the component.
+     */
+    attributeChangedCallback() {
+        //
+    }
+
+    /**
+     * Called when the component is added to the DOM.
+     */
+    connectedCallback() {
+        if (!this._ContainerElement) return;
+        if (!this._TabBarElement) return;
+        if (!this._TabContentElement) return;
+
+        Array.from(this.children).forEach((child, idx) => {
+            const slotName = child.slot || `tab-${idx}`;
+            child.setAttribute('slot', slotName);
+
+            const slot = document.createElement('slot');
+            slot.name = slotName;
+            if (idx === 0) {
+                slot.classList.add('active');
+            }
+
+            this._TabContentElement.appendChild(slot);
+            this._slots.push(slot);
+
+            const tab = document.createElement('button');
+            tab.classList.add('tab');
+
+            if (idx === 0) {
+                tab.classList.add('active');
+            }
+
+            tab.textContent = slotName;
+            tab.addEventListener('click', this._onTabClick.bind(this, slot, tab));
+            this._TabBarElement.appendChild(tab);
+            this._tabs.push(tab);
+        });
+    }
+
+    /**
+     * Called when the component is removed from the DOM.
+     */
+    disconnectedCallback() {
+        //..
+    }
+
+    /**
+     * Populates the shadow root with the component's structure.
+     */
+    private _populateShadowRoot() {
+        if (!this.shadowRoot) {
+            return;
+        }
 
         const style = document.createElement('style');
         style.textContent = `
@@ -75,51 +149,10 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
         this.shadowRoot?.appendChild(this._ContainerElement);
     }
 
-    static get observedAttributes() {
-        return [];
-    }
-
-    attributeChangedCallback() {
-        //
-    }
-
-    connectedCallback() {
-        if (!this._ContainerElement) return;
-        if (!this._TabBarElement) return;
-        if (!this._TabContentElement) return;
-
-        Array.from(this.children).forEach((child, idx) => {
-
-            const slotName = child.slot || `tab-${idx}`;
-            child.setAttribute('slot', slotName);
-
-            const slot = document.createElement('slot');
-            slot.name = slotName;
-            if (idx === 0) {
-                slot.classList.add('active');
-            }
-
-            this._TabContentElement.appendChild(slot);
-            this._slots.push(slot);
-
-            const tab = document.createElement('button');
-            tab.classList.add('tab');
-
-            if (idx === 0) {
-                tab.classList.add('active');
-            }
-
-            tab.textContent = slotName;
-            tab.addEventListener('click', this._onTabClick.bind(this, slot, tab));
-            this._TabBarElement.appendChild(tab);
-            this._tabs.push(tab);
-        });
-    }
-
-    disconnectedCallback() {
-        //..
-    }
-
+    /**
+     * Handles the click event on a tab button.
+     * This method updates the active slot and tab based on the clicked tab.
+     */
     private _onTabClick(slot: HTMLSlotElement, tab: HTMLButtonElement) {
         this._slots.forEach(slot => {
             slot.classList.remove('active');
@@ -132,4 +165,8 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
     }
 }
 
+/* -------------------------------------------------------------------------- */
+
 customElements.define('tab-container', TabContainer);
+
+/* -------------------------------------------------------------------------- */
