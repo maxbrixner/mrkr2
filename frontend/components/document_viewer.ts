@@ -1,3 +1,6 @@
+
+/* -------------------------------------------------------------------------- */
+
 interface DocumentViewerAttributes {
     metadataUrl?: string;
     contentUrl?: string;
@@ -32,23 +35,80 @@ interface PageContentResponse {
     mime: string;
 }
 
+/* -------------------------------------------------------------------------- */
+
 export class DocumentViewer extends HTMLElement implements DocumentViewerAttributes {
     public metadataUrl?: string = undefined;
     public contentUrl?: string = undefined;
-    // todo: make something of this
-    public showPages: "instantly" | "first-loaded" | "all-loaded" = "all-loaded";
-    private _style: HTMLStyleElement | null = null;
+    public showPages?: "instantly" | "first-loaded" | "all-loaded" = undefined;
     private _viewerElement: HTMLDivElement | null = null;
-    private _metadata: DocumentMetadataResponse | null = null;
     private _pages: { [page: number]: HTMLDivElement } = {};
 
+    /**
+     * Creates an instance of LabelMaker.
+     */
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
 
-        this._style = document.createElement('style');
+        this._populateShadowRoot();
+    }
+
+    /**
+     * Returns an array of attribute names that this component observes.
+     */
+    static get observedAttributes() {
+        return ['metadata-url', 'content-url', 'show-pages'];
+    }
+
+    /**
+     * Handles changes to the attributes of the component.
+     */
+    attributeChangedCallback(
+        propertyName: string,
+        oldValue: string | null,
+        newValue: string | null) {
+        if (oldValue === newValue) return;
+
+        if (propertyName === 'metadata-url') {
+            this.metadataUrl = newValue || undefined;
+        } else if (propertyName === 'content-url') {
+            this.contentUrl = newValue || undefined;
+        } else if (propertyName === 'show-pages') {
+            if (newValue !== 'instantly' && newValue !== 'first-loaded' &&
+                newValue !== 'all-loaded') {
+                return;
+            }
+            this.showPages = newValue || 'all-loaded';
+        }
+
+        this._populateViewer();
+    }
+
+    /**
+     * Called when the component is added to the DOM.
+     */
+    connectedCallback() {
+    }
+
+    /**
+     * Called when the component is removed from the DOM.
+     */
+    disconnectedCallback() {
+    }
+
+    /**
+     * Populates the shadow root with the component's structure.
+     */
+    private _populateShadowRoot() {
+        if (!this.shadowRoot) {
+            return;
+        }
+
+        const style = document.createElement('style');
+
         // todo: we do not need the document-viewer div - we can just use the host?
-        this._style.textContent = `
+        style.textContent = `
             :host {
                 display: block;
                 width: 100%;
@@ -138,58 +198,32 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         const slot = document.createElement('slot');
         this._viewerElement.appendChild(slot);
 
-        this.shadowRoot?.appendChild(this._style);
+        this.shadowRoot?.appendChild(style);
         this.shadowRoot?.appendChild(this._viewerElement);
     }
 
-    static get observedAttributes() {
-        return ['metadata-url', 'content-url', 'show-pages'];
-    }
-
-    attributeChangedCallback(propertyName: string, oldValue: string | null, newValue: string | null) {
-        if (oldValue === newValue) return;
-        console.log("a", propertyName, oldValue, newValue);
-
-        if (propertyName === 'metadata-url') {
-            this.metadataUrl = newValue || undefined;
-        } else if (propertyName === 'content-url') {
-            this.contentUrl = newValue || undefined;
-        } else if (propertyName === 'show-pages') {
-            if (newValue !== 'instantly' && newValue !== 'first-loaded' &&
-                newValue !== 'all-loaded') {
-                return;
-            }
-            this.showPages = newValue || 'all-loaded';
-        }
-
-        this._populateViewer();
-    }
-
-    connectedCallback() {
-    }
-
-    disconnectedCallback() {
-    }
-
     private _populateViewer() {
-        if (!this.metadataUrl || !this.contentUrl) {
+        if (!this.metadataUrl || !this.contentUrl || !this.showPages) {
             return;
         }
-
-        console.log("aaaa")
-
         if (!this._viewerElement) return;
+
         this._viewerElement.innerHTML = '';
+
         this._viewerElement.classList.add('loading');
 
         this._queryMetadata().then(metadata => {
             if (!metadata) {
+                // todo: handle this by adding text to show the user
                 return;
             }
             this._createPages(metadata);
+            if (this.showPages === 'instantly')
+                this._addPagesToViewer();
             this._dispatchPagesCreatedEvent();
         }).catch(error => {
-            throw new Error(`Error fetching metadata: ${error.message}`);
+            // todo: handle this by showing the user
+            throw new Error(`Error fetching document metadata: {error.message}`);
         });
     }
 
@@ -221,7 +255,10 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
                 }
                 this._loadPageContent(pageElement, content);
 
-                if (page.page === 1) // add pages after first page is fully loaded to avoid flickering
+                if (this.showPages === 'first-loaded' && page.page === 1)
+                    this._addPagesToViewer();
+
+                if (this.showPages === 'all-loaded' && page.page === metadata.pages.length)
                     this._addPagesToViewer();
             }).catch(error => {
                 pageElement.classList.remove('loading');
@@ -341,4 +378,8 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
 
 }
 
+/* -------------------------------------------------------------------------- */
+
 customElements.define('document-viewer', DocumentViewer);
+
+/* -------------------------------------------------------------------------- */

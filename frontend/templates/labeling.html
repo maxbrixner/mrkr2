@@ -23,7 +23,7 @@
 {% block main %}
 <main class="labeling-main">
     <label-maker document-metadata-url="{{ url_for('document_metadata', document_id=document.id) }}"
-        document-content-url="{{ url_for('document_content', document_id=document.id) }}"
+        document-content-url="{{ url_for('document_content', document_id=document.id) }}" show-pages="all-loaded"
         ocr-url="{{ url_for('ocr_retrieve', ocr_id=ocr_id) }}">
     </label-maker>
 </main>

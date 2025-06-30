@@ -37,14 +37,13 @@ interface OcrResponse {
     timestamp: string;
 }
 
-
 /* -------------------------------------------------------------------------- */
 
 class LabelMaker extends HTMLElement implements LabelMakerAttributes {
     public documentMetadataUrl?: string = undefined;
     public documentContentUrl?: string = undefined;
     public ocrUrl?: string = undefined;
-    public showPages: 'instantly' | 'first-loaded' | 'all-loaded' = 'instantly';
+    public showPages?: 'instantly' | 'first-loaded' | 'all-loaded' = undefined;
     private _resizablePanes: ResizablePanes = new ResizablePanes();
     private _documentViewer: DocumentViewer = new DocumentViewer();
     private _tabContainer: TabContainer = new TabContainer();
