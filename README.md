@@ -80,21 +80,16 @@ You can then use the client as follows:
 ```python
 import mrkr.sdk as sdk
 
-with sdk.MrkrClient() as client:
-    # Your code here
-```
-
-Examples:
-
-```python
-import mrkr.sdk as sdk
-
 with sdk.MrkrClient(log_level="DEBUG") as client:
 
     # create demo project
     project_id = client.create_project(
         name="Demo Project",
         config=sdk.schemas.ProjectSchema(
+            label_setup={
+                "type": "blockwise",
+                "config": {}
+            },
             file_provider={
                 "type": "local",
                 "config": {
