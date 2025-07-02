@@ -2,7 +2,7 @@
 
 import pydantic
 import enum
-from typing import Optional
+from typing import Optional, List
 
 # ---------------------------------------------------------------------------- #
 
@@ -182,43 +182,52 @@ class ProjectOcrProviderSchema(pydantic.BaseModel):
             examples=[{"language": "eng"}]
         )
 
-# ---------------------------------------------------------------------------- #
-
-
-class LabelSetupType(str, enum.Enum):
-    """
-    Enum for label setup types.
-    """
-    blockwise = "blockwise"
 
 # ---------------------------------------------------------------------------- #
 
 
-class BaseLabelSetupConfigSchema(pydantic.BaseModel):
-    pass
+class LabelType(str, enum.Enum):
+    """
+    Enum for label types.
+    """
+    classification = "classification"
+    exclusive_classification = "classification_exclusive"
+    text = "text"
 
 # ---------------------------------------------------------------------------- #
 
 
-class BlockwiseLabelSetupConfig(BaseLabelSetupConfigSchema):
-    pass
+class LabelTarget(str, enum.Enum):
+    """
+    Enum for label types.
+    """
+    document = "document"
+    page = "page"
+    block = "block"
 
 # ---------------------------------------------------------------------------- #
 
 
-class ProjectLabelSetupSchema(pydantic.BaseModel):
+class LabelDefinitionSchema(pydantic.BaseModel):
     """
-    Schema for the label setup of a project.
+    Schema for a label type in a project.
     """
-    type: LabelSetupType = pydantic.Field(
+    type: LabelType = pydantic.Field(
         ...,
-        description="The type of label setup.",
-        examples=["blockwise"]
+        description="The type of label."
     )
-    config: Optional[BlockwiseLabelSetupConfig] = pydantic.Field(
+    targets: List[LabelTarget] = pydantic.Field(
         ...,
-        description="Configuration for the label setup.",
-        examples=[{}]
+        description="The targets for the label (document, page, block).",
+    )
+    name: str = pydantic.Field(
+        ...,
+        min_length=1, max_length=50,
+        description="The name of the label.",
+    )
+    color: str = pydantic.Field(
+        pattern=r"^#(?:[0-9a-fA-F]{3}){1,2}$",
+        description="The color of the label in hex format (starting with #)."
     )
 
 # ---------------------------------------------------------------------------- #
@@ -228,40 +237,17 @@ class ProjectSchema(pydantic.BaseModel):
     """
     Schema for a project.
     """
-    label_setup: ProjectLabelSetupSchema = pydantic.Field(
+    label_definitions: List[LabelDefinitionSchema] = pydantic.Field(
         ...,
-        description="Label setup configuration for the project.",
-        examples=[
-            {
-                "type": "blockwise",
-                "config": {}
-            }
-        ]
+        description="List of label definitions for the project."
     )
     file_provider: ProjectFileProviderSchema = pydantic.Field(
         ...,
-        description="File provider for the project.",
-        examples=[
-            {
-                "type": "local",
-                "config": {
-                    "path": "demo",
-                    "pdf_dpi": 200
-                }
-            }
-        ]
+        description="File provider for the project."
     )
     ocr_provider: ProjectOcrProviderSchema = pydantic.Field(
         ...,
-        description="OCR provider for the project.",
-        examples=[
-            {
-                "type": "tesseract",
-                "config": {
-                    "language": "eng"
-                }
-            }
-        ]
+        description="OCR provider for the project."
     )
 
 # ---------------------------------------------------------------------------- #
@@ -281,10 +267,68 @@ class ProjectCreateSchema(pydantic.BaseModel):
         ...,
         description="Configuration for the project.",
         examples=[{
-            "label_setup": {
-                "type": "blockwise",
-                "config": {}
-            },
+            "label_definitions": [
+                {
+                    "type": "classification_exclusive",
+                    "targets": ["document"],
+                    "name": "Letter",
+                    "color": "#4CAF50"
+                },
+                {
+                    "type": "classification_exclusive",
+                    "targets": ["document"],
+                    "name": "Email",
+                    "color": "#2196F3"
+                },
+                {
+                    "type": "classification",
+                    "targets": ["page"],
+                    "name": "Cover Page",
+                    "color": "#FF9800"
+                },
+                {
+                    "type": "classification",
+                    "targets": ["page"],
+                    "name": "Attachment",
+                    "color": "#F44336"
+                },
+                {
+                    "type": "classification",
+                    "targets": ["block"],
+                    "name": "Header",
+                    "color": "#9C27B0"
+                },
+                {
+                    "type": "classification",
+                    "targets": ["block"],
+                    "name": "Body",
+                    "color": "#00BCD4"
+                },
+                {
+                    "type": "classification",
+                    "targets": ["block"],
+                    "name": "Footer",
+                    "color": "#FFEB3B"
+                },
+                {
+                    "type": "text",
+                    "targets": ["block"],
+                    "name": "Name",
+                    "color": "#607D8B"
+                },
+                {
+                    "type": "text",
+                    "targets": ["block"],
+                    "name": "IBAN",
+                    "color": "#8BC34A"
+                },
+                {
+                    "type": "text",
+                    "targets": ["block"],
+                    "name": "Street",
+                    "color": "#3F51B5"
+                }
+            ],
             "file_provider": {
                 "type": "local",
                 "config": {
