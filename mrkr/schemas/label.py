@@ -38,6 +38,38 @@ class TextLabelSchema(LabelSchema):
 # ---------------------------------------------------------------------------- #
 
 
+class CoordinateSchema(pydantic.BaseModel):
+    """
+    Schema for coordinates of a fragment.
+    """
+    left: float = pydantic.Field(
+        ...,
+        description="The left coordinate in the image, "
+                    "normalized to [0, 1].",
+        examples=[0.1]
+    )
+    top: float = pydantic.Field(
+        ...,
+        description="The top coordinate in the image, "
+                    "normalized to [0, 1].",
+        examples=[0.1]
+    )
+    width: float = pydantic.Field(
+        ...,
+        description="The width in the image, "
+                    "normalized to [0, 1].",
+        examples=[0.8]
+    )
+    height: float = pydantic.Field(
+        ...,
+        description="The height in the image, "
+                    "normalized to [0, 1].",
+        examples=[0.2]
+    )
+
+# ---------------------------------------------------------------------------- #
+
+
 class BlockLabelSchema(pydantic.BaseModel):
     """
     Schema for labels associated with a specific page in a document.
@@ -53,6 +85,11 @@ class BlockLabelSchema(pydantic.BaseModel):
     text_labels: List[TextLabelSchema] = pydantic.Field(
         ...,
         description="List of text labels associated with the block.",
+    )
+    coordinate: CoordinateSchema = pydantic.Field(
+        ...,
+        description="Coordinates of the block in the image, "
+                    "normalized to [0, 1]."
     )
     content: str = pydantic.Field(
         ...,

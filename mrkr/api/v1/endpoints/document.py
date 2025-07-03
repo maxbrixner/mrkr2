@@ -77,18 +77,3 @@ async def document_content(
     )
 
 # ---------------------------------------------------------------------------- #
-
-
-@router.post("/create",
-             summary="Create Document")
-async def document_create(
-    document: schemas.DocumentCreateSchema,
-    session: database.DatabaseDependency
-) -> Dict:
-    """
-    Create a new document.
-    """
-    crud.create_document(session=session, document=document)
-    return {"message": f"Document '{document.path}' created successfully."}
-
-# ---------------------------------------------------------------------------- #

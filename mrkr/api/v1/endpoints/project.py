@@ -9,6 +9,8 @@ import mrkr.schemas as schemas
 import mrkr.crud as crud
 import mrkr.database as database
 import mrkr.providers as providers
+import mrkr.services as services
+import mrkr.core as core
 
 # ---------------------------------------------------------------------------- #
 
@@ -38,7 +40,8 @@ async def project_create(
 @router.post("/scan/{project_id}", summary="Scan Project")
 async def project_scan_schedule(
     project_id: int,
-    session: database.DatabaseDependency
+    session: database.DatabaseDependency,
+    worker: services.WorkerPoolDependency
 ) -> Dict:
     """
     Scan a project.
@@ -51,21 +54,10 @@ async def project_scan_schedule(
             detail="Project not found"
         )
 
-    file_provider = providers.get_file_provider(
-        project_config=project.config)
-
-    # todo: do this somewhere else and take care of already present files ...
-    # also do this with a worker and a queue in postgres
-
-    async with file_provider("/") as provider:
-        async for file in provider.list():
-            crud.create_document(
-                session=session,
-                document=schemas.DocumentCreateSchema(
-                    project_id=project.id,
-                    path=file
-                )
-            )
+    worker.submit(
+        core.scan_project,
+        project=project
+    )
 
     return {
         "message": f"Scan scheduled for project {project_id}."

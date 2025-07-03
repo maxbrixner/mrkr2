@@ -6,17 +6,23 @@ from typing import Annotated
 
 # ---------------------------------------------------------------------------- #
 
-import mrkr.services as services
+from .templates import get_templates
+from .config import get_configuration, ConfigSchema
+from .worker import get_worker_pool, WorkerPool
 
 # ---------------------------------------------------------------------------- #
 
 
 ConfigDependency = Annotated[
-    services.ConfigSchema, fastapi.Depends(services.get_configuration)
+    ConfigSchema, fastapi.Depends(get_configuration)
 ]
 
 TemplatesDependency = Annotated[
-    Jinja2Templates, fastapi.Depends(services.get_templates)
+    Jinja2Templates, fastapi.Depends(get_templates)
+]
+
+WorkerPoolDependency = Annotated[
+    WorkerPool, fastapi.Depends(get_worker_pool)
 ]
 
 # ---------------------------------------------------------------------------- #

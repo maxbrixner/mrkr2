@@ -11,6 +11,7 @@ from typing import AsyncGenerator
 # ---------------------------------------------------------------------------- #
 
 import mrkr.database as database
+import mrkr.services as services
 
 # ---------------------------------------------------------------------------- #
 
@@ -29,11 +30,15 @@ async def lifespan(app: fastapi.FastAPI) -> AsyncGenerator[None, None]:
 
     database_instance.connect()
 
+    worker_pool = services.get_worker_pool()
+
     logger.info("Application startup complete.")
 
     yield
 
     database_instance.disconnect()
+
+    worker_pool.shutdown(wait=True)
 
     logger.info("Application shutdown complete.")
 

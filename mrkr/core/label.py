@@ -79,6 +79,12 @@ def _initialize_label_blocks(
                 ocr_item_id=item.id,
                 labels=[],
                 text_labels=[],
+                coordinate=schemas.CoordinateSchema(
+                    left=item.left,
+                    top=item.top,
+                    width=item.width,
+                    height=item.height
+                ),
                 content=_get_item_content(
                     ocr_result=ocr_result,
                     ocr_item=item

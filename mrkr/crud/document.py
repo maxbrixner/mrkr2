@@ -2,6 +2,7 @@
 
 import sqlmodel
 import datetime
+from typing import List, Sequence
 
 # ---------------------------------------------------------------------------- #
 
@@ -19,6 +20,22 @@ def get_document(
     Retrieve a document from the database by its ID.
     """
     return session.get(models.Document, id)
+
+# ---------------------------------------------------------------------------- #
+
+
+def get_project_documents(
+    session: sqlmodel.Session,
+    project_id: int
+) -> Sequence[models.Document]:
+    """
+    Retrieve all documents for a specific project from the database.
+    """
+    return session.exec(
+        sqlmodel.select(models.Document).where(
+            models.Document.project_id == project_id
+        )
+    ).all()
 
 # ---------------------------------------------------------------------------- #
 

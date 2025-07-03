@@ -23,5 +23,6 @@ class Document(sqlmodel.SQLModel, table=True):
     )
 
     project: Project = sqlmodel.Relationship()
+    ocr: Ocr | None = sqlmodel.Relationship()
 
 # ---------------------------------------------------------------------------- #
