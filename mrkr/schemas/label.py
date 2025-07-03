@@ -38,9 +38,9 @@ class TextLabelSchema(LabelSchema):
 # ---------------------------------------------------------------------------- #
 
 
-class CoordinateSchema(pydantic.BaseModel):
+class PositionSchema(pydantic.BaseModel):
     """
-    Schema for coordinates of a fragment.
+    Schema for the position of an OCR fragment.
     """
     left: float = pydantic.Field(
         ...,
@@ -74,7 +74,7 @@ class BlockLabelSchema(pydantic.BaseModel):
     """
     Schema for labels associated with a specific page in a document.
     """
-    ocr_item_id: uuid.UUID = pydantic.Field(
+    id: uuid.UUID = pydantic.Field(
         ...,
         description="The unique identifier for the OCR item (as a UUID4)."
     )
@@ -86,7 +86,7 @@ class BlockLabelSchema(pydantic.BaseModel):
         ...,
         description="List of text labels associated with the block.",
     )
-    coordinate: CoordinateSchema = pydantic.Field(
+    position: PositionSchema = pydantic.Field(
         ...,
         description="Coordinates of the block in the image, "
                     "normalized to [0, 1]."
@@ -103,6 +103,10 @@ class PageLabelSchema(pydantic.BaseModel):
     """
     Schema for labels associated with a specific page in a document.
     """
+    id: uuid.UUID = pydantic.Field(
+        ...,
+        description="The unique identifier for the OCR item (as a UUID4)."
+    )
     page: int = pydantic.Field(
         ...,
         description="The page number in the document (starting from 1).",

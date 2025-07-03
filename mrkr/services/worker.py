@@ -44,6 +44,8 @@ class WorkerPool(concurrent.futures.ThreadPoolExecutor):
         Shutdown the worker pool gracefully.
         """
         logger.info("Shutting down worker pool.")
+        logger.debug(
+            f"Worker pool remaining queue size: {self._work_queue.qsize()}")
         super().shutdown(*args, **kwargs)
 
 # ---------------------------------------------------------------------------- #

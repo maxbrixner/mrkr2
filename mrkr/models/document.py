@@ -2,6 +2,10 @@
 
 import sqlmodel
 import datetime
+from typing import List
+
+# ---------------------------------------------------------------------------- #
+
 from .project import Project
 from .ocr import Ocr
 
@@ -23,6 +27,8 @@ class Document(sqlmodel.SQLModel, table=True):
     )
 
     project: Project = sqlmodel.Relationship()
-    ocr: Ocr | None = sqlmodel.Relationship()
+    ocr: List[Ocr] = sqlmodel.Relationship(
+        back_populates="document",
+    )
 
 # ---------------------------------------------------------------------------- #

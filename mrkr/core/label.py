@@ -21,7 +21,7 @@ def _get_item_children(
 
         for relationship in item.relationships:
             if relationship.type == schemas.OcrRelationshipType.child \
-                    and relationship.id == item.id:
+                    and relationship.id == ocr_item.id:
                 result.append(item)
 
     return result
@@ -36,7 +36,7 @@ def _get_item_content(
         content = ""
 
     if ocr_item.content and len(ocr_item.content) > 0:
-        content += (content + " ")
+        content += (ocr_item.content + " ")
 
     children = _get_item_children(
         ocr_result=ocr_result,
@@ -76,10 +76,10 @@ def _initialize_label_blocks(
 
         result.append(
             schemas.BlockLabelSchema(
-                ocr_item_id=item.id,
+                id=item.id,
                 labels=[],
                 text_labels=[],
-                coordinate=schemas.CoordinateSchema(
+                position=schemas.PositionSchema(
                     left=item.left,
                     top=item.top,
                     width=item.width,
@@ -88,7 +88,7 @@ def _initialize_label_blocks(
                 content=_get_item_content(
                     ocr_result=ocr_result,
                     ocr_item=item
-                )
+                ).strip()
             )
         )
 
@@ -105,6 +105,7 @@ def _initialize_label_pages(
 
         result.append(
             schemas.PageLabelSchema(
+                id=item.id,
                 page=item.page,
                 labels=[],
                 blocks=_initialize_label_blocks(
@@ -115,3 +116,15 @@ def _initialize_label_pages(
         )
 
     return result
+
+
+def initialize_label_document(
+    ocr_result: schemas.OcrResultSchema
+) -> schemas.DocumentLabelSchema:
+    """
+    Initialize the label setup based on the OCR result.
+    """
+    return schemas.DocumentLabelSchema(
+        pages=_initialize_label_pages(ocr_result=ocr_result),
+        labels=[]
+    )

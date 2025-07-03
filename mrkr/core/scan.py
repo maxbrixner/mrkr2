@@ -13,6 +13,7 @@ import mrkr.schemas as schemas
 import mrkr.models as models
 import mrkr.crud as crud
 import mrkr.database as database
+from .label import initialize_label_document
 
 # ---------------------------------------------------------------------------- #
 
@@ -56,6 +57,8 @@ async def scan_project(project: models.Project) -> None:
         await _create_label_setup(session=session, project=project)
     except Exception as exception:
         logger.error(f"Error creating label setup: {exception}")
+        # todo: remove
+        logger.exception(exception)
 
 # ---------------------------------------------------------------------------- #
 
@@ -124,7 +127,7 @@ async def _run_project_ocr(
 
     for document in db_documents:
 
-        if document.ocr:
+        if document.ocr and len(document.ocr) > 0:
             logger.debug(f"Document already has OCR: {document.path}")
             continue
 
@@ -156,6 +159,32 @@ async def _create_label_setup(
     Create the label setup for the project.
     """
     logger.debug("Creating label setup...")
+
+    db_documents = crud.get_project_documents(
+        session=session,
+        project_id=project.id
+    )
+
+    for document in db_documents:
+
+        ocr = crud.get_current_ocr(
+            session=session,
+            document=document
+        )
+
+        if not ocr:
+            raise Exception(
+                f"No OCR result found for document: {document.path}"
+            )
+
+        ocr_result = schemas.OcrResultSchema(**ocr.result)
+
+        # todo
+        blub = initialize_label_document(ocr_result=ocr_result)
+
+        import pathlib
+        with pathlib.Path("test.json").open("w") as f:
+            f.write(blub.model_dump_json(indent=4))
 
     logger.debug("Label setup created successfully.")
 

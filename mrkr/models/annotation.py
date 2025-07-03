@@ -4,20 +4,15 @@ import sqlmodel
 import datetime
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy import Column
-from typing import List
-
-# ---------------------------------------------------------------------------- #
-
-from .annotation import Annotation
 
 # ---------------------------------------------------------------------------- #
 
 
-class Ocr(sqlmodel.SQLModel, table=True):
+class Annotation(sqlmodel.SQLModel, table=True):
     id: int = sqlmodel.Field(primary_key=True)
-    document_id: int = sqlmodel.Field(
-        foreign_key="document.id",
-        description="The ID of the document associated with this OCR result."
+    ocr_id: int = sqlmodel.Field(
+        foreign_key="ocr.id",
+        description="The ID of the OCR result associated with this annotation."
     )
     timestamp: datetime.datetime = sqlmodel.Field(
         default_factory=datetime.datetime.now,
@@ -25,12 +20,9 @@ class Ocr(sqlmodel.SQLModel, table=True):
     )
     result: dict = sqlmodel.Field(
         sa_column=Column(JSON),
-        description="The OCR result as a JSON string."
+        description="The annotation result as a JSON string."
     )
 
-    document: "Document" = sqlmodel.Relationship()  # type: ignore
-    annotations: List[Annotation] = sqlmodel.Relationship(
-        back_populates="ocr",
-    )
+    ocr: "Ocr" = sqlmodel.Relationship()  # type: ignore
 
 # ---------------------------------------------------------------------------- #

@@ -57,3 +57,19 @@ def get_current_ocr_id(
     ).first()
 
 # ---------------------------------------------------------------------------- #
+
+
+def get_current_ocr(
+    session: sqlmodel.Session,
+    document: models.Document
+) -> models.Ocr | None:
+    """
+    Retrieve the current OCR result for a document.
+    """
+    return session.exec(
+        sqlmodel.select(models.Ocr)
+        .where(models.Ocr.document_id == document.id)
+        .order_by(sqlmodel.desc(models.Ocr.timestamp))
+    ).first()
+
+# ---------------------------------------------------------------------------- #
