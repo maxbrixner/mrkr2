@@ -9,7 +9,7 @@ import { TabContainer } from './tab_container.js';
 interface LabelMakerAttributes {
     documentMetadataUrl?: string,
     documentContentUrl?: string,
-    ocrUrl?: string
+    documentLabeldataUrl?: string
     showPages?: 'instantly' | 'first-loaded' | 'all-loaded';
 }
 
@@ -42,7 +42,7 @@ interface OcrResponse {
 class LabelMaker extends HTMLElement implements LabelMakerAttributes {
     public documentMetadataUrl?: string = undefined;
     public documentContentUrl?: string = undefined;
-    public ocrUrl?: string = undefined;
+    public documentLabeldataUrl?: string = undefined;
     public showPages?: 'instantly' | 'first-loaded' | 'all-loaded' = undefined;
     private _resizablePanes: ResizablePanes = new ResizablePanes();
     private _documentViewer: DocumentViewer = new DocumentViewer();
@@ -66,7 +66,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
      */
     static get observedAttributes() {
         return ['document-metadata-url', 'document-content-url',
-            'ocr-url', 'show-pages'];
+            'document-labeldata-url', 'show-pages'];
     }
 
     /**
@@ -88,13 +88,13 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             if (this.documentContentUrl)
                 this._documentViewer.setAttribute('content-url',
                     this.documentContentUrl);
+        } else if (propertyName === 'document-labeldata-url') {
+            this.documentLabeldataUrl = newValue || undefined;
         } else if (propertyName === 'show-pages') {
             this.showPages = newValue as 'instantly' | 'first-loaded' | 'all-loaded';
             if (this.showPages)
                 this._documentViewer.setAttribute('show-pages',
                     this.showPages);
-        } else if (propertyName === 'ocr-url') {
-            this.ocrUrl = newValue || undefined;
         }
     }
 
@@ -180,12 +180,12 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
      * to add the highlights to the pages.
      */
     private _onPagesCreated = (event: CustomEvent) => {
-        this._queryOcr().then(ocr => {
-            if (!ocr) {
+        this._queryLabeldata().then(labeldata => {
+            if (!labeldata) {
                 // todo: handle this by adding text to show the user
                 return;
             }
-            console.log("OCR data fetched successfully:", ocr);
+            console.log("Label data fetched successfully:", labeldata);
             //todo: see label_viewer on what to do here
         }).catch(error => {
             // todo: handle this by showing the user
@@ -196,11 +196,11 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
     /**
      * Fetches OCR data from the specified URL and updates the component.
      */
-    private async _queryOcr(): Promise<OcrResponse | null> {
-        if (!this.ocrUrl) {
-            throw new Error(`OCR URL is not set`);
+    private async _queryLabeldata(): Promise<OcrResponse | null> {
+        if (!this.documentLabeldataUrl) {
+            throw new Error(`Label data URL is not set`);
         }
-        const response = await fetch(this.ocrUrl);
+        const response = await fetch(this.documentLabeldataUrl);
         if (!response.ok) {
             throw new Error(`Response status: ${response.status} `);
         }
@@ -208,7 +208,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         const content: OcrResponse | null = await response.json();
 
         if (!content) {
-            throw new Error(`Failed to fetch OCR content`);
+            throw new Error(`Failed to fetch label data`);
         }
 
         return content;
