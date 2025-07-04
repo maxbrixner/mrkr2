@@ -60,4 +60,7 @@
     --label-viewer-background-color: var(--surface-color);
     --label-viewer-pulse-color: var(--primary-color);
     --label-viewer-scrollbar-color: var(--scrollbar-thumb) var(--surface-color);
+
+    --label-fragment-border-radius: var(--border-radius-medium);
+    --label-fragment-border-color: var(--border-color);
 }

@@ -4,6 +4,7 @@
 <script type="module" src="{{ url_for('static', path='/js/styled_link.js') }}"></script>
 <script type="module" src="{{ url_for('static', path='/js/styled_button.js') }}"></script>
 <script type="module" src="{{ url_for('static', path='/js/label_maker.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/label_button.js') }}"></script>
 {% endblock %}
 
 {% block header %}
@@ -22,9 +23,11 @@
 
 {% block main %}
 <main class="labeling-main">
+
     <label-maker document-metadata-url="{{ url_for('document_metadata', document_id=document.id) }}"
         document-content-url="{{ url_for('document_content', document_id=document.id) }}" show-pages="all-loaded"
-        document-labeldata-url="{{ url_for('document_labeldata', document_id=document.id) }}">
+        document-labeldata-url="{{ url_for('document_labeldata', document_id=document.id) }}"
+        project-label-definition-url="{{ url_for('project_label_definitions', project_id=document.project.id) }}">
     </label-maker>
 </main>
 {% endblock %}

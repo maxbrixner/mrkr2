@@ -1,7 +1,7 @@
 # ---------------------------------------------------------------------------- #
 
 import fastapi
-from typing import Dict
+from typing import Dict, List
 
 # ---------------------------------------------------------------------------- #
 
@@ -63,5 +63,54 @@ async def project_scan_schedule(
     return {
         "message": f"Scan scheduled for project {project_id}."
     }
+
+# ---------------------------------------------------------------------------- #
+
+
+@router.get("/config/{project_id}", summary="Project configuration")
+async def project_config(
+    project_id: int,
+    session: database.DatabaseDependency
+) -> schemas.ProjectSchema:
+    """
+    Return the configuration for a project.
+    """
+    project = crud.get_project(session=session, id=project_id)
+
+    if not project:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
+
+    config = schemas.ProjectSchema(**project.config)
+
+    return config
+
+# ---------------------------------------------------------------------------- #
+
+
+@router.get("/label-definitions/{project_id}",
+            summary="Project label definitions")
+async def project_label_definitions(
+    project_id: int,
+    session: database.DatabaseDependency
+) -> List[schemas.LabelDefinitionSchema]:
+    """
+    Return the project's label definitions.
+    """
+    project = crud.get_project(session=session, id=project_id)
+
+    if not project:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
+
+    config = schemas.ProjectSchema(**project.config)
+
+    print("aaaa", config.label_definitions)
+
+    return config.label_definitions
 
 # ---------------------------------------------------------------------------- #

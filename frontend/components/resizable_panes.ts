@@ -88,6 +88,7 @@ export class ResizablePanes extends HTMLElement implements ResizablePanesAttribu
             :host {
                 display: block;
                 overflow: hidden;
+                user-select: none;
             }
 
             .container {

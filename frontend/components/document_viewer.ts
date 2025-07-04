@@ -115,6 +115,7 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
                 height: 100%;
                 box-sizing: border-box;
                 overflow: hidden;
+                user-select: none;
             }
 
             .document-viewer {

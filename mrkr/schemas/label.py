@@ -7,7 +7,7 @@ from typing import Any, Optional, List
 # ---------------------------------------------------------------------------- #
 
 
-class LabelDataSchema(pydantic.BaseModel):
+class LabelSchema(pydantic.BaseModel):
     """
     Base schema for labels.
     """
@@ -20,7 +20,7 @@ class LabelDataSchema(pydantic.BaseModel):
 # ---------------------------------------------------------------------------- #
 
 
-class TextLabelDataSchema(LabelDataSchema):
+class TextLabelSchema(LabelSchema):
     """
     Schema for text labels.
     """
@@ -78,11 +78,11 @@ class BlockLabelDataSchema(pydantic.BaseModel):
         ...,
         description="The unique identifier for the OCR item (as a UUID4)."
     )
-    labels: List[LabelDataSchema] = pydantic.Field(
+    labels: List[LabelSchema] = pydantic.Field(
         ...,
         description="List of labels associated with the block."
     )
-    text_labels: List[TextLabelDataSchema] = pydantic.Field(
+    text_labels: List[TextLabelSchema] = pydantic.Field(
         ...,
         description="List of text labels associated with the block.",
     )
@@ -116,7 +116,7 @@ class PageLabelDataSchema(pydantic.BaseModel):
         description="The page number in the document (starting from 1).",
         examples=[1]
     )
-    labels: List[LabelDataSchema] = pydantic.Field(
+    labels: List[LabelSchema] = pydantic.Field(
         ...,
         description="List of labels associated with the page.",
     )
@@ -136,7 +136,7 @@ class DocumentLabelDataSchema(pydantic.BaseModel):
     """
     Schema for document labels.
     """
-    labels: List[LabelDataSchema] = pydantic.Field(
+    labels: List[LabelSchema] = pydantic.Field(
         ...,
         description="List of labels associated with the document."
     )
