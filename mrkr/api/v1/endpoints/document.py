@@ -35,11 +35,13 @@ async def document_metadata(
             detail="Document not found"
         )
 
-    file_provider = providers.get_file_provider(
-        project_config=document.project.config)
+    if not document.metacontent:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="Document metadata not found"
+        )
 
-    async with file_provider(document.path) as provider:
-        metadata = await provider.image_metadata
+    metadata = schemas.DocumentMetadataSchema(**document.metacontent)
 
     return metadata
 

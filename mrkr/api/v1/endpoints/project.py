@@ -8,7 +8,6 @@ from typing import Dict
 import mrkr.schemas as schemas
 import mrkr.crud as crud
 import mrkr.database as database
-import mrkr.providers as providers
 import mrkr.services as services
 import mrkr.core as core
 
