@@ -2,12 +2,12 @@
 
 import pydantic
 import uuid
-from typing import Optional, List
+from typing import Any, Optional, List
 
 # ---------------------------------------------------------------------------- #
 
 
-class LabelSchema(pydantic.BaseModel):
+class LabelDataSchema(pydantic.BaseModel):
     """
     Base schema for labels.
     """
@@ -20,7 +20,7 @@ class LabelSchema(pydantic.BaseModel):
 # ---------------------------------------------------------------------------- #
 
 
-class TextLabelSchema(LabelSchema):
+class TextLabelDataSchema(LabelDataSchema):
     """
     Schema for text labels.
     """
@@ -70,7 +70,7 @@ class PositionSchema(pydantic.BaseModel):
 # ---------------------------------------------------------------------------- #
 
 
-class BlockLabelSchema(pydantic.BaseModel):
+class BlockLabelDataSchema(pydantic.BaseModel):
     """
     Schema for labels associated with a specific page in a document.
     """
@@ -78,11 +78,11 @@ class BlockLabelSchema(pydantic.BaseModel):
         ...,
         description="The unique identifier for the OCR item (as a UUID4)."
     )
-    labels: List[LabelSchema] = pydantic.Field(
+    labels: List[LabelDataSchema] = pydantic.Field(
         ...,
         description="List of labels associated with the block."
     )
-    text_labels: List[TextLabelSchema] = pydantic.Field(
+    text_labels: List[TextLabelDataSchema] = pydantic.Field(
         ...,
         description="List of text labels associated with the block.",
     )
@@ -96,10 +96,14 @@ class BlockLabelSchema(pydantic.BaseModel):
         description="Text content of the block."
     )
 
+    @pydantic.field_serializer('id', when_used='always')
+    def serialize_uuid(self, value: uuid.UUID, _info: Any) -> str:
+        return str(value)
+
 # ---------------------------------------------------------------------------- #
 
 
-class PageLabelSchema(pydantic.BaseModel):
+class PageLabelDataSchema(pydantic.BaseModel):
     """
     Schema for labels associated with a specific page in a document.
     """
@@ -112,27 +116,31 @@ class PageLabelSchema(pydantic.BaseModel):
         description="The page number in the document (starting from 1).",
         examples=[1]
     )
-    labels: List[LabelSchema] = pydantic.Field(
+    labels: List[LabelDataSchema] = pydantic.Field(
         ...,
         description="List of labels associated with the page.",
     )
-    blocks: List[BlockLabelSchema] = pydantic.Field(
+    blocks: List[BlockLabelDataSchema] = pydantic.Field(
         ...,
         description="List of labeled blocks on the page.",
     )
 
+    @pydantic.field_serializer('id', when_used='always')
+    def serialize_uuid(self, value: uuid.UUID, _info: Any) -> str:
+        return str(value)
+
 # ---------------------------------------------------------------------------- #
 
 
-class DocumentLabelSchema(pydantic.BaseModel):
+class DocumentLabelDataSchema(pydantic.BaseModel):
     """
     Schema for document labels.
     """
-    labels: List[LabelSchema] = pydantic.Field(
+    labels: List[LabelDataSchema] = pydantic.Field(
         ...,
         description="List of labels associated with the document."
     )
-    pages: List[PageLabelSchema] = pydantic.Field(
+    pages: List[PageLabelDataSchema] = pydantic.Field(
         ...,
         description="List of labeled pages in the document.",
     )

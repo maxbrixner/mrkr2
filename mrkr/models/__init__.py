@@ -3,7 +3,5 @@
 from .document import *
 from .project import *
 from .user import *
-from .ocr import *
-from .annotation import *
 
 # ---------------------------------------------------------------------------- #

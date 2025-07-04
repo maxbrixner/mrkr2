@@ -41,17 +41,18 @@ async def label(
             detail="Document not found"
         )
 
-    current_ocr_id = crud.get_current_ocr_id(
-        session=session,
-        document=document
-    )
+    # todo : this is wrong now
+    # current_ocr_id = crud.get_current_ocr_id(
+    #    session=session,
+    #    document=document
+    # )
 
     return templates.TemplateResponse(
         "labeling.html",
         context={
             "request": request,
             "document": document,
-            "ocr_id": current_ocr_id
+            "ocr_id": None  # current_ocr_id
         }
     )
 

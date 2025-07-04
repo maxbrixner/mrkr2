@@ -58,3 +58,39 @@ def create_document(
     return database_document
 
 # ---------------------------------------------------------------------------- #
+
+
+def update_document_meta_content(
+    session: sqlmodel.Session,
+    document: models.Document,
+    meta_content: schemas.DocumentMetadataSchema
+) -> models.Document:
+    """
+    Update a documents metacontent in the database.
+    """
+    document.metacontent = meta_content.model_dump()
+
+    session.add(document)
+    session.commit()
+    session.refresh(document)
+    return document
+
+# ---------------------------------------------------------------------------- #
+
+
+def update_document_label_content(
+    session: sqlmodel.Session,
+    document: models.Document,
+    label_content: schemas.DocumentLabelDataSchema
+) -> models.Document:
+    """
+    Update a documents metacontent in the database.
+    """
+    document.labelcontent = label_content.model_dump()
+
+    session.add(document)
+    session.commit()
+    session.refresh(document)
+    return document
+
+# ---------------------------------------------------------------------------- #

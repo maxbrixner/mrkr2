@@ -27,14 +27,16 @@ async def ocr_retrieve(
     """
     Return the OCR text of the document from the database.
     """
-    ocr = crud.get_ocr(session, ocr_id)
+    # todo : this is wrong now
+    # ocr = crud.get_ocr(session, ocr_id)
 
-    if not ocr:
-        raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_404_NOT_FOUND,
-            detail="OCR not found"
-        )
+    # if not ocr:
+    #    raise fastapi.HTTPException(
+    #        status_code=fastapi.status.HTTP_404_NOT_FOUND,
+    #        detail="OCR not found"
+    #    )
 
-    return schemas.OcrResultSchema(**ocr.result)
+    # return schemas.OcrResultSchema(**ocr.result)
 
+    raise NotImplementedError
 # ---------------------------------------------------------------------------- #

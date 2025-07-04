@@ -16,10 +16,16 @@ class Project(sqlmodel.SQLModel, table=True):
         index=True,
         unique=True
     )
-    timestamp: datetime.datetime = sqlmodel.Field(
+    created: datetime.datetime = sqlmodel.Field(
         default_factory=datetime.datetime.now,
-        description="The timestamp when the project was created."
+        description="The timestamp when the project was created.",
     )
+    # todo
+    # updated: datetime.datetime = sqlmodel.Field(
+    #    default_factory=datetime.datetime.now,
+    #    description="The timestamp when the project was created.",
+    #    sa_column_kwargs={"onupdate": lambda: datetime.datetime.now}
+    # )
     config: dict = sqlmodel.Field(
         sa_column=Column(JSON),
         description="The project configuration."

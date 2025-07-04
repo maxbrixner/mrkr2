@@ -65,7 +65,7 @@ def _get_item_content(
 def _initialize_label_blocks(
     ocr_result: schemas.OcrResultSchema,
     page: int
-) -> List[schemas.BlockLabelSchema]:
+) -> List[schemas.BlockLabelDataSchema]:
     result = []
     for item in ocr_result.items:
         if item.type != schemas.OcrItemType.block:
@@ -75,7 +75,7 @@ def _initialize_label_blocks(
             continue
 
         result.append(
-            schemas.BlockLabelSchema(
+            schemas.BlockLabelDataSchema(
                 id=item.id,
                 labels=[],
                 text_labels=[],
@@ -97,14 +97,14 @@ def _initialize_label_blocks(
 
 def _initialize_label_pages(
     ocr_result: schemas.OcrResultSchema
-) -> List[schemas.PageLabelSchema]:
+) -> List[schemas.PageLabelDataSchema]:
     result = []
     for item in ocr_result.items:
         if item.type != schemas.OcrItemType.page:
             continue
 
         result.append(
-            schemas.PageLabelSchema(
+            schemas.PageLabelDataSchema(
                 id=item.id,
                 page=item.page,
                 labels=[],
@@ -120,11 +120,11 @@ def _initialize_label_pages(
 
 def initialize_label_document(
     ocr_result: schemas.OcrResultSchema
-) -> schemas.DocumentLabelSchema:
+) -> schemas.DocumentLabelDataSchema:
     """
     Initialize the label setup based on the OCR result.
     """
-    return schemas.DocumentLabelSchema(
+    return schemas.DocumentLabelDataSchema(
         pages=_initialize_label_pages(ocr_result=ocr_result),
         labels=[]
     )

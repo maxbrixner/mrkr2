@@ -41,7 +41,8 @@ async def project_create(
 async def project_scan_schedule(
     project_id: int,
     session: database.DatabaseDependency,
-    worker: services.WorkerPoolDependency
+    worker: services.WorkerPoolDependency,
+    force: bool = False,
 ) -> Dict:
     """
     Scan a project.
@@ -56,7 +57,8 @@ async def project_scan_schedule(
 
     worker.submit(
         core.scan_project,
-        project=project
+        project=project,
+        force=force
     )
 
     return {
