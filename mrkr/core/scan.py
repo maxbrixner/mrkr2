@@ -13,7 +13,6 @@ import mrkr.schemas as schemas
 import mrkr.models as models
 import mrkr.crud as crud
 import mrkr.database as database
-from .label import initialize_label_document
 
 # ---------------------------------------------------------------------------- #
 
@@ -239,6 +238,9 @@ def _get_item_children(
     ocr_result: schemas.OcrResultSchema,
     ocr_item: schemas.OcrItemSchema,
 ) -> List[schemas.OcrItemSchema]:
+    """
+    Return a list of children for an OCR item.
+    """
     result = []
     for item in ocr_result.items:
         if item.id == ocr_item.id:
@@ -251,12 +253,18 @@ def _get_item_children(
 
     return result
 
+# ---------------------------------------------------------------------------- #
+
 
 def _get_item_content(
     ocr_result: schemas.OcrResultSchema,
     ocr_item: schemas.OcrItemSchema,
     content: Optional[str] = None
 ) -> str:
+    """
+    Recursively traverse the ocr result to get the content of a certain item
+    (including its children).
+    """
     if not content:
         content = ""
 
@@ -286,11 +294,16 @@ def _get_item_content(
 
     return content
 
+# ---------------------------------------------------------------------------- #
+
 
 def _initialize_label_blocks(
     ocr_result: schemas.OcrResultSchema,
     page: int
 ) -> List[schemas.BlockLabelDataSchema]:
+    """
+    Initialize all blocks in a page.
+    """
     result = []
     for item in ocr_result.items:
         if item.type != schemas.OcrItemType.block:
@@ -319,10 +332,15 @@ def _initialize_label_blocks(
 
     return result
 
+# ---------------------------------------------------------------------------- #
+
 
 def _initialize_label_pages(
     ocr_result: schemas.OcrResultSchema
 ) -> List[schemas.PageLabelDataSchema]:
+    """
+    Initialize a page.
+    """
     result = []
     for item in ocr_result.items:
         if item.type != schemas.OcrItemType.page:
@@ -341,3 +359,5 @@ def _initialize_label_pages(
         )
 
     return result
+
+# ---------------------------------------------------------------------------- #
