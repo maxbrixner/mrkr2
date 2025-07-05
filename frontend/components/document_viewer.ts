@@ -397,6 +397,9 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         return content;
     }
 
+    /**
+     * Scrolls to a specific page in the viewer.
+     */
     public scrollToPage(page: number) {
         if (!this._viewerElement || !this._pages[page]) return;
         const pageElement = this._pages[page];
@@ -404,6 +407,20 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         pageElement.classList.remove('pulsing');
         pageElement.offsetHeight;
         pageElement.classList.add('pulsing');
+    }
+
+    /**
+     * Adds an event listener to a specific page.
+     */
+    public addPageEventListener(
+        page: number,
+        type: string,
+        listener: EventListenerOrEventListenerObject
+    ): void {
+        if (!this._viewerElement || !this._pages[page]) return;
+
+        const pageElement = this._pages[page];
+        pageElement.addEventListener(type, listener);
     }
 
     /**

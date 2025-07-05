@@ -64,6 +64,7 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
                 tab.classList.add('active');
             }
 
+            tab.name = slotName;
             tab.textContent = slotName;
             tab.addEventListener('click', this._onTabClick.bind(this, slot, tab));
             this._TabBarElement.appendChild(tab);
@@ -99,6 +100,7 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
                 height: 100%;
                 width: 100%;
                 background-color: var(--tab-container-background-color, #ffffff);
+                overflow: hidden;
             }
             .tabbar {
                 background-color: var(--tab-container-tabbar-background-color, #ffffff);
@@ -163,6 +165,19 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
         slot.classList.add('active');
         tab.classList.add('active');
     }
+
+    public switchToTab(slotName: string) {
+        const slot = this._slots.find(s => s.name === slotName);
+        const tab = this._tabs.find(t => t.name === slotName);
+
+        if (slot && tab) {
+            this._slots.forEach(s => s.classList.remove('active'));
+            this._tabs.forEach(t => t.classList.remove('active'));
+            slot.classList.add('active');
+            tab.classList.add('active');
+        }
+    }
+
 }
 
 /* -------------------------------------------------------------------------- */

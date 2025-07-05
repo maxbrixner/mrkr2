@@ -160,6 +160,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 grid-template-rows: 1fr;
             }
             .tab-content {
+                box-sizing: border-box;
                 display: grid;
                 grid-auto-rows: min-content;
                 overflow-y: auto;
@@ -168,6 +169,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 scrollbar-gutter: stable;
                 scrollbar-width: thin;
                 scrollbar-color: var(--label-viewer-scrollbar-color, inherit);
+                height: 100%;
             }
             .label-container {
                 display: grid;
@@ -180,6 +182,23 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 padding: 0.5rem;
                 border-top: 1px solid var(--label-fragment-border-color);
                 background-color: var(--label-fragment-title-background-color);
+            }
+            .pulsing {
+                animation: pulse .8s ease-in-out 0s 2 alternate;
+            }
+
+            @keyframes pulse {
+                0% {
+                    outline: 0px solid transparent;
+                }
+
+                50% {
+                    outline: 3px solid var(--document-viewer-pulse-color);               
+                }
+
+                100% {
+                    outline: 0px solid transparent;
+                }
             }
         `;
         this.shadowRoot.appendChild(style);
@@ -354,8 +373,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             detail.button.setAttribute('active', 'false');
         }
 
-        console.log(list)
-
         console.log("Label data updated", this._labeldata);
     }
 
@@ -380,6 +397,27 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             throw new Error(`Error fetching label data: ${error.message}`);
         });
 
+    }
+
+    /**
+     * Handles the 'label-button-click' event. This event is triggered when
+     * the user clicks on a label button in the label fragment.
+     */
+    private _onPageClick(scrollElement: HTMLElement) {
+        return (event: CustomEvent) => {
+            this._tabContainer.switchToTab("Page");
+            scrollElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+            scrollElement.classList.remove('pulsing');
+            scrollElement.offsetHeight;
+            scrollElement.classList.add('pulsing');
+
+            scrollElement.addEventListener('animationend', () => {
+                scrollElement.classList.remove('pulsing');
+            }, { once: true }); // The { once: true } option ensures the listener is removed after it fires
+        }
     }
 
     /**
@@ -451,7 +489,13 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
             fragment.addEventListener(
                 'focusin',
-                this._onFocusInPage(page.page) as EventListener
+                this._onFocusInFragment(page.page) as EventListener
+            )
+
+            this._documentViewer.addPageEventListener(
+                page.page,
+                'click',
+                this._onPageClick(fragment) as EventListener,
             )
 
             this._pageTab.appendChild(fragment);
@@ -459,9 +503,8 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         }
     }
 
-    private _onFocusInPage(page: number) {
+    private _onFocusInFragment(page: number) {
         return (event: Event) => {
-            console.log("page:", page)
             this._documentViewer.scrollToPage(page);
         }
     }
