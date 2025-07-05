@@ -68,6 +68,7 @@ export class LabelFragment extends HTMLElement implements LabelFragmentAttribute
             }
             .title {
                 font-weight: 500;
+                font-size: 0.9rem;
                 padding: 0.5em;
                 background-color: var(--label-fragment-title-background-color);
                 color: var(--label-fragment-title-color);
@@ -95,7 +96,9 @@ export class LabelFragment extends HTMLElement implements LabelFragmentAttribute
         name: string,
         color: string,
         type: string,
-        active: boolean
+        active: boolean,
+        targetType: "document" | "page" | "block",
+        target: string
     ) {
         if (!this._labelContainer) {
             console.error("Label container is not initialized.");
@@ -107,8 +110,8 @@ export class LabelFragment extends HTMLElement implements LabelFragmentAttribute
         button.setAttribute("name", name);
         button.setAttribute("type", type);
         button.setAttribute("active", active.toString());
-        button.setAttribute("target", "document");
-        button.setAttribute("target-type", "document");
+        button.setAttribute("target", target);
+        button.setAttribute("target-type", targetType);
 
         const span = document.createElement('span');
         span.slot = "label";

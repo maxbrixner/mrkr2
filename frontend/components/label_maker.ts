@@ -160,11 +160,19 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 grid-template-rows: 1fr;
             }
             .tab-content {
+                display: grid;
+                grid-auto-rows: min-content;
+                overflow-y: auto;
                 padding: 1rem;
+                gap: 1rem;
+                scrollbar-gutter: stable;
+                scrollbar-width: thin;
+                scrollbar-color: var(--label-viewer-scrollbar-color, inherit);
             }
             .label-container {
                 display: grid;
                 grid-template-rows: 1fr auto;
+                overflow: hidden;
             }
             .label-controls {
                 display: flex;
@@ -189,7 +197,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
         this._labelContainer.appendChild(this._tabContainer);
 
-
         this._submitButton.setAttribute('type', 'button');
         this._submitButton.setAttribute('name', 'submit-labels');
         this._submitButton.textContent = 'Submit';
@@ -198,15 +205,15 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         this._labelContainer.appendChild(this._labelControls);
 
         this._documentTab.slot = 'Document';
-        this._documentTab.classList.add("tab-content");
+        this._documentTab.classList.add("tab-content", "tab-document");
         this._tabContainer.appendChild(this._documentTab);
 
         this._pageTab.slot = 'Page';
-        this._pageTab.classList.add("tab-content");
+        this._pageTab.classList.add("tab-content", "tab-page");
         this._tabContainer.appendChild(this._pageTab);
 
         this._blockTab.slot = 'Block';
-        this._blockTab.classList.add("tab-content");
+        this._blockTab.classList.add("tab-content", "tab-block");
         this._tabContainer.appendChild(this._blockTab);
 
         this.shadowRoot.appendChild(this._resizablePanes);
@@ -267,6 +274,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             this._labelDefinitions = definitions;
 
             this._addDocumentLabelers();
+            this._addPageLabelers();
         }).catch(error => {
             // todo: handle this by showing the user
             throw new Error(`Error fetching label definitions: ${error.message}`);
@@ -280,6 +288,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             this._labeldata = data;
 
             this._addDocumentLabelers();
+            this._addPageLabelers();
         }).catch(error => {
             // todo: handle this by showing the user
             throw new Error(`Error fetching label data: ${error.message}`);
@@ -297,33 +306,57 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         }
 
         const detail = event.detail;
-        if (detail.targetType === 'document') {
 
-            if (detail.active) {
-                if (detail.type === 'classification_exclusive') {
-                    this._labeldata.labels = [{ 'name': detail.name }];
-                    detail.button.setAttribute('active', 'true');
-                    const siblings = detail.button.parentElement?.children;
-                    for (const sibling of siblings || []) {
-                        if (sibling instanceof LabelButton &&
-                            sibling !== detail.button) {
-                            sibling.setAttribute('active', 'false');
-                        }
+        var list: LabelSchema[] | null;
+        if (detail.targetType === 'document') {
+            list = this._labeldata?.labels || null;
+        } else {
+            list = this._labeldata.pages.find(
+                page => page.page === parseInt(detail.target)
+            )?.labels || null;
+        }
+
+        if (list === null) {
+            console.error(`Labels not found for target type: ${detail.targetType}`);
+            return;
+        }
+
+        if (detail.active) {
+            if (detail.type === 'classification_exclusive') {
+                list.length = 0;
+                list.push({ 'name': detail.name });
+                detail.button.setAttribute('active', 'true');
+                const siblings = detail.button.parentElement?.children;
+                for (const sibling of siblings || []) {
+                    if (sibling instanceof LabelButton &&
+                        sibling !== detail.button) {
+                        sibling.setAttribute('active', 'false');
                     }
-                } else {
-                    this._labeldata.labels.push(
+                }
+            } else {
+                // Add the label to the list if it doesn't already exist
+                if (!list.some(label => label.name === detail.name)) {
+                    list.push(
                         { 'name': detail.name }
                     );
                 }
-            } else {
-                this._labeldata.labels = this._labeldata.labels.filter(
-                    label => label.name !== detail.name
-                );
-                detail.button.setAttribute('active', 'false');
+                detail.button.setAttribute('active', 'true');
             }
+        } else if (!detail.active) {
+            let i = 0;
+            while (i < list.length) {
+                if (list[i].name === detail.name) {
+                    list.splice(i, 1);
+                } else {
+                    i++;
+                }
+            }
+            detail.button.setAttribute('active', 'false');
         }
 
-        console.log("Label data updated:", this._labeldata.labels);
+        console.log(list)
+
+        console.log("Label data updated", this._labeldata);
     }
 
     /**
@@ -349,6 +382,9 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
     }
 
+    /**
+     * Adds labelers to the document tab.
+     */
     private _addDocumentLabelers() {
         if (!this._labelDefinitions || !this._labeldata) {
             return;
@@ -371,11 +407,63 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 definition.name,
                 definition.color,
                 definition.type,
-                active
+                active,
+                "document",
+                ""
             );
         }
 
         this._documentTab.appendChild(fragment);
+    }
+
+    /**
+     * Adds labelers to the page tab.
+     */
+    private _addPageLabelers() {
+        if (!this._labelDefinitions || !this._labeldata) {
+            return;
+        }
+        this._pageTab.innerHTML = ''; // Clear previous content
+
+        for (const page of this._labeldata.pages) {
+
+            const fragment = new LabelFragment();
+            fragment.setAttribute('heading', `Page ${page.page}`);
+
+            for (const definition of this._labelDefinitions) {
+                if (!definition.targets.includes('page')) {
+                    continue;
+                }
+
+                const active = page.labels.some(
+                    label => label.name === definition.name
+                );
+
+                fragment.add_label_button(
+                    definition.name,
+                    definition.color,
+                    definition.type,
+                    active,
+                    "page",
+                    page.page.toString()
+                );
+            }
+
+            fragment.addEventListener(
+                'focusin',
+                this._onFocusInPage(page.page) as EventListener
+            )
+
+            this._pageTab.appendChild(fragment);
+
+        }
+    }
+
+    private _onFocusInPage(page: number) {
+        return (event: Event) => {
+            console.log("page:", page)
+            this._documentViewer.scrollToPage(page);
+        }
     }
 
     /**

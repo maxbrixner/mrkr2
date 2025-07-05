@@ -181,7 +181,7 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
                 outline: 3px solid var(--document-viewer-block-hover-color);  
             }
 
-            .highlight.pulsing {
+            .pulsing {
                 animation: pulse .8s ease-in-out 0s 2 alternate;
             }
 
@@ -395,6 +395,15 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         }
 
         return content;
+    }
+
+    public scrollToPage(page: number) {
+        if (!this._viewerElement || !this._pages[page]) return;
+        const pageElement = this._pages[page];
+        pageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        pageElement.classList.remove('pulsing');
+        pageElement.offsetHeight;
+        pageElement.classList.add('pulsing');
     }
 
     /**
