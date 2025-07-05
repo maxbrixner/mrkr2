@@ -3,6 +3,9 @@ interface LabelButtonAttributes {
     disabled?: boolean;
     name?: string;
     active?: boolean;
+    type?: string;
+    target?: string;
+    targetType?: "document" | "page" | "block";
 }
 
 export class LabelButton extends HTMLElement implements LabelButtonAttributes {
@@ -10,6 +13,9 @@ export class LabelButton extends HTMLElement implements LabelButtonAttributes {
     public disabled?: boolean = false;
     public name?: string = undefined;
     public active?: boolean = false;
+    public type?: string = undefined;
+    public target?: string = undefined;
+    public targetType?: "document" | "page" | "block" = undefined;
     private _ButtonElement: HTMLButtonElement;
 
     constructor() {
@@ -32,7 +38,7 @@ export class LabelButton extends HTMLElement implements LabelButtonAttributes {
                 line-height: 22px;
                 font-weight: 400;
                 display: inline-grid;
-
+                padding: 0.2rem 1rem;
             }
             .active {
                 color: #ffffff;
@@ -52,7 +58,7 @@ export class LabelButton extends HTMLElement implements LabelButtonAttributes {
     }
 
     static get observedAttributes() {
-        return ['color', 'disabled', 'name', 'active'];
+        return ['color', 'disabled', 'name', 'active', 'type', 'target', 'target-type'];
     }
 
     attributeChangedCallback(
@@ -64,12 +70,20 @@ export class LabelButton extends HTMLElement implements LabelButtonAttributes {
         if (propertyName === 'color') {
             this.color = newValue || '#000000';
             this._updateColor();
-        }
-        if (propertyName === 'disabled') {
+        } else if (propertyName === 'active') {
+            this.active = (newValue == "true") || false;
+            this._updateColor();
+        } else if (propertyName === 'disabled') {
             this._ButtonElement.disabled = newValue !== null;
-        }
-        if (propertyName === 'name') {
+        } else if (propertyName === 'name') {
             this._ButtonElement.name = newValue || '';
+            this.name = newValue || undefined;
+        } else if (propertyName === 'type') {
+            this.type = newValue || undefined;
+        } else if (propertyName === 'target') {
+            this.target = newValue || undefined;
+        } else if (propertyName === 'target-type') {
+            this.targetType = newValue as "document" | "page" | "block" || undefined;
         }
     }
 
@@ -79,13 +93,15 @@ export class LabelButton extends HTMLElement implements LabelButtonAttributes {
 
     private _onClick(event: MouseEvent) {
         if (this.disabled) return;
-        this.active = !this.active;
-        this._updateColor();
+
         this.dispatchEvent(new CustomEvent('label-button-click', {
             detail: {
+                button: this,
                 name: this.name,
-                active: this.active,
-                color: this.color
+                active: !this.active,
+                type: this.type,
+                target: this.target,
+                targetType: this.targetType
             },
             bubbles: true,
             composed: true
@@ -120,7 +136,7 @@ export class LabelButton extends HTMLElement implements LabelButtonAttributes {
     }
 
     disconnectedCallback() {
-        //..
+        this.removeEventListener('click', this._onClick.bind(this));
     }
 
 }

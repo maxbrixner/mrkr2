@@ -5,7 +5,7 @@ interface StyledButtonAttributes {
     type?: string;
 }
 
-class StyledButton extends HTMLElement implements StyledButtonAttributes {
+export class StyledButton extends HTMLElement implements StyledButtonAttributes {
     public disabled?: boolean = false;
     public name?: string = undefined;
     public type?: 'button' | 'submit' | 'reset' = 'button';

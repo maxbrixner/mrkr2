@@ -4,6 +4,7 @@ import { ResizablePanes } from './resizable_panes.js';
 import { DocumentViewer } from './document_viewer.js';
 import { TabContainer } from './tab_container.js';
 import { LabelFragment } from './label_fragment.js';
+import { LabelButton } from './label_button.js';
 
 /* -------------------------------------------------------------------------- */
 
@@ -72,6 +73,8 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
     private _documentTab: HTMLDivElement = document.createElement('div');
     private _pageTab: HTMLDivElement = document.createElement('div');
     private _blockTab: HTMLDivElement = document.createElement('div');
+    private _labelDefinitions: LabelDefinitionSchema[] | null = null;
+    private _labeldata: DocumentLabelDataSchema | null = null;
 
     /**
      * Creates an instance of LabelMaker.
@@ -155,6 +158,17 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             .tab-content {
                 padding: 1rem;
             }
+            .label-container {
+                display: grid;
+                grid-template-rows: 1fr auto;
+            }
+            .label-controls {
+                display: flex;
+                justify-content: flex-end;
+                padding: 0.5rem;
+                border-top: 1px solid var(--label-fragment-border-color);
+                background-color: var(--label-fragment-title-background-color);
+            }
         `;
         this.shadowRoot.appendChild(style);
 
@@ -166,6 +180,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         this._resizablePanes.appendChild(this._documentViewer);
 
         this._tabContainer.slot = 'second';
+
         this._resizablePanes.appendChild(this._tabContainer);
 
         this._documentTab.slot = 'Document';
@@ -191,6 +206,11 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             'pages-created',
             this._onPagesCreated as EventListener
         );
+
+        this.shadowRoot?.addEventListener(
+            'label-button-click',
+            this._onLabelButtonClick as EventListener
+        );
     }
 
     /**
@@ -200,6 +220,11 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         this.shadowRoot?.removeEventListener(
             'pages-created',
             this._onPagesCreated as EventListener
+        );
+
+        this.shadowRoot?.addEventListener(
+            'label-button-click',
+            this._onLabelButtonClick as EventListener
         );
     }
 
@@ -215,22 +240,87 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 // todo: handle this by adding text to show the user
                 return;
             }
-            console.log("Label definitions fetched successfully:", definitions);
+            this._labelDefinitions = definitions;
 
-            this._addDocumentLabelers(definitions);
+            this._addDocumentLabelers();
         }).catch(error => {
             // todo: handle this by showing the user
             throw new Error(`Error fetching label definitions: ${error.message}`);
         });
+
+        this._queryLabeldata().then(data => {
+            if (!data) {
+                // todo: handle this by adding text to show the user
+                return;
+            }
+            this._labeldata = data;
+
+            this._addDocumentLabelers();
+        }).catch(error => {
+            // todo: handle this by showing the user
+            throw new Error(`Error fetching label data: ${error.message}`);
+        });
     };
 
-    private _addDocumentLabelers(definitions: LabelDefinitionSchema[]) {
+    /**
+     * Handles the 'label-button-click' event. This event is triggered when
+     * the user clicks on a label button in the label fragment.
+     */
+    private _onLabelButtonClick = (event: CustomEvent) => {
+        const detail = event.detail;
+        if (!this._labelDefinitions || !this._labeldata) {
+            return;
+        }
+
+        if (detail.targetType === 'document') {
+
+            if (detail.active) {
+                if (detail.type === 'classification_exclusive') {
+                    this._labeldata.labels = [{ 'name': detail.name }];
+                    detail.button.setAttribute('active', 'true');
+                    const siblings = detail.button.parentElement?.children;
+                    for (const sibling of siblings || []) {
+                        if (sibling instanceof LabelButton &&
+                            sibling !== detail.button) {
+                            sibling.setAttribute('active', 'false');
+                        }
+                    }
+                } else {
+                    this._labeldata.labels.push(
+                        { 'name': detail.name }
+                    );
+                }
+            } else {
+                this._labeldata.labels = this._labeldata.labels.filter(
+                    label => label.name !== detail.name
+                );
+                detail.button.setAttribute('active', 'false');
+            }
+        }
+
+        console.log("Label data updated:", this._labeldata.labels);
+    }
+
+    private _addDocumentLabelers() {
+        if (!this._labelDefinitions || !this._labeldata) {
+            return;
+        }
+        this._documentTab.innerHTML = ''; // Clear previous content
+        console.log("aa")
+
         const fragment = new LabelFragment();
+        fragment.setAttribute('heading', 'Document');
 
-        console.log("aaa", definitions)
-
-        for (const definition of definitions) {
-            fragment.add_label_button();
+        for (const definition of this._labelDefinitions) {
+            if (!definition.targets.includes('document')) {
+                continue;
+            }
+            fragment.add_label_button(
+                definition.name,
+                definition.color,
+                definition.type,
+                false
+            );
         }
 
         this._documentTab.appendChild(fragment);
@@ -258,7 +348,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
     }
 
     /**
-     * Fetches project configuration.
+     * Fetches label definitions from the specified URL.
      */
     private async _queryLabelDefinitions(): Promise<LabelDefinitionSchema[] | null> {
         if (!this.projectLabelDefinitionUrl) {
