@@ -187,6 +187,23 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 animation: pulse .8s ease-in-out 0s 2 alternate;
             }
 
+            .loading::before {
+                content: "";
+                display: block;
+                margin: 2rem auto;
+                width: 30px;
+                height: 30px;
+                border: 4px solid var(--document-viewer-spinner-color, #000000);
+                border-top: 4px solid var(--document-viewer-spinner-color-top, #ffffff);
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+
             @keyframes pulse {
                 0% {
                     outline: 0px solid transparent;
@@ -224,15 +241,15 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         this._labelContainer.appendChild(this._labelControls);
 
         this._documentTab.slot = 'Document';
-        this._documentTab.classList.add("tab-content", "tab-document");
+        this._documentTab.classList.add("tab-content", "tab-document", "loading");
         this._tabContainer.appendChild(this._documentTab);
 
         this._pageTab.slot = 'Page';
-        this._pageTab.classList.add("tab-content", "tab-page");
+        this._pageTab.classList.add("tab-content", "tab-page", "loading");
         this._tabContainer.appendChild(this._pageTab);
 
         this._blockTab.slot = 'Block';
-        this._blockTab.classList.add("tab-content", "tab-block");
+        this._blockTab.classList.add("tab-content", "tab-block", "loading");
         this._tabContainer.appendChild(this._blockTab);
 
         this.shadowRoot.appendChild(this._resizablePanes);
@@ -427,6 +444,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         if (!this._labelDefinitions || !this._labeldata) {
             return;
         }
+        this._documentTab.classList.remove("loading");
         this._documentTab.innerHTML = ''; // Clear previous content
 
         const fragment = new LabelFragment();
@@ -461,6 +479,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         if (!this._labelDefinitions || !this._labeldata) {
             return;
         }
+        this._pageTab.classList.remove("loading");
         this._pageTab.innerHTML = ''; // Clear previous content
 
         for (const page of this._labeldata.pages) {
