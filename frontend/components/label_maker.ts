@@ -335,7 +335,17 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             return;
         }
 
-        console.log("Submit");
+        this._submitLabeldata().then(result => {
+            if (!result) {
+                // todo: handle this by adding text to show the user
+                return;
+            }
+
+            console.log("Label data submitted successfully.");
+        }).catch(error => {
+            // todo: handle this by showing the user
+            throw new Error(`Error fetching label data: ${error.message}`);
+        });
 
     }
 
@@ -352,11 +362,16 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             if (!definition.targets.includes('document')) {
                 continue;
             }
+
+            const active = this._labeldata.labels.some(
+                label => label.name === definition.name
+            );
+
             fragment.add_label_button(
                 definition.name,
                 definition.color,
                 definition.type,
-                false
+                active
             );
         }
 
@@ -372,7 +387,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         }
         const response = await fetch(this.documentLabeldataUrl);
         if (!response.ok) {
-            throw new Error(`Response status: ${response.status} `);
+            throw new Error(`Response status: ${response.status}`);
         }
 
         const content: DocumentLabelDataSchema | null = await response.json();
@@ -393,7 +408,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         }
         const response = await fetch(this.projectLabelDefinitionUrl);
         if (!response.ok) {
-            throw new Error(`Response status: ${response.status} `);
+            throw new Error(`Response status: ${response.status}`);
         }
 
         const content: LabelDefinitionSchema[] | null = await response.json();
@@ -405,6 +420,35 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         return content;
     }
 
+    /**
+     * Updates label data using the label data URL.
+     */
+    private async _submitLabeldata(): Promise<boolean> {
+        if (!this.documentLabeldataUrl) {
+            throw new Error(`Label data URL is not set`);
+        }
+        const response = await fetch(
+            this.documentLabeldataUrl,
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(this._labeldata)
+            }
+        );
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+
+        const content: DocumentLabelDataSchema | null = await response.json();
+
+        if (!content) {
+            throw new Error(`Failed to submit label data`);
+        }
+
+        return (true);
+    }
 
 }
 

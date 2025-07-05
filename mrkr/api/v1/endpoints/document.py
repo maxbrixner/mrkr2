@@ -48,6 +48,39 @@ async def document_metadata(
 # ---------------------------------------------------------------------------- #
 
 
+@router.get("/content/{document_id}",
+            summary="Get Document Content")
+async def document_content(
+    document_id: int,
+    page: int,
+    session: database.DatabaseDependency
+) -> schemas.PageContentSchema:
+    """
+    Return the content of a specific page in the document.
+    """
+    document = crud.get_document(session=session, id=document_id)
+
+    if not document:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="Document not found"
+        )
+
+    file_provider = providers.get_file_provider(
+        project_config=document.project.config)
+
+    async with file_provider(document.path) as provider:
+        image = await provider.read_as_base64_images(page=page, format="JPEG")
+
+    return schemas.PageContentSchema(
+        content=image[0],
+        mime="image/jpeg",
+        page=page
+    )
+
+# ---------------------------------------------------------------------------- #
+
+
 @router.get("/labeldata/{document_id}",
             summary="Get Document Label Data")
 async def document_labeldata(
@@ -78,15 +111,15 @@ async def document_labeldata(
 # ---------------------------------------------------------------------------- #
 
 
-@router.get("/content/{document_id}",
-            summary="Get Document Content")
-async def document_content(
+@router.put("/labeldata/{document_id}",
+            summary="Update Document Label Data")
+async def document_submit_labeldata(
     document_id: int,
-    page: int,
+    labeldata: schemas.DocumentLabelDataSchema,
     session: database.DatabaseDependency
-) -> schemas.PageContentSchema:
+) -> Dict:
     """
-    Return the content of a specific page in the document.
+    Update the label data for the document.
     """
     document = crud.get_document(session=session, id=document_id)
 
@@ -96,16 +129,14 @@ async def document_content(
             detail="Document not found"
         )
 
-    file_provider = providers.get_file_provider(
-        project_config=document.project.config)
+    document.labelcontent = labeldata.model_dump()
 
-    async with file_provider(document.path) as provider:
-        image = await provider.read_as_base64_images(page=page, format="JPEG")
+    session.add(document)
+    session.commit()
+    session.refresh(document)
 
-    return schemas.PageContentSchema(
-        content=image[0],
-        mime="image/jpeg",
-        page=page
-    )
+    return {
+        "message": "Label data updated successfully.",
+    }
 
 # ---------------------------------------------------------------------------- #
