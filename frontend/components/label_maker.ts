@@ -5,6 +5,7 @@ import { DocumentViewer } from './document_viewer.js';
 import { TabContainer } from './tab_container.js';
 import { LabelFragment } from './label_fragment.js';
 import { LabelButton } from './label_button.js';
+import { StyledButton } from './styled_button.js';
 
 /* -------------------------------------------------------------------------- */
 
@@ -69,6 +70,9 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
     public showPages?: 'instantly' | 'first-loaded' | 'all-loaded' = undefined;
     private _resizablePanes: ResizablePanes = new ResizablePanes();
     private _documentViewer: DocumentViewer = new DocumentViewer();
+    private _labelContainer: HTMLDivElement = document.createElement('div');
+    private _labelControls: HTMLDivElement = document.createElement('div');
+    private _submitButton: StyledButton = new StyledButton();
     private _tabContainer: TabContainer = new TabContainer();
     private _documentTab: HTMLDivElement = document.createElement('div');
     private _pageTab: HTMLDivElement = document.createElement('div');
@@ -179,9 +183,19 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         this._documentViewer.slot = 'first';
         this._resizablePanes.appendChild(this._documentViewer);
 
-        this._tabContainer.slot = 'second';
+        this._labelContainer.slot = 'second';
+        this._labelContainer.className = 'label-container';
+        this._resizablePanes.appendChild(this._labelContainer);
 
-        this._resizablePanes.appendChild(this._tabContainer);
+        this._labelContainer.appendChild(this._tabContainer);
+
+
+        this._submitButton.setAttribute('type', 'button');
+        this._submitButton.setAttribute('name', 'submit-labels');
+        this._submitButton.textContent = 'Submit';
+        this._labelControls.className = 'label-controls';
+        this._labelControls.appendChild(this._submitButton);
+        this._labelContainer.appendChild(this._labelControls);
 
         this._documentTab.slot = 'Document';
         this._documentTab.classList.add("tab-content");
@@ -211,6 +225,11 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             'label-button-click',
             this._onLabelButtonClick as EventListener
         );
+
+        this._submitButton?.addEventListener(
+            'click',
+            this._onSubmitButtonClick as EventListener
+        );
     }
 
     /**
@@ -222,9 +241,14 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             this._onPagesCreated as EventListener
         );
 
-        this.shadowRoot?.addEventListener(
+        this.shadowRoot?.removeEventListener(
             'label-button-click',
             this._onLabelButtonClick as EventListener
+        );
+
+        this._submitButton?.removeEventListener(
+            'click',
+            this._onSubmitButtonClick as EventListener
         );
     }
 
@@ -267,11 +291,12 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
      * the user clicks on a label button in the label fragment.
      */
     private _onLabelButtonClick = (event: CustomEvent) => {
-        const detail = event.detail;
+
         if (!this._labelDefinitions || !this._labeldata) {
             return;
         }
 
+        const detail = event.detail;
         if (detail.targetType === 'document') {
 
             if (detail.active) {
@@ -301,12 +326,24 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         console.log("Label data updated:", this._labeldata.labels);
     }
 
+    /**
+     * Handles the 'label-button-click' event. This event is triggered when
+     * the user clicks on a label button in the label fragment.
+     */
+    private _onSubmitButtonClick = (event: CustomEvent) => {
+        if (!this._labelDefinitions || !this._labeldata) {
+            return;
+        }
+
+        console.log("Submit");
+
+    }
+
     private _addDocumentLabelers() {
         if (!this._labelDefinitions || !this._labeldata) {
             return;
         }
         this._documentTab.innerHTML = ''; // Clear previous content
-        console.log("aa")
 
         const fragment = new LabelFragment();
         fragment.setAttribute('heading', 'Document');

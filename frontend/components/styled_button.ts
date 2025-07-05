@@ -75,17 +75,17 @@ export class StyledButton extends HTMLElement implements StyledButtonAttributes 
     }
 
     connectedCallback() {
-        this.addEventListener('click', this._onClick);
+        //this.addEventListener('click', this._onClick);
     }
 
-    private _onClick = (e: Event) => {
+    /*private _onClick = (e: Event) => {
         if (e.target === this) {
             this._ButtonElement.click();
         }
-    };
+    };*/
 
     disconnectedCallback() {
-        //..
+        //this.removeEventListener('click', this._onClick);
     }
 
 }
