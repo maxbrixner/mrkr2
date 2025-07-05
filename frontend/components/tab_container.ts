@@ -109,6 +109,7 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
                 grid-auto-flow: column;
                 grid-auto-columns: min-content;
                 border-bottom: 1px solid var(--tab-container-tabbar-border-color, #000000);
+                gap: 2px;
             }
             .tab {
                 background-color: var(--tab-container-tabbar-background-color, #ffffff);

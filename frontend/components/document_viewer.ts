@@ -403,7 +403,7 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
     public scrollToPage(page: number) {
         if (!this._viewerElement || !this._pages[page]) return;
         const pageElement = this._pages[page];
-        pageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        pageElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
         pageElement.classList.remove('pulsing');
         pageElement.offsetHeight;
         pageElement.classList.add('pulsing');
