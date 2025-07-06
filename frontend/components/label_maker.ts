@@ -45,7 +45,7 @@ interface PageLabelDataSchema {
     id: string
     page: number
     labels: LabelSchema[]
-    blocks: BlockLabelDataSchema
+    blocks: BlockLabelDataSchema[]
 }
 
 interface DocumentLabelDataSchema {
@@ -311,6 +311,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
             this._addDocumentLabelers();
             this._addPageLabelers();
+            this._addBlockLabelers();
         }).catch(error => {
             // todo: handle this by showing the user
             throw new Error(`Error fetching label definitions: ${error.message}`);
@@ -325,6 +326,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
             this._addDocumentLabelers();
             this._addPageLabelers();
+            this._addBlockLabelers();
         }).catch(error => {
             // todo: handle this by showing the user
             throw new Error(`Error fetching label data: ${error.message}`);
@@ -343,13 +345,26 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
         const detail = event.detail;
 
-        var list: LabelSchema[] | null;
+        var list: LabelSchema[] | null = null;
+
         if (detail.targetType === 'document') {
             list = this._labeldata?.labels || null;
-        } else {
+        } else if (detail.targetType === 'page') {
             list = this._labeldata.pages.find(
                 page => page.page === parseInt(detail.target)
             )?.labels || null;
+        } else if (detail.targetType === 'block') {
+            for (const page of this._labeldata.pages) {
+                list = page.blocks.find(
+                    block => block.id === detail.target
+                )?.labels || null;
+                if (list) {
+                    break; // Exit loop if found
+                }
+            }
+        } else {
+            list = null; // Invalid target type
+            return;
         }
 
         if (list === null) {
@@ -413,7 +428,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             // todo: handle this by showing the user
             throw new Error(`Error fetching label data: ${error.message}`);
         });
-
     }
 
     /**
@@ -422,6 +436,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
      */
     private _onPageClick(scrollElement: HTMLElement) {
         return (event: CustomEvent) => {
+            console.log("Page clicked", event);
             this._tabContainer.switchToTab("Page");
             scrollElement.scrollIntoView({
                 behavior: 'smooth',
@@ -434,6 +449,36 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             scrollElement.addEventListener('animationend', () => {
                 scrollElement.classList.remove('pulsing');
             }, { once: true }); // The { once: true } option ensures the listener is removed after it fires
+
+            // stop the event from propagating to the document viewer
+            event.stopPropagation();
+            event.preventDefault();
+        }
+    }
+
+    /**
+     * Handles the 'highlight-click' event. This event is triggered when
+     * the user clicks on a highlight in the document viewer.
+     */
+    private _onHighlightClick(scrollElement: HTMLElement) {
+        return (event: CustomEvent) => {
+            console.log("Block clicked", scrollElement);
+            this._tabContainer.switchToTab("Block");
+            scrollElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+            scrollElement.classList.remove('pulsing');
+            scrollElement.offsetHeight;
+            scrollElement.classList.add('pulsing');
+
+            scrollElement.addEventListener('animationend', () => {
+                scrollElement.classList.remove('pulsing');
+            }, { once: true }); // The { once: true } option ensures the listener is removed after it fires
+
+            // stop the event from propagating to the document viewer
+            event.stopPropagation();
+            event.preventDefault();
         }
     }
 
@@ -508,7 +553,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
             fragment.addEventListener(
                 'focusin',
-                this._onFocusInFragment(page.page) as EventListener
+                this._onFocusInPageFragment(page.page) as EventListener
             )
 
             this._documentViewer.addPageEventListener(
@@ -522,11 +567,94 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         }
     }
 
-    private _onFocusInFragment(page: number) {
+    /**
+     * Adds labelers to the block tab.
+     */
+    private _addBlockLabelers() {
+        if (!this._labelDefinitions || !this._labeldata) {
+            return;
+        }
+        this._blockTab.classList.remove("loading");
+        this._blockTab.innerHTML = ''; // Clear previous content
+
+        for (const page of this._labeldata.pages) {
+
+            for (const block of page.blocks) {
+
+                const fragment = new LabelFragment();
+                fragment.setAttribute('heading', `Block`);
+
+                for (const definition of this._labelDefinitions) {
+                    if (!definition.targets.includes('block')) {
+                        continue;
+                    }
+                    if (definition.type === 'text') {
+                        continue;
+                    }
+
+                    const active = block.labels.some(
+                        label => label.name === definition.name
+                    );
+
+                    fragment.add_label_button(
+                        definition.name,
+                        definition.color,
+                        definition.type,
+                        active,
+                        "block",
+                        block.id
+                    );
+
+                }
+
+                fragment.add_text(block.content);
+
+                const highlight = this._documentViewer.addHighlight(
+                    page.page,
+                    block.position.left,
+                    block.position.top,
+                    block.position.width,
+                    block.position.height,
+                    block.id,
+                    { 'click': this._onHighlightClick(fragment) as EventListener }
+                )
+
+                if (highlight) {
+                    fragment.addEventListener(
+                        'focusin',
+                        this._onFocusInBlockFragment(highlight) as EventListener
+                    )
+                }
+
+                this._blockTab.appendChild(fragment);
+
+            }
+
+        }
+    }
+
+    private _onFocusInPageFragment(page: number) {
         return (event: Event) => {
             this._documentViewer.scrollToPage(page);
         }
     }
+
+    private _onFocusInBlockFragment(block: HTMLElement) {
+        return (event: Event) => {
+            block.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+            block.classList.remove('pulsing');
+            block.offsetHeight;
+            block.classList.add('pulsing');
+
+            block.addEventListener('animationend', () => {
+                block.classList.remove('pulsing');
+            }, { once: true }); // The { once: true } option ensures the listener is removed after it fires
+        }
+    }
+
 
     /**
      * Fetches label data from the specified URL.

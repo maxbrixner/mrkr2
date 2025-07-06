@@ -437,7 +437,7 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         height: number,
         title: string,
         listeners: { [type: string]: EventListenerOrEventListenerObject } = {}
-    ): Element | null {
+    ): HTMLElement | null {
         if (!this._viewerElement || !this._pages[page]) return null;
 
         const highlightElement = document.createElement("div");

@@ -9,6 +9,8 @@ export class LabelFragment extends HTMLElement implements LabelFragmentAttribute
     public heading?: string = undefined;
     private _titleDiv: HTMLSpanElement = document.createElement('div');
     private _labelContainer: HTMLDivElement = document.createElement('div');
+    private _textContainer: HTMLDivElement = document.createElement('div');
+    private _textArea: HTMLTextAreaElement = document.createElement('textarea');
 
     /**
      * Creates an instance of LabelFragment.
@@ -64,7 +66,7 @@ export class LabelFragment extends HTMLElement implements LabelFragmentAttribute
                 border: 1px solid var(--label-fragment-border-color);
                 border-radius: var(--label-fragment-border-radius);
                 user-select: none;
-                grid-template-rows: auto 1fr;
+                grid-template-rows: auto 1fr auto;
             }
             .title {
                 font-weight: 500;
@@ -80,6 +82,30 @@ export class LabelFragment extends HTMLElement implements LabelFragmentAttribute
                 padding: 0.5em;
                 gap: 0.5em;
             }
+            .text-container {
+                padding: 0.5em;
+                font-size: 0.9rem;
+                color: var(--label-fragment-text-color);
+                border-top: 1px solid var(--label-fragment-border-color);
+            }
+            .text-area {
+                width: 100%;
+                field-sizing: content;
+                border: none;
+                background: transparent;
+                font-family: var(--document-viewer-font-family, Arial, sans-serif);
+                font-size: var(--document-viewer-font-size, 16px);
+                color: var(--document-viewer-font-color, #000000);
+                resize: none;
+                outline: none;
+                box-sizing: border-box;
+                padding: 0.5rem;
+                line-height: 1.5;
+                white-space: pre-wrap;
+                word-break: break-word;
+                overflow: auto;
+                transition: background-color 0.3s ease;
+            }
         `;
         this.shadowRoot?.appendChild(style);
 
@@ -89,7 +115,6 @@ export class LabelFragment extends HTMLElement implements LabelFragmentAttribute
 
         this._labelContainer.className = "label-container";
         this.shadowRoot?.appendChild(this._labelContainer);
-
     }
 
     public add_label_button(
@@ -121,6 +146,14 @@ export class LabelFragment extends HTMLElement implements LabelFragmentAttribute
 
         this._labelContainer.appendChild(button);
 
+    }
+
+    public add_text(text: string) {
+        this._textContainer.className = "text-container";
+        this._textArea.className = "text-area";
+        this._textArea.textContent = text;
+        this._textContainer.appendChild(this._textArea);
+        this.shadowRoot?.appendChild(this._textContainer);
     }
 
     disconnectedCallback() {
