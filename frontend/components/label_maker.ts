@@ -273,6 +273,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             'click',
             this._onSubmitButtonClick as EventListener
         );
+
     }
 
     /**
@@ -626,10 +627,25 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                     )
                 }
 
+                document.addEventListener(
+                    'selectionchange',
+                    this._onSelectionChange(fragment) as EventListener
+                );
+
                 this._blockTab.appendChild(fragment);
 
             }
 
+        }
+    }
+
+    private _onSelectionChange(element: HTMLElement) {
+        return (event: Event) => {
+            const selection = (element.shadowRoot as any)?.getSelection(); // Warning: this only works in Chrome-Browsers
+            if (!selection || selection.rangeCount === 0) return;
+            const range = selection.getRangeAt(0);
+            console.log(selection, range);
+            console.log(range.startOffset, range.endOffset);
         }
     }
 
@@ -654,6 +670,8 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             }, { once: true }); // The { once: true } option ensures the listener is removed after it fires
         }
     }
+
+
 
 
     /**

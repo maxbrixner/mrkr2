@@ -10,7 +10,7 @@ export class LabelFragment extends HTMLElement implements LabelFragmentAttribute
     private _titleDiv: HTMLSpanElement = document.createElement('div');
     private _labelContainer: HTMLDivElement = document.createElement('div');
     private _textContainer: HTMLDivElement = document.createElement('div');
-    private _textArea: HTMLTextAreaElement = document.createElement('textarea');
+    private _textArea: HTMLDivElement = document.createElement('div');
 
     /**
      * Creates an instance of LabelFragment.
@@ -152,6 +152,7 @@ export class LabelFragment extends HTMLElement implements LabelFragmentAttribute
         this._textContainer.className = "text-container";
         this._textArea.className = "text-area";
         this._textArea.textContent = text;
+        this._textArea.setAttribute("contenteditable", "true");
         this._textContainer.appendChild(this._textArea);
         this.shadowRoot?.appendChild(this._textContainer);
     }
@@ -159,6 +160,7 @@ export class LabelFragment extends HTMLElement implements LabelFragmentAttribute
     disconnectedCallback() {
         //..
     }
+
 
 }
 
