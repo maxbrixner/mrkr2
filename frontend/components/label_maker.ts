@@ -629,7 +629,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
                 document.addEventListener(
                     'selectionchange',
-                    this._onSelectionChange(fragment) as EventListener
+                    this._onSelectionChange(fragment, block) as EventListener
                 );
 
                 this._blockTab.appendChild(fragment);
@@ -639,13 +639,42 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         }
     }
 
-    private _onSelectionChange(element: HTMLElement) {
+    private _onSelectionChange(fragment: LabelFragment, block: BlockLabelDataSchema) {
         return (event: Event) => {
-            const selection = (element.shadowRoot as any)?.getSelection(); // Warning: this only works in Chrome-Browsers
+            const selection = (fragment.shadowRoot as any)?.getSelection(); // Warning: this only works in Chrome-Browsers
             if (!selection || selection.rangeCount === 0) return;
             const range = selection.getRangeAt(0);
             console.log(selection, range);
             console.log(range.startOffset, range.endOffset);
+
+            if (range.startContainer === range.endContainer &&
+                range.startContainer.nodeType === Node.TEXT_NODE) {
+                const startOffset = range.startOffset;
+                const endOffset = range.endOffset;
+
+                if (startOffset === endOffset) {
+                    // No selection, do nothing
+                    return;
+                }
+
+                const textLabel: TextLabelSchema = {
+                    name: 'text',
+                    content_start: startOffset,
+                    content_end: endOffset
+                };
+
+                // Check if the text label already exists
+                const existingTextLabel = block.text_labels.find(
+                    label => label.content_start === startOffset &&
+                        label.content_end === endOffset
+                );
+
+
+
+                /*if (!existingTextLabel) {
+                    block.text_labels.push(textLabel);
+                }*/
+            }
         }
     }
 

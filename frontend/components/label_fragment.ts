@@ -151,7 +151,23 @@ export class LabelFragment extends HTMLElement implements LabelFragmentAttribute
     public add_text(text: string) {
         this._textContainer.className = "text-container";
         this._textArea.className = "text-area";
-        this._textArea.textContent = text;
+
+        const tests = document.createElement('span');
+        tests.textContent = "";
+        tests.style.backgroundColor = "transparent";
+        this._textArea.appendChild(tests);
+
+        const test = document.createElement('span');
+        test.textContent = "Click to edit";
+        test.style.backgroundColor = "red";
+        this._textArea.appendChild(test);
+
+        const test2 = document.createElement('span');
+        test2.textContent = text;
+        test2.style.backgroundColor = "transparent";
+        this._textArea.appendChild(test2);
+
+
         this._textArea.setAttribute("contenteditable", "true");
         this._textContainer.appendChild(this._textArea);
         this.shadowRoot?.appendChild(this._textContainer);
