@@ -590,21 +590,26 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                         continue;
                     }
                     if (definition.type === 'text') {
-                        continue;
+                        fragment.add_text_label_button(
+                            definition.name,
+                            definition.color,
+                            definition.type
+                        );
+                    } else {
+
+                        const active = block.labels.some(
+                            label => label.name === definition.name
+                        );
+
+                        fragment.add_label_button(
+                            definition.name,
+                            definition.color,
+                            definition.type,
+                            active,
+                            "block",
+                            block.id
+                        );
                     }
-
-                    const active = block.labels.some(
-                        label => label.name === definition.name
-                    );
-
-                    fragment.add_label_button(
-                        definition.name,
-                        definition.color,
-                        definition.type,
-                        active,
-                        "block",
-                        block.id
-                    );
 
                 }
 

@@ -148,24 +148,39 @@ export class LabelFragment extends HTMLElement implements LabelFragmentAttribute
 
     }
 
+    public add_text_label_button(
+        name: string,
+        color: string,
+        type: string
+    ) {
+        if (!this._labelContainer || !this._textContainer) {
+            console.error("Label container or text container is not initialized.");
+            return;
+        }
+
+        const button = new LabelButton();
+        button.setAttribute("color", color);
+        button.setAttribute("name", name);
+        button.setAttribute("type", type);
+
+        const span = document.createElement('span');
+        span.slot = "label";
+        span.textContent = name;
+
+        button.appendChild(span);
+
+        this._textContainer.appendChild(button);
+
+    }
+
     public add_text(text: string) {
         this._textContainer.className = "text-container";
         this._textArea.className = "text-area";
 
         const tests = document.createElement('span');
-        tests.textContent = "";
+        tests.textContent = text;
         tests.style.backgroundColor = "transparent";
         this._textArea.appendChild(tests);
-
-        const test = document.createElement('span');
-        test.textContent = "Click to edit";
-        test.style.backgroundColor = "red";
-        this._textArea.appendChild(test);
-
-        const test2 = document.createElement('span');
-        test2.textContent = text;
-        test2.style.backgroundColor = "transparent";
-        this._textArea.appendChild(test2);
 
 
         this._textArea.setAttribute("contenteditable", "true");
