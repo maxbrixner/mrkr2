@@ -6,6 +6,5 @@ from .tags import *
 from .document import *
 from .project import *
 from .ocr import *
-from .label import *
 
 # ---------------------------------------------------------------------------- #

@@ -147,21 +147,21 @@ class BaseFileProvider:
         return text
 
     @property
-    async def image_metadata(
+    async def page_properties(
         self
-    ) -> schemas.DocumentMetadataSchema:
+    ) -> List[schemas.PagePropertiesSchema]:
         """
-        Converts the file to an image or a list of images if the file is a PDF.
-        If the file is not a PDF, it raises an exception.
+        Returns the properties of the pages in the file as a list of
+        PagePropertiesSchema objects.
         """
-        logger.debug(f"Getting image metadata for: '{self.path}'")
+        logger.debug(f"Getting image properties for: '{self.path}'")
 
         images = await self.read_as_images()
 
-        pages = []
+        result = []
         for image in images:
-            pages.append(
-                schemas.PageMetadataSchema(
+            result.append(
+                schemas.PagePropertiesSchema(
                     page=images.index(image) + 1,
                     width=image.width,
                     height=image.height,
@@ -171,10 +171,7 @@ class BaseFileProvider:
                 )
             )
 
-        return schemas.DocumentMetadataSchema(
-            path=self.path,
-            pages=pages
-        )
+        return result
 
     async def _read_image_file(
         self

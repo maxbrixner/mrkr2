@@ -34,19 +34,42 @@ def run_as_sync(func: Callable) -> Callable:
 
 
 @run_as_sync
+async def scan_project_sync(
+    project_id: int,
+    force: bool = False,
+    session: sqlmodel.Session | None = None
+) -> None:
+    """
+    A synchronous wrapper for scanning a project.
+    """
+    await scan_project(
+        project_id=project_id,
+        force=force,
+        session=session
+    )
+
+# ---------------------------------------------------------------------------- #
+
+
 async def scan_project(
-    project: models.Project,
+    project_id: int,
     force: bool = False,
     session: sqlmodel.Session | None = None
 ) -> None:
     """
     Scan the project.
     """
-    logger.debug(f"Scanning project {project.id}...")
+    logger.debug(f"Scanning project {project_id}...")
 
     try:
         if not session:
             session = next(database.get_database_session())
+
+        project = crud.get_project(session=session, id=project_id)
+
+        if not project:
+            logger.error(f"Project {project_id} not found.")
+            return
 
         await _scan_project_file_system(session=session, project=project)
 
@@ -57,55 +80,79 @@ async def scan_project(
 
         for document in documents:
             await scan_document(
-                document=document,
+                document_id=document.id,
                 force=force,
-                session=session
-            )
+                session=session)
 
     except Exception as exception:
-        logger.error(f"Error scanning project {project.id}: {exception}")
+        logger.error(f"Error scanning project {project_id}: {exception}")
 
-    logger.debug(f"Scan of project {project.id} successful.")
+    logger.debug(f"Scan of project {project_id} successful.")
+
+# ---------------------------------------------------------------------------- #
+
+
+@run_as_sync
+async def scan_document_sync(
+    document_id: int,
+    force: bool = False,
+    session: sqlmodel.Session | None = None
+) -> None:
+    """
+    A synchronous wrapper for scanning a document.
+    """
+    await scan_document(
+        document_id=document_id,
+        force=force,
+        session=session
+    )
 
 # ---------------------------------------------------------------------------- #
 
 
 async def scan_document(
-    document: models.Document,
+    document_id: int,
     force: bool = False,
     session: sqlmodel.Session | None = None
 ) -> None:
     """
     Scan a single document.
     """
-    logger.debug(f"Scanning document {document.id}...")
-
-    if not session:
-        session = next(database.get_database_session())
+    logger.debug(f"Scanning document {document_id}...")
 
     try:
+        if not session:
+            session = next(database.get_database_session())
 
-        if document.metacontent is None or force:
-            await _update_document_metadata(
-                session=session,
-                document=document
-            )
+        document = crud.get_document(session=session, id=document_id)
 
-        if document.labelcontent is None or force:
+        if not document:
+            logger.error(f"Document {document_id} not found.")
+            raise Exception("Document not found")
+
+        if document.data is None or force:
             ocr_result = await _run_document_ocr(
                 document=document
             )
 
-            await _create_label_content(
-                session=session,
-                document=document,
-                ocr_result=ocr_result
+            page_properties = await _get_document_page_properties(
+                document=document
             )
 
+            await _create_document_data(
+                session=session,
+                document=document,
+                ocr_result=ocr_result,
+                page_properties=page_properties
+            )
+        else:
+            logger.debug(
+                f"Document {document.id} already scanned."
+            )
     except Exception as exception:
-        logger.error(f"Error scanning document {document.id}: {exception}")
+        logger.error(f"Error scanning document {document_id}: {exception}")
 
-    logger.debug(f"Scan of document {document.id} successful.")
+    logger.debug(f"Scan of document {document_id} successful.")
 
 # ---------------------------------------------------------------------------- #
 
@@ -152,29 +199,24 @@ async def _scan_project_file_system(
 # ---------------------------------------------------------------------------- #
 
 
-async def _update_document_metadata(
-    session: sqlmodel.Session,
+async def _get_document_page_properties(
     document: models.Document
-) -> None:
+) -> List[schemas.PagePropertiesSchema]:
     """
-    Uses the file provider to get image metadata for a document and update
-    it in the database.
+    Uses the file provider to get the page properties of a document.
     """
-    logger.debug(f"Updating metadata for document {document.id}...")
+    logger.debug(f"Retrieving properties for document {document.id}...")
 
     file_provider = providers.get_file_provider(
         project_config=document.project.config)
 
     async with file_provider(document.path) as provider:
-        metadata = await provider.image_metadata
+        properties = await provider.page_properties
 
-        crud.update_document_meta_content(
-            session=session,
-            document=document,
-            meta_content=metadata
-        )
+    logger.debug(
+        f"Retrieval of properties for document {document.id} successful.")
 
-    logger.debug(f"Update of metadata for document {document.id} successful.")
+    return properties
 
 # ---------------------------------------------------------------------------- #
 
@@ -207,10 +249,11 @@ async def _run_document_ocr(
 # ---------------------------------------------------------------------------- #
 
 
-async def _create_label_content(
+async def _create_document_data(
     session: sqlmodel.Session,
     document: models.Document,
-    ocr_result: schemas.OcrResultSchema
+    ocr_result: schemas.OcrResultSchema,
+    page_properties: List[schemas.PagePropertiesSchema]
 ) -> None:
     """
     Create the label setup for a document and update it in the database.
@@ -218,14 +261,18 @@ async def _create_label_content(
     logger.debug(f"Creating label content for document {document.id}...")
 
     label_content = schemas.DocumentLabelDataSchema(
-        pages=_initialize_label_pages(ocr_result=ocr_result),
+        pages=_initialize_label_pages(
+            ocr_result=ocr_result,
+            page_properties=page_properties
+        ),
         labels=[]
     )
 
-    crud.update_document_label_content(
+    crud.update_document(
         session=session,
         document=document,
-        label_content=label_content
+        path=document.path,
+        data=label_content
     )
 
     logger.debug(
@@ -316,7 +363,6 @@ def _initialize_label_blocks(
             schemas.BlockLabelDataSchema(
                 id=item.id,
                 labels=[],
-                text_labels=[],
                 position=schemas.PositionSchema(
                     left=item.left,
                     top=item.top,
@@ -336,7 +382,8 @@ def _initialize_label_blocks(
 
 
 def _initialize_label_pages(
-    ocr_result: schemas.OcrResultSchema
+    ocr_result: schemas.OcrResultSchema,
+    page_properties: List[schemas.PagePropertiesSchema]
 ) -> List[schemas.PageLabelDataSchema]:
     """
     Initialize a page.
@@ -346,10 +393,22 @@ def _initialize_label_pages(
         if item.type != schemas.OcrItemType.page:
             continue
 
+        properties = next(
+            (property_item for property_item in page_properties if
+                property_item.page == item.page),
+            None
+        )
+
+        if not properties:
+            raise Exception(
+                f"Unable to find properties for page {item.page}."
+            )
+
         result.append(
             schemas.PageLabelDataSchema(
                 id=item.id,
                 page=item.page,
+                properties=properties,
                 labels=[],
                 blocks=_initialize_label_blocks(
                     ocr_result=ocr_result,

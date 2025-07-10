@@ -2,7 +2,7 @@
 
 import pydantic
 import enum
-from typing import Optional, List
+from typing import Optional, List, Self
 
 # ---------------------------------------------------------------------------- #
 
@@ -24,12 +24,10 @@ class FileProviderConfig(pydantic.BaseModel):
     path: str = pydantic.Field(
         ...,
         description="The path within ine file provider.",
-        examples=["demo"]
     )
     pdf_dpi: int = pydantic.Field(
         default=200,
         description="The DPI (dots per inch) for the conversion of PDF files.",
-        examples=[200]
     )
 
 # ---------------------------------------------------------------------------- #
@@ -51,32 +49,26 @@ class FileProviderS3Config(FileProviderConfig):
     access_key: str = pydantic.Field(
         ...,
         description="The AWS access key for S3.",
-        examples=["EXAMPLEKEY"]
     )
     account_id: str = pydantic.Field(
         ...,
         description="The AWS account ID for the S3 bucket.",
-        examples=["123456789012"]
     )
     bucket: str = pydantic.Field(
         ...,
         description="The name of the S3 bucket.",
-        examples=["my-bucket"]
     )
     region: str = pydantic.Field(
         ...,
         description="The AWS region where the S3 bucket is located.",
-        examples=["us-west-2"]
     )
     role_name: str = pydantic.Field(
         ...,
         description="The AWS IAM role name for accessing the S3 bucket.",
-        examples=["my-role"]
     )
     secret_access_key: str = pydantic.Field(
         ...,
         description="The AWS secret access key for S3.",
-        examples=["EXAMPLEKEY"]
     )
 
 
@@ -90,12 +82,10 @@ class ProjectFileProviderSchema(pydantic.BaseModel):
     type: FileProviderType = pydantic.Field(
         ...,
         description="The type of file provider for the project.",
-        examples=["local", "s3"]
     )
     config: FileProviderLocalConfig | FileProviderS3Config = pydantic.Field(
         ...,
         description="Configuration for the file provider.",
-        examples=[{"path": "demo", "pdf_dpi": 200}]
     )
 
 # ---------------------------------------------------------------------------- #
@@ -127,7 +117,6 @@ class OcrProviderTesseractConfig(OcrProviderConfig):
     language: str = pydantic.Field(
         default="eng",
         description="The language to use for OCR processing.",
-        examples=["eng", "deu"]
     )
 
 # ---------------------------------------------------------------------------- #
@@ -140,27 +129,22 @@ class OcrProviderTextractConfig(OcrProviderConfig):
     access_key: str = pydantic.Field(
         ...,
         description="The AWS access key for S3.",
-        examples=["EXAMPLEKEY"]
     )
     account_id: str = pydantic.Field(
         ...,
         description="The AWS account ID for the S3 bucket.",
-        examples=["123456789012"]
     )
     region: str = pydantic.Field(
         ...,
         description="The AWS region where the S3 bucket is located.",
-        examples=["us-west-2"]
     )
     role_name: str = pydantic.Field(
         ...,
         description="The AWS IAM role name for accessing the S3 bucket.",
-        examples=["my-role"]
     )
     secret_access_key: str = pydantic.Field(
         ...,
         description="The AWS secret access key for S3.",
-        examples=["EXAMPLEKEY"]
     )
 
 # ---------------------------------------------------------------------------- #
@@ -173,13 +157,11 @@ class ProjectOcrProviderSchema(pydantic.BaseModel):
     type: OcrProviderType = pydantic.Field(
         ...,
         description="The type of ocr provider for the project.",
-        examples=["tesseract", "textract"]
     )
     config: OcrProviderTesseractConfig | OcrProviderTextractConfig = \
         pydantic.Field(
             ...,
             description="Configuration for the ocr provider.",
-            examples=[{"language": "eng"}]
         )
 
 
@@ -190,8 +172,8 @@ class LabelType(str, enum.Enum):
     """
     Enum for label types.
     """
-    classification = "classification"
-    exclusive_classification = "classification_exclusive"
+    classification_multiple = "classification_multiple"
+    classification_single = "classification_single"
     text = "text"
 
 # ---------------------------------------------------------------------------- #
@@ -216,9 +198,9 @@ class LabelDefinitionSchema(pydantic.BaseModel):
         ...,
         description="The type of label."
     )
-    targets: List[LabelTarget] = pydantic.Field(
+    target: LabelTarget = pydantic.Field(
         ...,
-        description="The targets for the label (document, page, block).",
+        description="The target for the label (e.g. document, page, block).",
     )
     name: str = pydantic.Field(
         ...,
@@ -229,6 +211,12 @@ class LabelDefinitionSchema(pydantic.BaseModel):
         pattern=r"^#(?:[0-9a-fA-F]{3}){1,2}$",
         description="The color of the label in hex format (starting with #)."
     )
+
+    @pydantic.model_validator(mode='after')
+    def check_type_target(self) -> Self:
+        if self.type == LabelType.text and not self.target == LabelTarget.block:
+            raise ValueError("Text labels can only be applied to blocks.")
+        return self
 
 # ---------------------------------------------------------------------------- #
 
@@ -269,62 +257,62 @@ class ProjectCreateSchema(pydantic.BaseModel):
         examples=[{
             "label_definitions": [
                 {
-                    "type": "classification_exclusive",
-                    "targets": ["document"],
+                    "type": "classification_single",
+                    "target": "document",
                     "name": "Letter",
                     "color": "#4CAF50"
                 },
                 {
-                    "type": "classification_exclusive",
-                    "targets": ["document"],
+                    "type": "classification_single",
+                    "target": "document",
                     "name": "Email",
                     "color": "#2196F3"
                 },
                 {
-                    "type": "classification",
-                    "targets": ["page"],
+                    "type": "classification_multiple",
+                    "target": "page",
                     "name": "Cover Page",
                     "color": "#FF9800"
                 },
                 {
-                    "type": "classification",
-                    "targets": ["page"],
+                    "type": "classification_multiple",
+                    "target": "page",
                     "name": "Attachment",
                     "color": "#F44336"
                 },
                 {
-                    "type": "classification",
-                    "targets": ["block"],
+                    "type": "classification_multiple",
+                    "target": "block",
                     "name": "Header",
                     "color": "#9C27B0"
                 },
                 {
-                    "type": "classification",
-                    "targets": ["block"],
+                    "type": "classification_multiple",
+                    "target": "block",
                     "name": "Body",
                     "color": "#00BCD4"
                 },
                 {
-                    "type": "classification",
-                    "targets": ["block"],
+                    "type": "classification_multiple",
+                    "target": "block",
                     "name": "Footer",
                     "color": "#FFEB3B"
                 },
                 {
                     "type": "text",
-                    "targets": ["block"],
+                    "target": "block",
                     "name": "Name",
                     "color": "#607D8B"
                 },
                 {
                     "type": "text",
-                    "targets": ["block"],
+                    "target": "block",
                     "name": "IBAN",
                     "color": "#8BC34A"
                 },
                 {
                     "type": "text",
-                    "targets": ["block"],
+                    "target": "block",
                     "name": "Street",
                     "color": "#3F51B5"
                 }

@@ -32,12 +32,7 @@ class Document(sqlmodel.SQLModel, table=True):
     path: str = sqlmodel.Field(
         description="The path to the document file."
     )
-    metacontent: Optional[dict] = sqlmodel.Field(
-        default=None,
-        sa_column=Column(JSON),
-        description="Metadata for the document"
-    )
-    labelcontent: Optional[dict] = sqlmodel.Field(
+    data: Optional[dict] = sqlmodel.Field(
         default=None,
         sa_column=Column(JSON),
         description="Label data for the document"

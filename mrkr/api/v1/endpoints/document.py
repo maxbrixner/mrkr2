@@ -7,8 +7,11 @@ from typing import Dict
 
 import mrkr.schemas as schemas
 import mrkr.crud as crud
+import mrkr.models as models
 import mrkr.providers as providers
 import mrkr.database as database
+import mrkr.services as services
+import mrkr.core as core
 
 # ---------------------------------------------------------------------------- #
 
@@ -18,14 +21,14 @@ router = fastapi.APIRouter(prefix="/document", tags=[schemas.Tags.document])
 # ---------------------------------------------------------------------------- #
 
 
-@router.get("/metadata/{document_id}",
-            summary="Get Document Metadata")
-async def document_metadata(
+@router.get("/{document_id}",
+            summary="Retrieve Document")
+async def get_document(
     document_id: int,
     session: database.DatabaseDependency
-) -> schemas.DocumentMetadataSchema:
+) -> models.Document:
     """
-    Return the number of pages in the document along with some other metadata.
+    Return the document data.
     """
     document = crud.get_document(session=session, id=document_id)
 
@@ -35,15 +38,7 @@ async def document_metadata(
             detail="Document not found"
         )
 
-    if not document.metacontent:
-        raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_404_NOT_FOUND,
-            detail="Document metadata not found"
-        )
-
-    metadata = schemas.DocumentMetadataSchema(**document.metacontent)
-
-    return metadata
+    return document
 
 # ---------------------------------------------------------------------------- #
 
@@ -81,7 +76,7 @@ async def document_content(
 # ---------------------------------------------------------------------------- #
 
 
-@router.get("/labeldata/{document_id}",
+@router.get("/{document_id}/data",
             summary="Get Document Label Data")
 async def document_labeldata(
     document_id: int,
@@ -98,24 +93,24 @@ async def document_labeldata(
             detail="Document not found"
         )
 
-    if not document.labelcontent:
+    if not document.data:
         raise fastapi.HTTPException(
             status_code=fastapi.status.HTTP_404_NOT_FOUND,
             detail="Document label data not found"
         )
 
-    labeldata = schemas.DocumentLabelDataSchema(**document.labelcontent)
+    data = schemas.DocumentLabelDataSchema(**document.data)
 
-    return labeldata
+    return data
 
 # ---------------------------------------------------------------------------- #
 
 
-@router.put("/labeldata/{document_id}",
+@router.put("/{document_id}/data",
             summary="Update Document Label Data")
 async def document_submit_labeldata(
     document_id: int,
-    labeldata: schemas.DocumentLabelDataSchema,
+    data: schemas.DocumentLabelDataSchema,
     session: database.DatabaseDependency
 ) -> Dict:
     """
@@ -129,7 +124,7 @@ async def document_submit_labeldata(
             detail="Document not found"
         )
 
-    document.labelcontent = labeldata.model_dump()
+    document.data = data.model_dump()
 
     session.add(document)
     session.commit()
@@ -137,6 +132,37 @@ async def document_submit_labeldata(
 
     return {
         "message": "Label data updated successfully.",
+    }
+
+# ---------------------------------------------------------------------------- #
+
+
+@router.post("/{document_id}/scan", summary="Scan Document")
+async def scan_document(
+    document_id: int,
+    session: database.DatabaseDependency,
+    worker: services.WorkerPoolDependency,
+    force: bool = False,
+) -> Dict:
+    """
+    Scan a project.
+    """
+    document = crud.get_document(session=session, id=document_id)
+
+    if not document:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="Document not found"
+        )
+
+    worker.submit(
+        core.scan_document_sync,
+        document_id=document.id,
+        force=force
+    )
+
+    return {
+        "message": f"Scan scheduled for document {document_id}."
     }
 
 # ---------------------------------------------------------------------------- #
