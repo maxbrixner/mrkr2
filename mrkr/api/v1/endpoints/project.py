@@ -22,8 +22,8 @@ router = fastapi.APIRouter(prefix="/project", tags=[schemas.Tags.project])
 
 @router.post("", summary="Create Project")
 async def project_create(
-    project: schemas.ProjectCreateSchema,
-    session: database.DatabaseDependency
+    session: database.DatabaseDependency,
+    project: schemas.ProjectCreateSchema
 ) -> Dict:
     """
     Create a new project.
@@ -39,8 +39,12 @@ async def project_create(
 
 @router.get("/{project_id}", summary="Get Project")
 async def get_project(
-    project_id: int,
-    session: database.DatabaseDependency
+    session: database.DatabaseDependency,
+    project_id: int = fastapi.Path(
+        ...,
+        description="The unique identifier for the project (as an integer).",
+        examples=[1]
+    ),
 ) -> schemas.ProjectRetrieveSchema:
     """
     Retrieve a new project.
@@ -63,10 +67,14 @@ async def get_project(
 
 @router.post("/{project_id}/scan", summary="Scan Project")
 async def scan_project(
-    project_id: int,
     session: database.DatabaseDependency,
     worker: services.WorkerPoolDependency,
-    force: bool = False,
+    project_id: int = fastapi.Path(
+        ...,
+        description="The unique identifier for the project (as an integer).",
+        examples=[1]
+    ),
+    force: bool = False
 ) -> Dict:
     """
     Scan a project.

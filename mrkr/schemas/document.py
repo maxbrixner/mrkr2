@@ -15,6 +15,9 @@ class LabelSchema(pydantic.BaseModel):
     name: str = pydantic.Field(
         ...,
         description="The name of the label.",
+        examples=[
+            "Letter"
+        ]
     )
 
 # ---------------------------------------------------------------------------- #
@@ -27,10 +30,16 @@ class TextLabelSchema(LabelSchema):
     content_start: Optional[int] = pydantic.Field(
         ...,
         description="The starting position within the content.",
+        examples=[
+            5
+        ]
     )
     content_end: Optional[int] = pydantic.Field(
         ...,
         description="The ending position within the content.",
+        examples=[
+            15
+        ]
     )
 
 # ---------------------------------------------------------------------------- #
@@ -44,21 +53,25 @@ class PositionSchema(pydantic.BaseModel):
         ...,
         description="The left coordinate in the image, "
                     "normalized to [0, 1].",
+        examples=[0.1]
     )
     top: float = pydantic.Field(
         ...,
         description="The top coordinate in the image, "
                     "normalized to [0, 1].",
+        examples=[0.1]
     )
     width: float = pydantic.Field(
         ...,
         description="The width in the image, "
                     "normalized to [0, 1].",
+        examples=[0.4]
     )
     height: float = pydantic.Field(
         ...,
         description="The height in the image, "
                     "normalized to [0, 1].",
+        examples=[0.4]
     )
 
 # ---------------------------------------------------------------------------- #
@@ -67,27 +80,33 @@ class PositionSchema(pydantic.BaseModel):
 class PagePropertiesSchema(pydantic.BaseModel):
     aspect_ratio: float = pydantic.Field(
         ...,
-        description="The aspect ratio of the page (width / height)."
+        description="The aspect ratio of the page (width / height).",
+        examples=[1.3]
     )
     format: Optional[str] = pydantic.Field(
         default=None,
         description="The format of the image.",
+        examples=["PPM"]
     )
     height: int = pydantic.Field(
         ...,
         description="The height of the page in pixels.",
+        examples=[1200]
     )
     mode: str = pydantic.Field(
         ...,
-        description="The color mode of the image (e.g., RGB).",
+        description="The color mode of the image.",
+        examples=["RGB"]
     )
     page: int = pydantic.Field(
         ...,
         description="The page number in the document (starting from 1).",
+        examples=[1]
     )
     width: int = pydantic.Field(
         ...,
         description="The width of the page in pixels.",
+        examples=[1000]
     )
 
 # ---------------------------------------------------------------------------- #
@@ -99,7 +118,8 @@ class BlockLabelDataSchema(pydantic.BaseModel):
     """
     id: uuid.UUID = pydantic.Field(
         ...,
-        description="The unique identifier for the OCR item (as a UUID4)."
+        description="The unique identifier for the OCR item (as a UUID4).",
+        examples=["d33e6de2-379d-453f-bbd6-30bb9433563b"]
     )
     position: PositionSchema = pydantic.Field(
         ...,
@@ -112,7 +132,8 @@ class BlockLabelDataSchema(pydantic.BaseModel):
     )
     content: str = pydantic.Field(
         ...,
-        description="Text content of the block."
+        description="Text content of the block.",
+        examples=["This is a sample text."]
     )
 
     @pydantic.field_serializer('id', when_used='always')
@@ -128,11 +149,13 @@ class PageLabelDataSchema(pydantic.BaseModel):
     """
     id: uuid.UUID = pydantic.Field(
         ...,
-        description="The unique identifier for the OCR item (as a UUID4)."
+        description="The unique identifier for the OCR item (as a UUID4).",
+        examples=["d33e6de2-379d-453f-bbd6-30bb9433563b"]
     )
     page: int = pydantic.Field(
         ...,
-        description="The page number in the document (starting from 1)."
+        description="The page number in the document (starting from 1).",
+        examples=[1]
     )
     properties: PagePropertiesSchema = pydantic.Field(
         ...,
@@ -171,13 +194,27 @@ class DocumentLabelDataSchema(pydantic.BaseModel):
 # ---------------------------------------------------------------------------- #
 
 
-class DocumentRetrieveSchema(pydantic.BaseModel):
+class GetDocumentSchema(pydantic.BaseModel):
     """
-    Schema for retrieving document pages.
+    API-Schema for document retrieval.
     """
     id: int = pydantic.Field(
         ...,
-        description="The unique identifier for the document (as a UUID4)."
+        description="The unique identifier for the document (as an integer).",
+        examples=[1]
+    )
+
+# ---------------------------------------------------------------------------- #
+
+
+class DocumentSchema(pydantic.BaseModel):
+    """
+    API-Schema for a document.
+    """
+    id: int = pydantic.Field(
+        ...,
+        description="The unique identifier for the document (as an integer).",
+        examples=[1]
     )
     created: datetime.datetime = pydantic.Field(
         ...,
@@ -194,51 +231,18 @@ class DocumentRetrieveSchema(pydantic.BaseModel):
         description="The path to the document file within its source.",
         examples=["/documents/my_document.pdf"]
     )
-    # todo: update example data with real data
     data: DocumentLabelDataSchema = pydantic.Field(
         ...,
         description="The label data for the document",
-        examples=[{
-            "labels": [{"name": "Important"}],
-            "pages": [
-                {
-                    "id": "123e4567-e89b-12d3-a456-426614174000",
-                    "page": 1,
-                    "properties": {
-                        "aspect_ratio": 1.5,
-                        "format": "JPEG",
-                        "height": 1080,
-                        "mode": "RGB",
-                        "width": 1920
-                    },
-                    "labels": [{"name": "Header"}],
-                    "blocks": [
-                        {
-                            "id": "123e4567-e89b-12d3-a456-426614174001",
-                            "position": {
-                                "left": 0.1,
-                                "top": 0.2,
-                                "width": 0.8,
-                                "height": 0.2
-                            },
-                            "labels": [{"name": "Text Block"}],
-                            "content": "This is a sample text block."
-                        }
-                    ]
-                }
-            ]
-        }]
-
-
-
-
-
     )
 
 # ---------------------------------------------------------------------------- #
 
 
 class PageContentSchema(pydantic.BaseModel):
+    """
+    API-Schema for a page's content as a base64 encoded image.
+    """
     content: str = pydantic.Field(
         ...,
         description="The content of the document page as a base64 encoded "
@@ -256,5 +260,14 @@ class PageContentSchema(pydantic.BaseModel):
         examples=[1]
     )
 
+
+# ---------------------------------------------------------------------------- #
+
+
+class UpdateDocumentLabelDataSchema(DocumentLabelDataSchema):
+    """
+    API-Schema for document data updates.
+    """
+    pass
 
 # ---------------------------------------------------------------------------- #

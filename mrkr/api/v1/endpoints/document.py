@@ -24,9 +24,13 @@ router = fastapi.APIRouter(prefix="/document", tags=[schemas.Tags.document])
 @router.get("/{document_id}",
             summary="Get Document")
 async def get_document(
-    document_id: int,
-    session: database.DatabaseDependency
-) -> schemas.DocumentRetrieveSchema:
+    session: database.DatabaseDependency,
+    document_id: int = fastapi.Path(
+        ...,
+        description="The unique identifier for the document (as an integer).",
+        examples=[1]
+    )
+) -> schemas.DocumentSchema:
     """
     Return the document from the database.
     """
@@ -38,19 +42,27 @@ async def get_document(
             detail="Document not found"
         )
 
-    document_schema = schemas.DocumentRetrieveSchema(**document.model_dump())
+    document_schema = schemas.DocumentSchema(**document.model_dump())
 
     return document_schema
 
 # ---------------------------------------------------------------------------- #
 
 
-@router.get("/content/{document_id}",
+@router.get("/{document_id}/content/{page}",
             summary="Get Document Content")
-async def document_content(
-    document_id: int,
-    page: int,
-    session: database.DatabaseDependency
+async def get_document_content(
+    session: database.DatabaseDependency,
+    document_id: int = fastapi.Path(
+        ...,
+        description="The unique identifier for the document (as an integer).",
+        examples=[1]
+    ),
+    page: int = fastapi.Path(
+        ...,
+        description="The page number in the document (starting from 1).",
+        examples=[1]
+    )
 ) -> schemas.PageContentSchema:
     """
     Return the content of a specific page in the document as a json
@@ -68,7 +80,8 @@ async def document_content(
         project_config=document.project.config)
 
     async with file_provider(document.path) as provider:
-        image = await provider.read_as_base64_images(page=page, format="JPEG")
+        image = await provider.read_as_base64_images(
+            page=page, format="JPEG")
 
     return schemas.PageContentSchema(
         content=image[0],
@@ -78,15 +91,17 @@ async def document_content(
 
 # ---------------------------------------------------------------------------- #
 
-# todo: cretae an update Schema for id+data
 
-
-@router.put("/{document_id}/data",
+@router.put("{document_id}/data",
             summary="Update Document Label Data")
-async def document_submit_labeldata(
-    document_id: int,
-    data: schemas.DocumentLabelDataSchema,
-    session: database.DatabaseDependency
+async def update_label_data(
+    session: database.DatabaseDependency,
+    data: schemas.UpdateDocumentLabelDataSchema,
+    document_id: int = fastapi.Path(
+        ...,
+        description="The unique identifier for the document (as an integer).",
+        examples=[1]
+    )
 ) -> Dict:
     """
     Update the label data for the document.
@@ -111,15 +126,17 @@ async def document_submit_labeldata(
 
 # ---------------------------------------------------------------------------- #
 
-# todo: add schema for fields with examples
-
 
 @router.post("/{document_id}/scan", summary="Scan Document")
 async def scan_document(
-    document_id: int,
     session: database.DatabaseDependency,
     worker: services.WorkerPoolDependency,
-    force: bool = False,
+    document_id: int = fastapi.Path(
+        ...,
+        description="The unique identifier for the document (as an integer).",
+        examples=[1]
+    ),
+    force: bool = False
 ) -> Dict:
     """
     Scan a project.
