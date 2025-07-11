@@ -36,12 +36,10 @@ class OcrRelationshipSchema(pydantic.BaseModel):
     type: OcrRelationshipType = pydantic.Field(
         ...,
         description="The type of the relationship.",
-        examples=["child"]
     )
     id: uuid.UUID = pydantic.Field(
         ...,
         description="The ID of the related OCR item (as a UUID4).",
-        examples=["123e4567-e89b-12d3-a456-426614174000"]
     )
 
     @pydantic.field_serializer('id', when_used='always')
@@ -55,62 +53,47 @@ class OcrItemSchema(pydantic.BaseModel):
     id: uuid.UUID = pydantic.Field(
         ...,
         description="The unique identifier for the OCR item (as a UUID4).",
-        examples=["123e4567-e89b-12d3-a456-426614174000"]
     )
     type: OcrItemType = pydantic.Field(
         ...,
         description="The type of the OCR item.",
-        examples=["page"]
     )
     left: float = pydantic.Field(
         ...,
         description="The left coordinate of the item in the image, "
                     "normalized to [0, 1].",
-        examples=[0.1]
     )
     top: float = pydantic.Field(
         ...,
         description="The top coordinate of the item in the image, "
                     "normalized to [0, 1].",
-        examples=[0.1]
     )
     width: float = pydantic.Field(
         ...,
         description="The width of the item in the image, "
                     "normalized to [0, 1].",
-        examples=[0.8]
     )
     height: float = pydantic.Field(
         ...,
         description="The height of the item in the image, "
                     "normalized to [0, 1].",
-        examples=[0.2]
     )
     page: int = pydantic.Field(
         ...,
         description="The page number where the item is located "
                     "(starting from 1).",
-        examples=[1]
     )
     confidence: Optional[float] = pydantic.Field(
         None,
         description="The confidence score of the OCR item as a percentage",
-        examples=[95]
     )
     content: Optional[str] = pydantic.Field(
         None,
         description="The text content of the OCR item.",
-        examples=["Test content"]
     )
     relationships: List[OcrRelationshipSchema] = pydantic.Field(
         [],
         description="A list of relationships to other OCR items.",
-        examples=[
-            {
-                "type": "child",
-                "id": "123e4567-e89b-12d3-a456-426614174000"
-            }
-        ]
     )
 
     @pydantic.field_serializer('id', when_used='always')
@@ -124,24 +107,10 @@ class OcrResultSchema(pydantic.BaseModel):
     id: uuid.UUID = pydantic.Field(
         ...,
         description="The unique identifier for the OCR result (as a UUID4).",
-        examples=["123e4567-e89b-12d3-a456-426614174000"]
     )
     items: List[OcrItemSchema] = pydantic.Field(
         ...,
-        description="A list of OCR items extracted from the document.",
-        examples=[
-            [{
-                "id": "123e4567-e89b-12d3-a456-426614174000",
-                "type": "page",
-                "left": 0.0,
-                "top": 0.0,
-                "width": 1.0,
-                "height": 1.0,
-                "confidence": None,
-                "content": None,
-                "relationships": []
-            }]
-        ]
+        description="A list of OCR items extracted from the document."
     )
 
     @pydantic.field_serializer('id', when_used='always')

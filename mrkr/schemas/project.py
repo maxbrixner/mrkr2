@@ -2,6 +2,7 @@
 
 import pydantic
 import enum
+import datetime
 from typing import Optional, List, Self
 
 # ---------------------------------------------------------------------------- #
@@ -240,6 +241,112 @@ class ProjectSchema(pydantic.BaseModel):
 
 # ---------------------------------------------------------------------------- #
 
+
+class ProjectRetrieveSchema(pydantic.BaseModel):
+    id: int = pydantic.Field(
+        ...,
+        description="The unique identifier of the project.",
+        examples=[1]
+    )
+    name: str = pydantic.Field(
+        ...,
+        description="The name of the project.",
+        examples=["My Project"]
+    )
+    created: datetime.datetime = pydantic.Field(
+        ...,
+        description="The timestamp when the project was created.",
+        examples=["2023-10-01T12:00:00Z"]
+    )
+    updated: datetime.datetime = pydantic.Field(
+        ...,
+        description="The timestamp when the project was last updated.",
+        examples=["2023-10-01T12:00:00Z"]
+    )
+    config: ProjectSchema = pydantic.Field(
+        ...,
+        description="Configuration for the project.",
+        examples=[{
+            "label_definitions": [
+                    {
+                        "type": "classification_single",
+                        "target": "document",
+                        "name": "Letter",
+                        "color": "#4CAF50"
+                    },
+                {
+                        "type": "classification_single",
+                        "target": "document",
+                        "name": "Email",
+                        "color": "#2196F3"
+                    },
+                {
+                        "type": "classification_multiple",
+                        "target": "page",
+                        "name": "Cover Page",
+                        "color": "#FF9800"
+                    },
+                {
+                        "type": "classification_multiple",
+                        "target": "page",
+                        "name": "Attachment",
+                        "color": "#F44336"
+                    },
+                {
+                        "type": "classification_multiple",
+                        "target": "block",
+                        "name": "Header",
+                        "color": "#9C27B0"
+                    },
+                {
+                        "type": "classification_multiple",
+                        "target": "block",
+                        "name": "Body",
+                        "color": "#00BCD4"
+                    },
+                {
+                        "type": "classification_multiple",
+                        "target": "block",
+                        "name": "Footer",
+                        "color": "#FFEB3B"
+                    },
+                {
+                        "type": "text",
+                        "target": "block",
+                        "name": "Name",
+                        "color": "#607D8B"
+                    },
+                {
+                        "type": "text",
+                        "target": "block",
+                        "name": "IBAN",
+                        "color": "#8BC34A"
+                    },
+                {
+                        "type": "text",
+                        "target": "block",
+                        "name": "Street",
+                        "color": "#3F51B5"
+                    }
+            ],
+            "file_provider": {
+                "type": "local",
+                "config": {
+                    "path": "demo",
+                    "pdf_dpi": 200
+                }
+            },
+            "ocr_provider": {
+                "type": "tesseract",
+                "config": {
+                    "language": "eng"
+                }
+            }}
+        ]
+    )
+
+
+# ---------------------------------------------------------------------------- #
 
 class ProjectCreateSchema(pydantic.BaseModel):
     """

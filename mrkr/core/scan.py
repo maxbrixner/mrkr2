@@ -188,10 +188,8 @@ async def _scan_project_file_system(
 
             crud.create_document(
                 session=session,
-                document=schemas.DocumentCreateSchema(
-                    project_id=project.id,
-                    path=file
-                )
+                project_id=project.id,
+                path=file
             )
 
     logger.debug("Project file system scan successful.")

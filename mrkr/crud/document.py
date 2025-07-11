@@ -42,14 +42,15 @@ def get_project_documents(
 
 def create_document(
     session: sqlmodel.Session,
-    document: schemas.DocumentCreateSchema
+    project_id: int,
+    path: str
 ) -> models.Document:
     """
     Create a new document in the database.
     """
     database_document = models.Document(
-        project_id=document.project_id,
-        path=document.path,
+        project_id=project_id,
+        path=path,
     )
 
     session.add(database_document)

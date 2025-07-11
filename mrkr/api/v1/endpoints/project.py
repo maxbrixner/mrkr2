@@ -41,7 +41,7 @@ async def project_create(
 async def get_project(
     project_id: int,
     session: database.DatabaseDependency
-) -> models.Project:
+) -> schemas.ProjectRetrieveSchema:
     """
     Retrieve a new project.
     """
@@ -53,7 +53,9 @@ async def get_project(
             detail="Project not found"
         )
 
-    return project
+    project_schema = schemas.ProjectRetrieveSchema(**project.model_dump())
+
+    return project_schema
 
 
 # ---------------------------------------------------------------------------- #

@@ -22,13 +22,13 @@ router = fastapi.APIRouter(prefix="/document", tags=[schemas.Tags.document])
 
 
 @router.get("/{document_id}",
-            summary="Retrieve Document")
+            summary="Get Document")
 async def get_document(
     document_id: int,
     session: database.DatabaseDependency
-) -> models.Document:
+) -> schemas.DocumentRetrieveSchema:
     """
-    Return the document data.
+    Return the document from the database.
     """
     document = crud.get_document(session=session, id=document_id)
 
@@ -38,7 +38,9 @@ async def get_document(
             detail="Document not found"
         )
 
-    return document
+    document_schema = schemas.DocumentRetrieveSchema(**document.model_dump())
+
+    return document_schema
 
 # ---------------------------------------------------------------------------- #
 
@@ -51,7 +53,8 @@ async def document_content(
     session: database.DatabaseDependency
 ) -> schemas.PageContentSchema:
     """
-    Return the content of a specific page in the document.
+    Return the content of a specific page in the document as a json
+    containing the images data as a base64 encoded byte string.
     """
     document = crud.get_document(session=session, id=document_id)
 
@@ -75,35 +78,7 @@ async def document_content(
 
 # ---------------------------------------------------------------------------- #
 
-
-@router.get("/{document_id}/data",
-            summary="Get Document Label Data")
-async def document_labeldata(
-    document_id: int,
-    session: database.DatabaseDependency
-) -> schemas.DocumentLabelDataSchema:
-    """
-    Return the label data for the document.
-    """
-    document = crud.get_document(session=session, id=document_id)
-
-    if not document:
-        raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_404_NOT_FOUND,
-            detail="Document not found"
-        )
-
-    if not document.data:
-        raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_404_NOT_FOUND,
-            detail="Document label data not found"
-        )
-
-    data = schemas.DocumentLabelDataSchema(**document.data)
-
-    return data
-
-# ---------------------------------------------------------------------------- #
+# todo: cretae an update Schema for id+data
 
 
 @router.put("/{document_id}/data",
@@ -135,6 +110,8 @@ async def document_submit_labeldata(
     }
 
 # ---------------------------------------------------------------------------- #
+
+# todo: add schema for fields with examples
 
 
 @router.post("/{document_id}/scan", summary="Scan Document")

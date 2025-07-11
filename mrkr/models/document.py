@@ -21,21 +21,20 @@ class Document(sqlmodel.SQLModel, table=True):
     )
     created: datetime.datetime = sqlmodel.Field(
         default_factory=datetime.datetime.now,
-        description="The timestamp when the project was created.",
+        description="The timestamp when the document was created.",
     )
-    # todo
-    # updated: datetime.datetime = sqlmodel.Field(
-    #    default_factory=datetime.datetime.now,
-    #    description="The timestamp when the project was created.",
-    #    sa_column_kwargs={"onupdate": lambda: datetime.datetime.now}
-    # )
+    updated: datetime.datetime = sqlmodel.Field(
+        default_factory=datetime.datetime.now,
+        description="The timestamp when the document was last updated.",
+        sa_column_kwargs={"onupdate": lambda: datetime.datetime.now()}
+    )
     path: str = sqlmodel.Field(
-        description="The path to the document file."
+        description="The path to the document file within its source."
     )
     data: Optional[dict] = sqlmodel.Field(
         default=None,
         sa_column=Column(JSON),
-        description="Label data for the document"
+        description="The label data for the document"
     )
 
     project: Project = sqlmodel.Relationship()
