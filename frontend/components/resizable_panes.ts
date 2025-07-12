@@ -96,48 +96,32 @@ export class ResizablePanes extends HTMLElement implements ResizablePanesAttribu
                 width: 100%;
             }
 
-            .horizontal.no-select {
-                cursor: row-resize;
-            }
-
-            .vertical.no-select {
-                cursor: col-resize;
-            }
-
             .pane {
+                background-color: var(--resizable-panes-background-color, #ffffff);    
                 display: grid;
-                grid-template-rows: 1fr;
                 grid-template-columns: 1fr;
+                grid-template-rows: 1fr;
                 overflow: hidden;
-                background-color: var(--resizable-pane-background-color, #f0f0f0);
             }
 
             .handle {
-                background-color: var(--resizable-pane-handle-color, #000000);
-                cursor: col-resize;
+                background-color: var(--resizable-panes-handle-color, #000000);
                 transition: background-color 0.2s ease, box-shadow 0.2s ease;
             }
 
             .handle.vertical {
-                width: var(--resizable-pane-handle-size, 1px);
                 cursor: col-resize;
+                width: var(--resizable-panes-handle-size, 1px);
             }
 
             .handle.horizontal {
-                height: var(--resizable-pane-handle-size, 1px);
                 cursor: row-resize;
+                height: var(--resizable-panes-handle-size, 1px);
             }
 
             .handle:hover,
             .handle:active {
-                background-color: var(--resizable-pane-handle-color-hover, #000000);
-            }
-
-            .no-select {
-                user-select: none;
-                -webkit-user-select: none;
-                -moz-user-select: none;
-                -ms-user-select: none;
+                background-color: var(--resizable-panes-handle-color-hover, #000000);
             }
         }
         `;
@@ -152,14 +136,14 @@ export class ResizablePanes extends HTMLElement implements ResizablePanesAttribu
 
         this._handle = document.createElement('div');
         this._handle.classList.add('handle');
-        this.appendChild(this._handle);
+        this.shadowRoot.appendChild(this._handle);
 
         this._secondPane = document.createElement('div');
         this._secondPane.classList.add('pane');
         const secondSlot = document.createElement('slot')
         secondSlot.name = `second`;
         this._secondPane.appendChild(secondSlot);
-        this.appendChild(this._secondPane);
+        this.shadowRoot.appendChild(this._secondPane);
     }
 
     /**
@@ -172,11 +156,8 @@ export class ResizablePanes extends HTMLElement implements ResizablePanesAttribu
 
         this.innerHTML = '';
 
-
         if (this.orientation === 'vertical') {
-            console.log("sjdhskjdjhskjdhk", this.startsize)
             this.style.gridTemplateColumns = `${this.startsize} min-content 1fr`;
-            console.log(this.style.gridTemplateColumns)
             this._handle?.classList.remove('horizontal');
             this._handle?.classList.add('vertical');
         } else {
@@ -195,7 +176,6 @@ export class ResizablePanes extends HTMLElement implements ResizablePanesAttribu
         e.preventDefault();
         if (!this._firstPane || !this._secondPane || !this._handle)
             return;
-        this.classList.add('no-select');
     };
 
     /**
@@ -229,11 +209,9 @@ export class ResizablePanes extends HTMLElement implements ResizablePanesAttribu
 
     /**
      * Handles the mouse up event after resizing.
-     * It resets the resizing state and removes the no-select class from the container.
      */
     private _onMouseUp = (): void => {
         this._isResizing = false;
-        this.classList.remove('no-select');
     };
 }
 
