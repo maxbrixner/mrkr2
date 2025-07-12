@@ -10,7 +10,6 @@ interface ResizablePanesAttributes {
 export class ResizablePanes extends HTMLElement implements ResizablePanesAttributes {
     public orientation?: 'horizontal' | 'vertical' = undefined;
     public startsize?: string = undefined;
-    private _container: HTMLDivElement | null = null;
     private _firstPane: HTMLDivElement | null = null;
     private _secondPane: HTMLDivElement | null = null;
     private _handle: HTMLDivElement | null = null;
@@ -48,14 +47,17 @@ export class ResizablePanes extends HTMLElement implements ResizablePanesAttribu
         if (propertyName === 'startsize') {
             this.startsize = newValue || '50%';
         }
-        this._updatePanes();
+
+        if (this.orientation && this.startsize) {
+            this._updatePanes();
+        }
     }
 
     /**
      * Called when the component is added to the DOM.
      */
     connectedCallback() {
-        if (!(this._handle && this._container && this._firstPane && this._secondPane)) {
+        if (!(this._handle && this._firstPane && this._secondPane)) {
             return;
         }
 
@@ -86,24 +88,19 @@ export class ResizablePanes extends HTMLElement implements ResizablePanesAttribu
         const style = document.createElement('style');
         style.textContent = `
             :host {
-                display: block;
-                overflow: hidden;
-                user-select: none;
-            }
-
-            .container {
+                box-sizing: border-box;
                 display: grid;
-                width: 100%;
                 height: 100%;
                 overflow: hidden;
-                box-sizing: border-box;          
+                user-select: none; 
+                width: 100%;
             }
 
-            .container.horizontal.no-select {
+            .horizontal.no-select {
                 cursor: row-resize;
             }
 
-            .container.vertical.no-select {
+            .vertical.no-select {
                 cursor: col-resize;
             }
 
@@ -146,46 +143,47 @@ export class ResizablePanes extends HTMLElement implements ResizablePanesAttribu
         `;
         this.shadowRoot?.appendChild(style);
 
-        this._container = document.createElement('div');
-        this._container.classList.add('container');
-        this.shadowRoot?.appendChild(this._container);
-    }
-
-    /**
-     * Updates the panes based on the current orientation, minsize, and startsize.
-     */
-    private _updatePanes() {
-        if (!this.orientation || !this.startsize) {
-            return;
-        }
-        if (!this._container) return;
-
-        this._container.innerHTML = '';
-
-        if (this.orientation === 'vertical') {
-            this._container.style.gridTemplateColumns = `${this.startsize} min-content 1fr`;
-        } else {
-            this._container.style.gridTemplateRows = `${this.startsize} min-content 1fr`;
-        }
-
         this._firstPane = document.createElement('div');
         this._firstPane.classList.add('pane');
         const firstSlot = document.createElement('slot')
         firstSlot.name = `first`;
         this._firstPane.appendChild(firstSlot);
-        this._container.appendChild(this._firstPane);
+        this.shadowRoot.appendChild(this._firstPane);
 
         this._handle = document.createElement('div');
         this._handle.classList.add('handle');
-        this._handle.classList.add(this.orientation);
-        this._container.appendChild(this._handle);
+        this.appendChild(this._handle);
 
         this._secondPane = document.createElement('div');
         this._secondPane.classList.add('pane');
         const secondSlot = document.createElement('slot')
         secondSlot.name = `second`;
         this._secondPane.appendChild(secondSlot);
-        this._container.appendChild(this._secondPane);
+        this.appendChild(this._secondPane);
+    }
+
+    /**
+     * Updates the panes based on the current orientation, minsize, and startsize.
+     */
+    private _updatePanes() {
+        if (!this.shadowRoot) {
+            throw new Error("Shadow Root is not initialized.");
+        }
+
+        this.innerHTML = '';
+
+
+        if (this.orientation === 'vertical') {
+            console.log("sjdhskjdjhskjdhk", this.startsize)
+            this.style.gridTemplateColumns = `${this.startsize} min-content 1fr`;
+            console.log(this.style.gridTemplateColumns)
+            this._handle?.classList.remove('horizontal');
+            this._handle?.classList.add('vertical');
+        } else {
+            this.style.gridTemplateRows = `${this.startsize} min-content 1fr`;
+            this._handle?.classList.remove('vertical');
+            this._handle?.classList.add('horizontal');
+        }
     }
 
     /**
@@ -195,9 +193,9 @@ export class ResizablePanes extends HTMLElement implements ResizablePanesAttribu
     private _onMouseDown = (e: MouseEvent): void => {
         this._isResizing = true;
         e.preventDefault();
-        if (!this._container || !this._firstPane || !this._secondPane || !this._handle)
+        if (!this._firstPane || !this._secondPane || !this._handle)
             return;
-        this._container.classList.add('no-select');
+        this.classList.add('no-select');
     };
 
     /**
@@ -207,25 +205,25 @@ export class ResizablePanes extends HTMLElement implements ResizablePanesAttribu
      * It ensures that the new sizes do not go below the minimum size.
      */
     private _onMouseMove = (e: MouseEvent): void => {
-        if (!this._isResizing || !this._container || !this._firstPane || !this._secondPane || !this._handle)
+        if (!this._isResizing || !this._firstPane || !this._secondPane || !this._handle)
             return;
 
         if (this.orientation === 'vertical') {
-            let newFirstWidth = e.clientX - this._container.offsetLeft;
-            let newSecondWidth = this._container.offsetWidth - newFirstWidth - this._handle.offsetWidth;
+            let newFirstWidth = e.clientX - this.offsetLeft;
+            let newSecondWidth = this.offsetWidth - newFirstWidth - this._handle.offsetWidth;
 
             if (newFirstWidth < 100) newFirstWidth = 100;
-            if (newSecondWidth < 100) newFirstWidth = this._container.offsetWidth - 100 - this._handle.offsetWidth;
+            if (newSecondWidth < 100) newFirstWidth = this.offsetWidth - 100 - this._handle.offsetWidth;
 
-            this._container.style.gridTemplateColumns = `${newFirstWidth}px min-content 1fr`;
+            this.style.gridTemplateColumns = `${newFirstWidth}px min-content 1fr`;
         } else {
-            let newFirstHeight = e.clientY - this._container.offsetTop;
-            let newSecondHeight = this._container.offsetHeight - newFirstHeight - this._handle.offsetHeight;
+            let newFirstHeight = e.clientY - this.offsetTop;
+            let newSecondHeight = this.offsetHeight - newFirstHeight - this._handle.offsetHeight;
 
             if (newFirstHeight < 100) newFirstHeight = 100;
-            if (newSecondHeight < 100) newFirstHeight = this._container.offsetHeight - 100 - this._handle.offsetHeight;
+            if (newSecondHeight < 100) newFirstHeight = this.offsetHeight - 100 - this._handle.offsetHeight;
 
-            this._container.style.gridTemplateRows = `${newFirstHeight}px min-content 1fr`;
+            this.style.gridTemplateRows = `${newFirstHeight}px min-content 1fr`;
         }
     };
 
@@ -235,7 +233,7 @@ export class ResizablePanes extends HTMLElement implements ResizablePanesAttribu
      */
     private _onMouseUp = (): void => {
         this._isResizing = false;
-        this._container?.classList.remove('no-select');
+        this.classList.remove('no-select');
     };
 }
 

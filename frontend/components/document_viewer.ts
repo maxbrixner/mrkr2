@@ -138,43 +138,43 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
                 background-color: var(--document-viewer-highlight-background-color, transparent);
                 border: none;
                 cursor: pointer;
-                outline-width: var(--document-viewer-highlight-outline-width, 0px);
-                outline-style: solid;
                 outline-color: var(--document-viewer-highlight-outline-color, #000000);
+                outline-style: solid;
+                outline-width: var(--document-viewer-highlight-outline-width, 0px);
                 position: absolute;
                 z-index: 2;
             }
 
             .page:focus {
-                outline-width: var(--document-viewer-page-focus-outline-width, 2px);
+                outline-color: var(--document-viewer-page-focus-outline-color, #000000);    
                 outline-style: solid;
-                outline-color: var(--document-viewer-page-focus-outline-color, #000000);
+                outline-width: var(--document-viewer-page-focus-outline-width, 2px);
             }
 
             .highlight:focus,
             .highlight:hover {
-                outline-width: var(--document-viewer-highlight-focus-outline-width, 2px);
+                outline-color: var(--document-viewer-highlight-focus-outline-color, #000000);    
                 outline-style: solid;
-                outline-color: var(--document-viewer-highlight-focus-outline-color, #000000);
+                outline-width: var(--document-viewer-highlight-focus-outline-width, 2px);
             }
 
             .loading::before {
+                animation: spin 1s linear infinite;    
+                border: 4px solid var(--spinner-color, #000000);
+                border-radius: 50%; 
+                border-top: 4px solid var(--spinner-color-top, #ffffff);
                 content: "";
                 display: block;
+                height: 30px;
                 margin: 2rem auto;
                 width: 30px;
-                height: 30px;
-                border: 4px solid var(--spinner-color, #000000);
-                border-top: 4px solid var(--spinner-color-top, #ffffff);
-                border-radius: 50%;
-                animation: spin 1s linear infinite;
             }
 
             .pulsing {
                 animation: pulse .8s ease-in-out 0s 2 alternate;
             }
-
         `
+
         this.shadowRoot?.appendChild(style);
     }
 
