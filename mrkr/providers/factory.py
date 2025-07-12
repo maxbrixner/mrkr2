@@ -12,10 +12,10 @@ from .ocr.tesseract import TesseractOcrProvider
 
 
 def get_file_provider(
-    project_config: dict | schemas.ProjectSchema
+    project_config: dict | schemas.ProjectConfigSchema
 ) -> BaseFileProvider:
     if isinstance(project_config, dict):
-        project_config = schemas.ProjectSchema(**project_config)
+        project_config = schemas.ProjectConfigSchema(**project_config)
 
     match project_config.file_provider.type:
         case schemas.FileProviderType.local:
@@ -39,10 +39,10 @@ def get_file_provider(
 
 
 def get_ocr_provider(
-    project_config: dict | schemas.ProjectSchema
+    project_config: dict | schemas.ProjectConfigSchema
 ) -> BaseOcrProvider:
     if isinstance(project_config, dict):
-        project_config = schemas.ProjectSchema(**project_config)
+        project_config = schemas.ProjectConfigSchema(**project_config)
 
     match project_config.ocr_provider.type:
         case schemas.OcrProviderType.tesseract:

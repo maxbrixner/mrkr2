@@ -91,7 +91,7 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
      */
     private _populateShadowRoot() {
         if (!this.shadowRoot) {
-            return;
+            throw new Error("Shadow Root is not initialized.");
         }
 
         const style = document.createElement('style');
@@ -121,7 +121,6 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
                 box-shadow: var(--document-viewer-page-box-shadow, 0 2px 4px rgba(0, 0, 0, 0.1));
                 box-sizing: border-box;
                 padding: 0;
-                margin: 0;
                 position: relative;
                 user-select: none;
                 width: 100%;
@@ -158,7 +157,7 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
                 outline-width: var(--document-viewer-highlight-focus-outline-width, 2px);
             }
 
-            .loading::before {
+           :host(.loading)::before {
                 animation: spin 1s linear infinite;    
                 border: 4px solid var(--spinner-color, #000000);
                 border-radius: 50%; 
@@ -170,12 +169,20 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
                 width: 30px;
             }
 
-            .pulsing {
-                animation: pulse .8s ease-in-out 0s 2 alternate;
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+
+                100% {
+                    transform: rotate(360deg);
+                }
             }
         `
 
         this.shadowRoot?.appendChild(style);
+
+        this.classList.add('loading');
     }
 
     /**
@@ -285,7 +292,7 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         highlightElement.style.top = `${top * 100 - .1}%`;
         highlightElement.style.width = `${width * 100 + .2}%`;
         highlightElement.style.height = `${height * 100 + .2}%`;
-        highlightElement.name = title;
+        highlightElement.ariaLabel = title;
 
         highlightElement.addEventListener('click', (event: Event) => {
             event.stopPropagation();

@@ -57,8 +57,8 @@ export class ResizablePanes extends HTMLElement implements ResizablePanesAttribu
      * Called when the component is added to the DOM.
      */
     connectedCallback() {
-        if (!(this._handle && this._firstPane && this._secondPane)) {
-            return;
+        if (!this._handle) {
+            throw new Error("Handle is not initialized.");
         }
 
         this._handle.addEventListener('mousedown', this._onMouseDown);
@@ -70,9 +70,10 @@ export class ResizablePanes extends HTMLElement implements ResizablePanesAttribu
      * Called when the component is removed from the DOM.
      */
     disconnectedCallback() {
-        if (this._handle) {
-            this._handle.removeEventListener('mousedown', this._onMouseDown);
+        if (!this._handle) {
+            throw new Error("Handle is not initialized.");
         }
+        this._handle.removeEventListener('mousedown', this._onMouseDown);
         document.removeEventListener('mousemove', this._onMouseMove);
         document.removeEventListener('mouseup', this._onMouseUp);
     }
@@ -82,7 +83,7 @@ export class ResizablePanes extends HTMLElement implements ResizablePanesAttribu
      */
     private _populateShadowRoot() {
         if (!this.shadowRoot) {
-            return;
+            throw new Error("Shadow Root is not initialized.");
         }
 
         const style = document.createElement('style');
@@ -172,8 +173,6 @@ export class ResizablePanes extends HTMLElement implements ResizablePanesAttribu
     private _onMouseDown = (e: MouseEvent): void => {
         this._isResizing = true;
         e.preventDefault();
-        if (!this._firstPane || !this._secondPane || !this._handle)
-            return;
     };
 
     /**
@@ -183,7 +182,7 @@ export class ResizablePanes extends HTMLElement implements ResizablePanesAttribu
      * It ensures that the new sizes do not go below the minimum size.
      */
     private _onMouseMove = (e: MouseEvent): void => {
-        if (!this._isResizing || !this._firstPane || !this._secondPane || !this._handle)
+        if (!this._isResizing || !this._handle)
             return;
 
         if (this.orientation === 'vertical') {

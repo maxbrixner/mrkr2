@@ -48,16 +48,21 @@
     --styled-button-font-weight: 600;
     --styled-button-padding: var(--spacing-medium) var(--spacing-large);
 
+
+
+
+
     --resizable-panes-background-color: var(--background-color);
     --resizable-panes-handle-color: var(--border-color);
     --resizable-panes-handle-color-hover: var(--primary-color);
     --resizable-panes-handle-size: 1px;
 
-    --tab-container-background-color: var(--surface-color);
+    --tab-container-background-color: var(--background-color);
     --tab-container-tabbar-background-color: var(--background-color);
+    --tab-container-tabbar-border-color: var(--border-color);
     --tab-container-tab-active-background-color: var(--surface-color);
     --tab-container-tab-active-border-color: var(--border-color);
-    --tab-container-tabbar-border-color: var(--border-color);
+    --tab-container-content-background-color: var(--surface-color);
 
     --document-viewer-background: var(--background-color);
     --document-viewer-page-background: var(--surface-color);
@@ -73,12 +78,10 @@
 
 
 
-    --document-viewer-block-hover-color: var(--primary-color);
 
 
 
-    --document-viewer-pulse-color: var(--primary-color);
-    --document-viewer-page-border-color: var(--border-color);
+
 
     --label-viewer-background-color: var(--surface-color);
     --label-viewer-pulse-color: var(--primary-color);
@@ -86,28 +89,4 @@
 
     --label-fragment-border-radius: var(--border-radius-medium);
     --label-fragment-border-color: var(--border-color);
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes pulse {
-    0% {
-        outline: 0px solid transparent;
-    }
-
-    50% {
-        outline: 3px solid var(--document-viewer-pulse-color);
-    }
-
-    100% {
-        outline: 0px solid transparent;
-    }
 }

@@ -1,12 +1,12 @@
 /* -------------------------------------------------------------------------- */
 
 interface TabContainerAttributes {
+    //...
 }
 
 /* -------------------------------------------------------------------------- */
 
 export class TabContainer extends HTMLElement implements TabContainerAttributes {
-    private _ContainerElement: HTMLDivElement = document.createElement('div');
     private _TabBarElement: HTMLDivElement = document.createElement('div');
     private _TabContentElement: HTMLDivElement = document.createElement('div');
     private _slots: HTMLSlotElement[] = [];
@@ -40,36 +40,7 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
      * Called when the component is added to the DOM.
      */
     connectedCallback() {
-        if (!this._ContainerElement) return;
-        if (!this._TabBarElement) return;
-        if (!this._TabContentElement) return;
-
-        Array.from(this.children).forEach((child, idx) => {
-            const slotName = child.slot || `tab-${idx}`;
-            child.setAttribute('slot', slotName);
-
-            const slot = document.createElement('slot');
-            slot.name = slotName;
-            if (idx === 0) {
-                slot.classList.add('active');
-            }
-
-            this._TabContentElement.appendChild(slot);
-            this._slots.push(slot);
-
-            const tab = document.createElement('button');
-            tab.classList.add('tab');
-
-            if (idx === 0) {
-                tab.classList.add('active');
-            }
-
-            tab.name = slotName;
-            tab.textContent = slotName;
-            tab.addEventListener('click', this._onTabClick.bind(this, slot, tab));
-            this._TabBarElement.appendChild(tab);
-            this._tabs.push(tab);
-        });
+        console.log("bbb")
     }
 
     /**
@@ -84,72 +55,160 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
      */
     private _populateShadowRoot() {
         if (!this.shadowRoot) {
-            return;
+            throw new Error("Shadow Root is not initialized.");
         }
 
         const style = document.createElement('style');
         style.textContent = `
             :host {
-                display: block;
-                overflow: hidden;
-            }
-            .container {
+                background-color: var(--tab-container-background-color, #ffffff);    
                 display: grid;
                 grid-template-columns: 1fr;
                 grid-template-rows: auto 1fr;
                 height: 100%;
-                width: 100%;
-                background-color: var(--tab-container-background-color, #ffffff);
                 overflow: hidden;
+                width: 100%;
+                user-select: none;
             }
+
             .tabbar {
                 background-color: var(--tab-container-tabbar-background-color, #ffffff);
-                padding: 0.5rem 0 0 0.5rem;
-                display: grid;
-                grid-auto-flow: column;
-                grid-auto-columns: min-content;
                 border-bottom: 1px solid var(--tab-container-tabbar-border-color, #000000);
+                display: grid;
                 gap: 2px;
+                grid-auto-columns: min-content;
+                grid-auto-flow: column;
+                padding: 0.5rem 0 0 0.5rem;
             }
+
             .tab {
                 background-color: var(--tab-container-tabbar-background-color, #ffffff);
                 border: 1px solid transparent;
                 border-bottom: none;
-                padding: 0.5rem;
                 cursor: pointer;
-                margin: 0;
-                padding: .6rem 1rem;
+                font-family: inherit;
                 font-size: .8rem;
                 font-weight: 500;
-                user-select: none;
-                font-family: inherit;
-            }
-            .tab.active {
-                border-color: var(--tab-container-tab-active-border-color, #000000);
-                background-color: var(--tab-container-tab-active-background-color, #ffffff);
-                transform: translateY(1px);
-                border-bottom: none;
-            }
-            .content {
+                margin: 0;
                 overflow: hidden;
+                padding: .6rem 1rem;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                width: 100px;
             }
+
+            .tab.active {
+                background-color: var(--tab-container-tab-active-background-color, #ffffff);
+                border-color: var(--tab-container-tab-active-border-color, #000000);
+                transform: translateY(1px);
+            }
+
+            .content {
+                background-color: var(--tab-container-content-background-color, #ffffff);
+                height: 100%;
+                overflow: hidden;
+                width: 100%;
+            }
+
             slot {
                 display: none;
             }
+
             slot.active {
                 display: contents;
             }
+
+           :host(.loading)::before {
+                animation: spin 1s linear infinite;    
+                border: 4px solid var(--spinner-color, #000000);
+                border-radius: 50%; 
+                border-top: 4px solid var(--spinner-color-top, #ffffff);
+                content: "";
+                display: block;
+                height: 30px;
+                margin: 4rem auto;
+                width: 30px;
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
         `;
+
         this.shadowRoot?.appendChild(style);
-        this._ContainerElement = document.createElement('div');
-        this._ContainerElement.classList.add('container');
-        this._TabBarElement = document.createElement('div');
+
+        this.classList.add('loading');
+    }
+
+    /**
+     * Resets the component's state by clearing the tab bar and content elements.
+     */
+    private _reset() {
+        if (!this.shadowRoot) {
+            throw new Error("Shadow Root is not initialized.");
+        }
+
+        if (this.shadowRoot.contains(this._TabBarElement))
+            this.shadowRoot.removeChild(this._TabBarElement);
+        if (this.shadowRoot.contains(this._TabContentElement))
+            this.shadowRoot.removeChild(this._TabContentElement);
+        this._TabBarElement.innerHTML = '';
+        this._TabContentElement.innerHTML = '';
+        this._slots = [];
+        this._tabs = [];
+        this.classList.add('loading');
+    }
+
+    /**
+     * Updates the tabs in the container.
+     */
+    public updateTabs() {
+        if (!this.shadowRoot) {
+            throw new Error("Shadow Root is not initialized.");
+        }
+        this._reset();
+
+        this.classList.remove('loading');
+
         this._TabBarElement.classList.add('tabbar');
-        this._TabContentElement = document.createElement('div');
+        this.shadowRoot.appendChild(this._TabBarElement);
+
         this._TabContentElement.classList.add('content');
-        this._ContainerElement.appendChild(this._TabBarElement);
-        this._ContainerElement.appendChild(this._TabContentElement);
-        this.shadowRoot?.appendChild(this._ContainerElement);
+        this.shadowRoot.appendChild(this._TabContentElement);
+
+        Array.from(this.children).forEach((child, idx) => {
+            const slotName = child.slot || `tab-${idx}`;
+
+            const slot = document.createElement('slot');
+            slot.name = slotName;
+
+            this._TabContentElement.appendChild(slot);
+            this._slots.push(slot);
+
+            const tab = document.createElement('button');
+            tab.classList.add('tab');
+            tab.ariaLabel = slotName;
+            tab.textContent = slotName;
+
+            if (idx === 0) {
+                slot.classList.add('active');
+                tab.classList.add('active');
+            }
+
+            tab.addEventListener('click', (event: Event) => {
+                event.stopPropagation();
+                this._onTabClick(slot, tab);
+            });
+
+            this._TabBarElement.appendChild(tab);
+            this._tabs.push(tab);
+        });
     }
 
     /**
@@ -167,6 +226,9 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
         tab.classList.add('active');
     }
 
+    /**
+     * Switches to a specific tab by its slot name.
+     */
     public switchToTab(slotName: string) {
         const slot = this._slots.find(s => s.name === slotName);
         const tab = this._tabs.find(t => t.name === slotName);

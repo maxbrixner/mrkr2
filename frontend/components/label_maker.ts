@@ -93,10 +93,22 @@ interface LabelDefinitionSchema {
     color: string
 }
 
-interface ProjectSchema {
+/* -------------------------------------------------------------------------- */
+
+interface ProjectConfigSchema {
     label_definitions: LabelDefinitionSchema[]
     file_provider: any
     ocr_provider: any
+}
+
+/* -------------------------------------------------------------------------- */
+
+interface ProjectSchema {
+    id: number
+    name: string
+    created: string
+    updated: string
+    config: ProjectConfigSchema
 }
 
 /* -------------------------------------------------------------------------- */
@@ -201,11 +213,13 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 scrollbar-color: var(--label-viewer-scrollbar-color, inherit);
                 height: 100%;
             }
+
             .label-container {
                 display: grid;
                 grid-template-rows: 1fr auto;
                 overflow: hidden;
             }
+
             .label-controls {
                 display: flex;
                 justify-content: flex-end;
@@ -213,41 +227,8 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 border-top: 1px solid var(--label-fragment-border-color);
                 background-color: var(--label-fragment-title-background-color);
             }
-            .pulsing {
-                animation: pulse .8s ease-in-out 0s 2 alternate;
-            }
-
-            .loading::before {
-                content: "";
-                display: block;
-                margin: 2rem auto;
-                width: var(--spinner-size-large, 30px);
-                height: var(--spinner-size-large, 30px);
-                border: var(--spinner-border-large, 4px) solid var(--spinner-color, #000000);
-                border-top: var(--spinner-border-large, 4px) solid var(--spinner-color-top, #ffffff);
-                border-radius: 50%;
-                animation: spin 1s linear infinite;
-            }
-
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-
-            @keyframes pulse {
-                0% {
-                    outline: 0px solid transparent;
-                }
-
-                50% {
-                    outline: 3px solid var(--document-viewer-pulse-color);               
-                }
-
-                100% {
-                    outline: 0px solid transparent;
-                }
-            }
         `;
+
         this.shadowRoot.appendChild(style);
 
         this._resizablePanes.setAttribute('orientation', 'vertical');
@@ -362,6 +343,15 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             throw new Error("Document or project data is not available.");
         }
 
+        this._addHighlightsToDocumentViewer();
+        this._addTabsToTabContainer();
+    }
+
+    private _addHighlightsToDocumentViewer() {
+        if (!this._document || !this._project) {
+            throw new Error("Document or project data is not available.");
+        }
+
         for (const page of this._document.data.pages) {
             for (const block of page.blocks) {
                 this._documentViewer.addHighlight(
@@ -374,6 +364,41 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 );
             }
         }
+    }
+
+    private _addTabsToTabContainer() {
+        if (!this._document || !this._project) {
+            throw new Error("Document or project data is not available.");
+        }
+
+        console.log(this._project)
+
+        if (this._project.config.label_definitions.some(
+            (definition) => definition.target === 'document')) {
+            const documentTab = document.createElement('div');
+            documentTab.slot = 'Document';
+            documentTab.classList.add("loading");
+            documentTab.innerHTML = `<h2>Document Labels</h2>`;
+            this._tabContainer.appendChild(documentTab);
+        }
+
+        if (this._project.config.label_definitions.some(
+            (definition) => definition.target === 'page')) {
+            const pageTab = document.createElement('div');
+            pageTab.slot = 'Page';
+            pageTab.classList.add("loading");
+            this._tabContainer.appendChild(pageTab);
+        }
+
+        if (this._project.config.label_definitions.some(
+            (definition) => definition.target === 'block')) {
+            const blockTab = document.createElement('div');
+            blockTab.slot = 'Block';
+            blockTab.classList.add("loading");
+            this._tabContainer.appendChild(blockTab);
+        }
+
+        this._tabContainer.updateTabs();
     }
 
     /**

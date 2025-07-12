@@ -195,41 +195,8 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 border-top: 1px solid var(--label-fragment-border-color);
                 background-color: var(--label-fragment-title-background-color);
             }
-            .pulsing {
-                animation: pulse .8s ease-in-out 0s 2 alternate;
-            }
-
-            .loading::before {
-                content: "";
-                display: block;
-                margin: 2rem auto;
-                width: 30px;
-                height: 30px;
-                border: 4px solid var(--document-viewer-spinner-color, #000000);
-                border-top: 4px solid var(--document-viewer-spinner-color-top, #ffffff);
-                border-radius: 50%;
-                animation: spin 1s linear infinite;
-            }
-
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-
-            @keyframes pulse {
-                0% {
-                    outline: 0px solid transparent;
-                }
-
-                50% {
-                    outline: 3px solid var(--document-viewer-pulse-color);               
-                }
-
-                100% {
-                    outline: 0px solid transparent;
-                }
-            }
         `;
+
         this.shadowRoot.appendChild(style);
 
         this._resizablePanes.setAttribute('orientation', 'vertical');

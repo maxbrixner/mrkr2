@@ -248,7 +248,7 @@ class LabelDefinitionSchema(pydantic.BaseModel):
 # ---------------------------------------------------------------------------- #
 
 
-class ProjectSchema(pydantic.BaseModel):
+class ProjectConfigSchema(pydantic.BaseModel):
     """
     Schema for a project.
     """
@@ -268,7 +268,7 @@ class ProjectSchema(pydantic.BaseModel):
 # ---------------------------------------------------------------------------- #
 
 
-class GetProjectSchema(pydantic.BaseModel):
+class ProjectSchema(pydantic.BaseModel):
     id: int = pydantic.Field(
         ...,
         description="The unique identifier of the project.",
@@ -289,7 +289,7 @@ class GetProjectSchema(pydantic.BaseModel):
         description="The timestamp when the project was last updated.",
         examples=["2023-10-01T12:00:00Z"]
     )
-    config: ProjectSchema = pydantic.Field(
+    config: ProjectConfigSchema = pydantic.Field(
         ...,
         description="Configuration for the project."
     )
@@ -307,7 +307,7 @@ class ProjectCreateSchema(pydantic.BaseModel):
         description="Project name must be between 3 and 50 characters.",
         examples=["My Project"]
     )
-    config: ProjectSchema = pydantic.Field(
+    config: ProjectConfigSchema = pydantic.Field(
         ...,
         description="Configuration for the project."
     )

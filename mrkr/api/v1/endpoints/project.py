@@ -45,7 +45,7 @@ async def get_project(
         description="The unique identifier for the project (as an integer).",
         examples=[1]
     ),
-) -> schemas.GetProjectSchema:
+) -> schemas.ProjectSchema:
     """
     Retrieve a new project.
     """
@@ -57,7 +57,7 @@ async def get_project(
             detail="Project not found"
         )
 
-    project_schema = schemas.GetProjectSchema(**project.model_dump())
+    project_schema = schemas.ProjectSchema(**project.model_dump())
 
     return project_schema
 
