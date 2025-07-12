@@ -154,8 +154,6 @@ export class ResizablePanes extends HTMLElement implements ResizablePanesAttribu
             throw new Error("Shadow Root is not initialized.");
         }
 
-        this.innerHTML = '';
-
         if (this.orientation === 'vertical') {
             this.style.gridTemplateColumns = `${this.startsize} min-content 1fr`;
             this._handle?.classList.remove('horizontal');
