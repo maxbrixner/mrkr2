@@ -42,10 +42,10 @@ export class ResizablePanes extends HTMLElement implements ResizablePanesAttribu
         if (oldValue === newValue) return;
 
         if (propertyName === 'orientation') {
-            this.orientation = newValue as 'vertical' || 'horizontal';
+            this.orientation = newValue as 'horizontal' | 'vertical' || undefined;
         }
         if (propertyName === 'startsize') {
-            this.startsize = newValue || '50%';
+            this.startsize = newValue || undefined;
         }
 
         if (this.orientation && this.startsize) {
