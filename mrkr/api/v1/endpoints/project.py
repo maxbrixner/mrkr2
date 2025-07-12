@@ -21,7 +21,7 @@ router = fastapi.APIRouter(prefix="/project", tags=[schemas.Tags.project])
 
 
 @router.post("", summary="Create Project")
-async def project_create(
+async def create_project(
     session: database.DatabaseDependency,
     project: schemas.ProjectCreateSchema
 ) -> Dict:
@@ -45,7 +45,7 @@ async def get_project(
         description="The unique identifier for the project (as an integer).",
         examples=[1]
     ),
-) -> schemas.ProjectRetrieveSchema:
+) -> schemas.GetProjectSchema:
     """
     Retrieve a new project.
     """
@@ -57,7 +57,7 @@ async def get_project(
             detail="Project not found"
         )
 
-    project_schema = schemas.ProjectRetrieveSchema(**project.model_dump())
+    project_schema = schemas.GetProjectSchema(**project.model_dump())
 
     return project_schema
 

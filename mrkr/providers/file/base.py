@@ -25,19 +25,13 @@ class BaseFileProvider:
     A provider that handles file operations.
     """
     path: str
-    _config: schemas.FileProviderConfig
-    _stream: io.BufferedReader | None
-    _is_file: bool
-    _is_folder: bool
+    _config: schemas.FileProviderConfigSchema
 
-    def __init__(self, config: schemas.FileProviderConfig) -> None:
+    def __init__(self, config: schemas.FileProviderConfigSchema) -> None:
         """
         Initializes the BaseFileProvider with a file path and optional PDF DPI.
         """
         self.path = ''
-        self._stream = None
-        self._is_file = False
-        self._is_folder = False
         self._config = config
 
     def __call__(self, path: str) -> Self:
@@ -51,11 +45,7 @@ class BaseFileProvider:
         self
     ) -> Self:
         """
-        Implement this method to provide file reading functionality. If the
-        path is a file, it should store a binary file stream in
-        self._file, set _is_file to true, and return self. If the path is a
-        folder, it should set _is_folder to true and return self. If the path
-        is neither a file nor a folder, it should raise a FileNotFoundError.
+        Enters the context manager, allowing for file operations.
         """
         return self
 
@@ -66,15 +56,34 @@ class BaseFileProvider:
         traceback: Any
     ) -> None:
         """
-        Implement this method to close the file stream.
+        Exits the context manager, cleaning up resources if necessary.
         """
         pass
 
-    async def read(self) -> bytes:
+    @property
+    async def is_file(self) -> bool:
         """
-        Implement this method to read the file and return its content as bytes.
+        Returns True if the path is a file, False otherwise.
         """
         raise NotImplementedError
+
+    @property
+    async def is_folder(self) -> bool:
+        """
+        Returns True if the path is a folder, False otherwise.
+        """
+        raise NotImplementedError
+
+    async def read(
+        self,
+        chunk_size: Optional[int] = None
+    ) -> AsyncGenerator[bytes, None]:
+        """
+        Reads the file and returns its content as bytes. If the path is a
+        folder, it should raise an exception.
+        """
+        raise NotImplementedError
+        yield ""  # Placeholder for AsyncGenerator
 
     async def list(self) -> AsyncGenerator[str, None]:
         """
@@ -94,7 +103,7 @@ class BaseFileProvider:
         logger.debug(f"Reading file as images for: '{self.path}'")
 
         if self.path.lower().endswith('.pdf'):
-            images = await self._convert_pdf_to_images(page=page)
+            images = await self._read_pdf_file(page=page)
         else:
             if not page or page == 1:
                 images = [await self._read_image_file()]
@@ -105,9 +114,8 @@ class BaseFileProvider:
 
     async def read_as_base64_images(
         self,
-        page: Optional[int] = None,
-        format: str = "JPEG"
-    ) -> List[str]:
+        page: Optional[int] = None
+    ) -> List[schemas.PageContentSchema]:
         """
         Converts the file to a list of base64 encoded images.
         """
@@ -119,19 +127,29 @@ class BaseFileProvider:
         loop = asyncio.get_running_loop()
 
         result = []
-        for image in images:
+        for index, image in enumerate(images):
             bytes = io.BytesIO()
             await loop.run_in_executor(
                 None,
                 functools.partial(
                     image.save,
                     bytes,
-                    format=format
+                    format=self._config.image_format
                 )
             )
             bytes.seek(0)
             base64_string = await self._convert_to_base64(bytes.getvalue())
-            result.append(base64_string)
+            result.append(
+                schemas.PageContentSchema(
+                    content=base64_string,
+                    page=index+1 if page is None else page,
+                    width=image.width,
+                    height=image.height,
+                    aspect_ratio=round(image.width / image.height, 7),
+                    format=self._config.image_format.upper(),
+                    mode=image.mode
+                )
+            )
 
         return result
 
@@ -146,50 +164,28 @@ class BaseFileProvider:
             None, encoded_bytes.decode, 'utf-8')
         return text
 
-    @property
-    async def page_properties(
-        self
-    ) -> List[schemas.PagePropertiesSchema]:
-        """
-        Returns the properties of the pages in the file as a list of
-        PagePropertiesSchema objects.
-        """
-        logger.debug(f"Getting image properties for: '{self.path}'")
-
-        images = await self.read_as_images()
-
-        result = []
-        for image in images:
-            result.append(
-                schemas.PagePropertiesSchema(
-                    page=images.index(image) + 1,
-                    width=image.width,
-                    height=image.height,
-                    aspect_ratio=round(image.width / image.height, 7),
-                    format=image.format,
-                    mode=image.mode
-                )
-            )
-
-        return result
-
     async def _read_image_file(
         self
     ) -> Image.Image:
         """
-        Reads an image file and returns it as an Image object.
+        Reads an image file and returns it as an image object.
         """
         try:
+            chunks = []
+            async for chunk in self.read():
+                chunks.append(chunk)
+            bytes = b"".join(chunks)
+
             loop = asyncio.get_running_loop()
-            bytes = await self.read()
-            image = await loop.run_in_executor(None, Image.open, io.BytesIO(bytes))
+            image = await loop.run_in_executor(
+                None, Image.open, io.BytesIO(bytes))
             return image
         except Exception as e:
             raise Exception(
                 f"Failed to read image file: {e}"
             )
 
-    async def _convert_pdf_to_images(
+    async def _read_pdf_file(
         self,
         page: Optional[int] = None
     ) -> List[Image.Image]:
@@ -199,8 +195,12 @@ class BaseFileProvider:
         logger.debug(f"Converting PDF to images for: '{self.path}'")
 
         try:
+            chunks = []
+            async for chunk in self.read():
+                chunks.append(chunk)
+            bytes = b"".join(chunks)
+
             loop = asyncio.get_running_loop()
-            bytes = await self.read()
 
             if not page:
                 images = await loop.run_in_executor(
@@ -224,21 +224,9 @@ class BaseFileProvider:
                     )
                 )
                 return images
-        except Exception as e:
+        except Exception as exception:
             raise Exception(
-                f"Failed to convert PDF to images: {e}"
+                f"Failed to convert PDF to images: {exception}"
             )
-
-    def is_file(self) -> bool:
-        """
-        Returns True if the path is a file, False otherwise.
-        """
-        return self._is_file
-
-    def is_folder(self) -> bool:
-        """
-        Returns True if the path is a folder, False otherwise.
-        """
-        return self._is_folder
 
 # ---------------------------------------------------------------------------- #

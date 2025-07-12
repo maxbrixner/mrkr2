@@ -27,14 +27,14 @@ class TextLabelSchema(LabelSchema):
     """
     Schema for text labels.
     """
-    content_start: Optional[int] = pydantic.Field(
+    start: Optional[int] = pydantic.Field(
         ...,
         description="The starting position within the content.",
         examples=[
             5
         ]
     )
-    content_end: Optional[int] = pydantic.Field(
+    end: Optional[int] = pydantic.Field(
         ...,
         description="The ending position within the content.",
         examples=[
@@ -72,41 +72,6 @@ class PositionSchema(pydantic.BaseModel):
         description="The height in the image, "
                     "normalized to [0, 1].",
         examples=[0.4]
-    )
-
-# ---------------------------------------------------------------------------- #
-
-
-class PagePropertiesSchema(pydantic.BaseModel):
-    aspect_ratio: float = pydantic.Field(
-        ...,
-        description="The aspect ratio of the page (width / height).",
-        examples=[1.3]
-    )
-    format: Optional[str] = pydantic.Field(
-        default=None,
-        description="The format of the image.",
-        examples=["PPM"]
-    )
-    height: int = pydantic.Field(
-        ...,
-        description="The height of the page in pixels.",
-        examples=[1200]
-    )
-    mode: str = pydantic.Field(
-        ...,
-        description="The color mode of the image.",
-        examples=["RGB"]
-    )
-    page: int = pydantic.Field(
-        ...,
-        description="The page number in the document (starting from 1).",
-        examples=[1]
-    )
-    width: int = pydantic.Field(
-        ...,
-        description="The width of the page in pixels.",
-        examples=[1000]
     )
 
 # ---------------------------------------------------------------------------- #
@@ -156,11 +121,6 @@ class PageLabelDataSchema(pydantic.BaseModel):
         ...,
         description="The page number in the document (starting from 1).",
         examples=[1]
-    )
-    properties: PagePropertiesSchema = pydantic.Field(
-        ...,
-        description="Metadata for the page, including aspect ratio, "
-                    "format, height, mode, and width."
     )
     labels: List[LabelSchema] = pydantic.Field(
         ...,
@@ -249,15 +209,35 @@ class PageContentSchema(pydantic.BaseModel):
                     "image.",
         examples=["iVBORw0KGgoAAAANSUhEUgAA..."]
     )
-    mime: str = pydantic.Field(
-        ...,
-        description="The MIME type of the content.",
-        examples=["image/jpeg"]
-    )
     page: int = pydantic.Field(
         ...,
         description="The page number in the document (starting from 1).",
         examples=[1]
+    )
+    width: int = pydantic.Field(
+        ...,
+        description="The width of the image in pixels.",
+        examples=[800]
+    )
+    height: int = pydantic.Field(
+        ...,
+        description="The height of the image in pixels.",
+        examples=[600]
+    )
+    aspect_ratio: float = pydantic.Field(
+        ...,
+        description="The aspect ratio of the image (width / height).",
+        examples=[1.3333]
+    )
+    format: str = pydantic.Field(
+        ...,
+        description="The format of the image.",
+        examples=["JPEG"]
+    )
+    mode: str = pydantic.Field(
+        ...,
+        description="The color mode of the image (e.g., RGB, CMYK).",
+        examples=["RGB"]
     )
 
 

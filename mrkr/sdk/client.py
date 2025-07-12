@@ -179,7 +179,7 @@ class MrkrClient():
 
         response = self._call_api(
             method="POST",
-            endpoint="/project/create",
+            endpoint="/project",
             json=project.model_dump()
         )
 
@@ -195,21 +195,7 @@ class MrkrClient():
         """
         self._call_api(
             method="POST",
-            endpoint=f"/project/scan/{project_id}"
-        )
-
-    def schedule_ocr(
-        self,
-        project_id: int
-    ) -> None:
-        """
-        Schedule an OCR run for a project, i.e. ask the ocr provider to
-        run OCR on the files associated with the project that to not have
-        an OCR result yet.
-        """
-        self._call_api(
-            method="POST",
-            endpoint=f"/ocr/run/{project_id}"
+            endpoint=f"/project/{project_id}/scan"
         )
 
 # ---------------------------------------------------------------------------- #

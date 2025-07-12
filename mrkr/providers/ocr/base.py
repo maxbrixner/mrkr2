@@ -19,10 +19,10 @@ class BaseOcrProvider:
     """
     A provider that handles OCR operations on files.
     """
-    _config: schemas.OcrProviderConfig
+    _config: schemas.OcrProviderConfigSchema
     _images: List[Image.Image]
 
-    def __init__(self, config: schemas.OcrProviderConfig) -> None:
+    def __init__(self, config: schemas.OcrProviderConfigSchema) -> None:
         """
         Initializes the BaseOcrProvider with a configuration.
         """

@@ -21,7 +21,7 @@ def get_file_provider(
         case schemas.FileProviderType.local:
             if not isinstance(
                 project_config.file_provider.config,
-                schemas.FileProviderLocalConfig
+                schemas.FileProviderLocalConfigSchema
             ):
                 raise ValueError(
                     "Local file provider was configured incorrectly."
@@ -48,7 +48,7 @@ def get_ocr_provider(
         case schemas.OcrProviderType.tesseract:
             if not isinstance(
                 project_config.ocr_provider.config,
-                schemas.OcrProviderTesseractConfig
+                schemas.OcrProviderTesseractConfigSchema
             ):
                 raise ValueError(
                     "Tesseract OCR provider was configured incorrectly."

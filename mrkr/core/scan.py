@@ -135,15 +135,10 @@ async def scan_document(
                 document=document
             )
 
-            page_properties = await _get_document_page_properties(
-                document=document
-            )
-
             await _create_document_data(
                 session=session,
                 document=document,
-                ocr_result=ocr_result,
-                page_properties=page_properties
+                ocr_result=ocr_result
             )
         else:
             logger.debug(
@@ -197,28 +192,6 @@ async def _scan_project_file_system(
 # ---------------------------------------------------------------------------- #
 
 
-async def _get_document_page_properties(
-    document: models.Document
-) -> List[schemas.PagePropertiesSchema]:
-    """
-    Uses the file provider to get the page properties of a document.
-    """
-    logger.debug(f"Retrieving properties for document {document.id}...")
-
-    file_provider = providers.get_file_provider(
-        project_config=document.project.config)
-
-    async with file_provider(document.path) as provider:
-        properties = await provider.page_properties
-
-    logger.debug(
-        f"Retrieval of properties for document {document.id} successful.")
-
-    return properties
-
-# ---------------------------------------------------------------------------- #
-
-
 async def _run_document_ocr(
     document: models.Document
 ) -> schemas.OcrResultSchema:
@@ -251,7 +224,6 @@ async def _create_document_data(
     session: sqlmodel.Session,
     document: models.Document,
     ocr_result: schemas.OcrResultSchema,
-    page_properties: List[schemas.PagePropertiesSchema]
 ) -> None:
     """
     Create the label setup for a document and update it in the database.
@@ -261,7 +233,6 @@ async def _create_document_data(
     label_content = schemas.DocumentLabelDataSchema(
         pages=_initialize_label_pages(
             ocr_result=ocr_result,
-            page_properties=page_properties
         ),
         labels=[]
     )
@@ -380,8 +351,7 @@ def _initialize_label_blocks(
 
 
 def _initialize_label_pages(
-    ocr_result: schemas.OcrResultSchema,
-    page_properties: List[schemas.PagePropertiesSchema]
+    ocr_result: schemas.OcrResultSchema
 ) -> List[schemas.PageLabelDataSchema]:
     """
     Initialize a page.
@@ -391,22 +361,10 @@ def _initialize_label_pages(
         if item.type != schemas.OcrItemType.page:
             continue
 
-        properties = next(
-            (property_item for property_item in page_properties if
-                property_item.page == item.page),
-            None
-        )
-
-        if not properties:
-            raise Exception(
-                f"Unable to find properties for page {item.page}."
-            )
-
         result.append(
             schemas.PageLabelDataSchema(
                 id=item.id,
                 page=item.page,
-                properties=properties,
                 labels=[],
                 blocks=_initialize_label_blocks(
                     ocr_result=ocr_result,

@@ -23,11 +23,9 @@
 
 {% block main %}
 <main class="labeling-main">
-
-    <label-maker document-metadata-url="{{ url_for('document_metadata', document_id=document.id) }}"
-        document-content-url="{{ url_for('document_content', document_id=document.id) }}" show-pages="all-loaded"
-        document-labeldata-url="{{ url_for('document_labeldata', document_id=document.id) }}"
-        project-label-definition-url="{{ url_for('project_label_definitions', project_id=document.project.id) }}">
+    <label-maker document-url="{{ url_for('get_document', document_id=document.id) }}"
+        project-url="{{ url_for('get_project', project_id=document.project.id) }}"
+        image-url="{{ url_for('get_document_content', document_id=document.id) }}">
     </label-maker>
 </main>
 {% endblock %}

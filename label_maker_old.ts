@@ -23,8 +23,8 @@ interface LabelSchema {
 /* -------------------------------------------------------------------------- */
 
 interface TextLabelSchema extends LabelSchema {
-    content_start: number
-    content_end: number
+    start: number
+    end: number
 }
 
 /* -------------------------------------------------------------------------- */

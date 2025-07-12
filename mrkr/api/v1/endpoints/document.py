@@ -1,7 +1,7 @@
 # ---------------------------------------------------------------------------- #
 
 import fastapi
-from typing import Dict
+from typing import Dict, List
 
 # ---------------------------------------------------------------------------- #
 
@@ -49,24 +49,19 @@ async def get_document(
 # ---------------------------------------------------------------------------- #
 
 
-@router.get("/{document_id}/content/{page}",
-            summary="Get Document Content")
+@router.get("/{document_id}/content",
+            summary="Get Page Content")
 async def get_document_content(
     session: database.DatabaseDependency,
     document_id: int = fastapi.Path(
         ...,
         description="The unique identifier for the document (as an integer).",
         examples=[1]
-    ),
-    page: int = fastapi.Path(
-        ...,
-        description="The page number in the document (starting from 1).",
-        examples=[1]
     )
-) -> schemas.PageContentSchema:
+) -> List[schemas.PageContentSchema]:
     """
-    Return the content of a specific page in the document as a json
-    containing the images data as a base64 encoded byte string.
+    Return the content of the document as a json containing the images data
+    as a base64 encoded byte strings.
     """
     document = crud.get_document(session=session, id=document_id)
 
@@ -80,14 +75,9 @@ async def get_document_content(
         project_config=document.project.config)
 
     async with file_provider(document.path) as provider:
-        image = await provider.read_as_base64_images(
-            page=page, format="JPEG")
+        images = await provider.read_as_base64_images()
 
-    return schemas.PageContentSchema(
-        content=image[0],
-        mime="image/jpeg",
-        page=page
-    )
+    return images
 
 # ---------------------------------------------------------------------------- #
 

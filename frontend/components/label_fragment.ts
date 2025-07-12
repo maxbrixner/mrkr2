@@ -17,8 +17,8 @@ interface ColoredSpan {
 
 
 interface TextLabelSchema extends LabelSchema {
-    content_start: number
-    content_end: number
+    start: number
+    end: number
 }
 
 export class LabelFragment extends HTMLElement implements LabelFragmentAttributes {
@@ -231,8 +231,8 @@ export class LabelFragment extends HTMLElement implements LabelFragmentAttribute
 
         const points = new Set<number>([0, text.length]);
         labels.forEach(label => {
-            points.add(label.content_start);
-            points.add(label.content_end);
+            points.add(label.start);
+            points.add(label.end);
         });
 
         const sortedPoints = Array.from(points).sort((a, b) => a - b);
@@ -247,7 +247,7 @@ export class LabelFragment extends HTMLElement implements LabelFragmentAttribute
 
             console.log("start:", start, "end:", end, "mid:", mid);
 
-            const overlappingLabels = labels.filter(label => mid >= label.content_start && mid < label.content_end);
+            const overlappingLabels = labels.filter(label => mid >= label.start && mid < label.end);
 
             console.log("overlappingLabels:", overlappingLabels);
 
