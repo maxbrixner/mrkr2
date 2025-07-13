@@ -21,7 +21,7 @@ export interface PageClickedEvent {
 /* -------------------------------------------------------------------------- */
 
 export interface HighlightClickedEvent {
-    name: string;
+    id: string;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -178,6 +178,24 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
                     transform: rotate(360deg);
                 }
             }
+
+            .pulsing {
+                animation: pulse .8s ease-in-out 0s 2 alternate;
+            }
+
+            @keyframes pulse {
+                0% {
+                    outline: 0px solid transparent;
+                }
+
+                50% {
+                    outline: 3px solid var(--document-viewer-highlight-focus-outline-color);               
+                }
+
+                100% {
+                    outline: 0px solid transparent;
+                }
+            }
         `
 
         this.shadowRoot?.appendChild(style);
@@ -257,6 +275,10 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         this.shadowRoot.appendChild(pageElement);
     }
 
+    public getPage(page: number): HTMLButtonElement | undefined {
+        return this._pages[page];
+    }
+
     /**
      * Dispatches a custom event when a page is clicked.
      */
@@ -279,7 +301,8 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         top: number,
         width: number,
         height: number,
-        title: string
+        label: string,
+        id: string
     ): HTMLButtonElement {
         if (!this.shadowRoot) {
             throw new Error("Shadow Root is not initialized.");
@@ -292,11 +315,11 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         highlightElement.style.top = `${top * 100 - .1}%`;
         highlightElement.style.width = `${width * 100 + .2}%`;
         highlightElement.style.height = `${height * 100 + .2}%`;
-        highlightElement.ariaLabel = title;
+        highlightElement.ariaLabel = label;
 
         highlightElement.addEventListener('click', (event: Event) => {
             event.stopPropagation();
-            this._dispatchHighlightClickedEvent(title);
+            this._dispatchHighlightClickedEvent(id);
         });
 
         this._pages[page].appendChild(highlightElement);
@@ -307,10 +330,10 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
     /**
      * Dispatches a custom event when a highlight is clicked.
      */
-    private _dispatchHighlightClickedEvent(name: string) {
+    private _dispatchHighlightClickedEvent(id: string) {
         this.dispatchEvent(new CustomEvent<HighlightClickedEvent>('highlight-clicked', {
             detail: {
-                name: name
+                id: id
             },
             bubbles: true,
             composed: true

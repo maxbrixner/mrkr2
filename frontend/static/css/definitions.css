@@ -11,6 +11,8 @@
     --success-color: #4caf50;
     --warning-color: #ff9800;
     --scrollbar-thumb: #8b8b8b;
+    --disabled-color: #f0f0f0;
+    --disabled-text-color: #888888;
 
     /* Font sizes */
     --font-size-small: 12px;
@@ -39,14 +41,22 @@
     --styled-link-color: var(--text-color);
     --styled-link-hover-color: var(--primary-color);
 
-    --styled-button-background: var(--surface-color);
-    --styled-button-color: var(--text-color);
     --styled-button-border-radius: var(--border-radius-medium);
-    --styled-button-border-color: var(--border-color);
-    --styled-button-border-color-hover: var(--primary-color);
     --styled-button-border-width: 1px;
     --styled-button-font-weight: 600;
     --styled-button-padding: var(--spacing-medium) var(--spacing-large);
+    --styled-button-background-disabled: var(--disabled-color);
+    --styled-button-color-disabled: var(--disabled-text-color);
+
+    --styled-button-background-color: var(--surface-color);
+    --styled-button-border-color: var(--border-color);
+    --styled-button-border-color-hover: var(--primary-color);
+    --styled-button-color: var(--text-color);
+
+    --styled-button-background-color-primary: var(--primary-color);
+    --styled-button-border-color-primary: var(--primary-color);
+    --styled-button-border-color-hover-primary: var(--secondary-color);
+    --styled-button-color-primary: white;
 
 
 
@@ -76,7 +86,7 @@
     --document-viewer-page-focus-outline-color: var(--primary-color);
     --document-viewer-page-focus-outline-width: 2px;
 
-
+    --label-maker-scrollbar-color: var(--scrollbar-thumb) var(--surface-color);
 
 
 
@@ -85,7 +95,7 @@
 
     --label-viewer-background-color: var(--surface-color);
     --label-viewer-pulse-color: var(--primary-color);
-    --label-viewer-scrollbar-color: var(--scrollbar-thumb) var(--surface-color);
+
 
     --label-fragment-border-radius: var(--border-radius-medium);
     --label-fragment-border-color: var(--border-color);

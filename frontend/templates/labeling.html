@@ -10,14 +10,17 @@
 {% block header %}
 <header class="labeling-header">
     <h1>mrkr</h1>
-    <span>
+    <span class="path">
         <styled-link href="https://www.google.com">Projects</styled-link>
         &nbsp;&nbsp;/&nbsp;&nbsp;
         <styled-link href="https://www.google.com">{{document.project.name}}</styled-link>
         &nbsp;&nbsp;/&nbsp;&nbsp;
         <b>Document #{{document.id}}</b>
     </span>
-    <styled-button>Options</styled-button>
+    <span class="buttons">
+        <styled-button id="submit_labels" mode="primary" disabled>Submit</styled-button>
+        <styled-button>Options</styled-button>
+    </span>
 </header>
 {% endblock %}
 

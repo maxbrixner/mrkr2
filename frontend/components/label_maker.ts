@@ -3,9 +3,8 @@
 import { ResizablePanes } from './resizable_panes.js';
 import { DocumentViewer, PagesCreatedEvent, PageClickedEvent, HighlightClickedEvent } from './document_viewer.js';
 import { TabContainer } from './tab_container.js';
-import { LabelFragment } from './label_fragment.js';
+import { ClassificationLabeler } from './classification_labeler.js';
 import { LabelButton } from './label_button.js';
-import { StyledButton } from './styled_button.js';
 
 /* -------------------------------------------------------------------------- */
 
@@ -124,7 +123,12 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
     private _resizablePanes = new ResizablePanes();
     private _documentViewer = new DocumentViewer();
     private _tabContainer = new TabContainer();
-    private _controlBar = document.createElement('div');
+
+    private _documentTab?: HTMLElement = undefined;
+    private _pageTab?: HTMLElement = undefined;
+    private _blockTab?: HTMLElement = undefined;
+
+    private _submitButton?: HTMLElement = undefined;
 
     /**
      * Creates an instance of LabelMaker.
@@ -165,6 +169,11 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
      */
     connectedCallback() {
         this._addEventListeners();
+        this._submitButton = document.getElementById('submit_labels') || undefined;
+
+        if (!this._submitButton) {
+            throw new Error("Submit button not found in the document.");
+        }
     }
 
     /**
@@ -179,53 +188,30 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
      */
     private _populateShadowRoot() {
         if (!this.shadowRoot) {
-            return;
+            throw new Error("Shadow Root is not initialized.");
         }
 
         const style = document.createElement('style');
         style.textContent = `
             :host {
-                display: grid;
+                display: block;
+                height: 100%;
                 overflow: hidden;
-                grid-template-columns: 1fr;
-                grid-template-rows: 1fr auto;
-            }
-
-            .control-bar {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 0.5rem;
-                border-top: 1px solid var(--label-fragment-border-color);
-                background-color: var(--label-fragment-title-background-color);
-                height: 100px;
+                width: 100%;
             }
 
             .tab-content {
                 box-sizing: border-box;
                 display: grid;
+                gap: 1rem;
                 grid-auto-rows: min-content;
+                height: 100%;
                 overflow-y: auto;
                 padding: 1rem;
-                gap: 1rem;
+                scrollbar-color: var(--label-maker-scrollbar-color, inherit);
                 scrollbar-gutter: stable;
                 scrollbar-width: thin;
-                scrollbar-color: var(--label-viewer-scrollbar-color, inherit);
-                height: 100%;
-            }
-
-            .label-container {
-                display: grid;
-                grid-template-rows: 1fr auto;
-                overflow: hidden;
-            }
-
-            .label-controls {
-                display: flex;
-                justify-content: flex-end;
-                padding: 0.5rem;
-                border-top: 1px solid var(--label-fragment-border-color);
-                background-color: var(--label-fragment-title-background-color);
+                width: 100%;
             }
         `;
 
@@ -241,31 +227,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         this._tabContainer.slot = 'second';
         this._resizablePanes.appendChild(this._tabContainer);
 
-        this._controlBar.className = 'control-bar';
-
-        /*
-        this._submitButton.setAttribute('type', 'button');
-        this._submitButton.setAttribute('name', 'submit-labels');
-        this._submitButton.textContent = 'Submit';
-        this._labelControls.className = 'label-controls';
-        this._labelControls.appendChild(this._submitButton);
-        this._labelContainer.appendChild(this._labelControls);
-
-        this._documentTab.slot = 'Document';
-        this._documentTab.classList.add("tab-content", "tab-document", "loading");
-        this._tabContainer.appendChild(this._documentTab);
-
-        this._pageTab.slot = 'Page';
-        this._pageTab.classList.add("tab-content", "tab-page", "loading");
-        this._tabContainer.appendChild(this._pageTab);
-
-        this._blockTab.slot = 'Block';
-        this._blockTab.classList.add("tab-content", "tab-block", "loading");
-        this._tabContainer.appendChild(this._blockTab);
-        */
-
         this.shadowRoot.appendChild(this._resizablePanes);
-        this.shadowRoot.appendChild(this._controlBar);
     }
 
     /**
@@ -276,16 +238,8 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             throw new Error("Shadow Root is not initialized.");
         }
 
-        this.shadowRoot.addEventListener('pages-created', (event: Event) => {
-            const customEvent = event as CustomEvent<PagesCreatedEvent>;
-            this._queryContent(this._populateContent.bind(this));
-        });
-
-        this.shadowRoot.addEventListener('page-clicked', (event: Event) => {
-            const customEvent = event as CustomEvent<PageClickedEvent>;
-            console.log("Page clicked", customEvent.detail);
-        });
-
+        this.shadowRoot.addEventListener('pages-created', this._onPagesCreated.bind(this));
+        this.shadowRoot.addEventListener('page-clicked', this._onPageClicked.bind(this));
     }
 
     /**
@@ -296,15 +250,26 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             throw new Error("Shadow Root is not initialized.");
         }
 
-        this.shadowRoot.removeEventListener('pages-created', (event: Event) => {
-            const customEvent = event as CustomEvent<PagesCreatedEvent>;
-            this._queryContent(this._populateContent.bind(this));
-        });
+        this.shadowRoot.removeEventListener('pages-created', this._onPagesCreated.bind(this));
+        this.shadowRoot.removeEventListener('page-clicked', this._onPageClicked.bind(this));
+    }
 
-        this.shadowRoot.removeEventListener('page-clicked', (event: Event) => {
-            const customEvent = event as CustomEvent<PageClickedEvent>;
-            console.log("Page clicked", customEvent.detail);
-        });
+    /**
+     * Event listener for 'pages-created' events.
+     */
+    private _onPagesCreated(event: Event) {
+        event.stopPropagation();
+        const customEvent = event as CustomEvent<PagesCreatedEvent>;
+        this._queryContent(this._populateContent.bind(this));
+    }
+
+    /**
+     * Event listener for 'page-clicked' events.
+     */
+    private _onPageClicked(event: Event) {
+        event.stopPropagation();
+        const customEvent = event as CustomEvent<PageClickedEvent>;
+        this._tabContainer.switchToTab("Page");
     }
 
     /**
@@ -343,62 +308,220 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             throw new Error("Document or project data is not available.");
         }
 
-        this._addHighlightsToDocumentViewer();
         this._addTabsToTabContainer();
+        this._submitButton?.removeAttribute('disabled');
     }
 
-    private _addHighlightsToDocumentViewer() {
+    /**
+     * Adds tabs to the tab container based on the label definitions in the project.
+     */
+    private _addTabsToTabContainer() {
+        if (!this._document || !this._project) {
+            throw new Error("Document or project data is not available.");
+        }
+
+        if (this._project.config.label_definitions.some(
+            (definition) => definition.target === 'document')) {
+            this._documentTab = document.createElement('div');
+            this._documentTab.slot = 'Document';
+            this._documentTab.classList.add("tab-content");
+            this._addDocumentLabelers();
+            this._tabContainer.appendChild(this._documentTab);
+        }
+
+        if (this._project.config.label_definitions.some(
+            (definition) => definition.target === 'page')) {
+            this._pageTab = document.createElement('div');
+            this._pageTab.slot = 'Page';
+            this._pageTab.classList.add("tab-content");
+            this._addPageLabelers();
+            this._tabContainer.appendChild(this._pageTab);
+        }
+
+        if (this._project.config.label_definitions.some(
+            (definition) => definition.target === 'block')) {
+            this._blockTab = document.createElement('div');
+            this._blockTab.slot = 'Block';
+            this._blockTab.classList.add("tab-content");
+            this._addBlockLabelers();
+            this._tabContainer.appendChild(this._blockTab);
+        }
+
+        this._tabContainer.updateTabs();
+    }
+
+    private _addDocumentLabelers() {
+        if (!this._document || !this._project) {
+            throw new Error("Document or project data is not available.");
+        }
+        if (!this._documentTab) {
+            throw new Error("Document tab is not initialized.");
+        }
+
+        const classificationLabeler = new ClassificationLabeler();
+        classificationLabeler.setAttribute('heading', 'Document Classification');
+        classificationLabeler.addCheckButton();
+        this._documentTab.appendChild(classificationLabeler);
+
+        const labelDefinitions = this._project.config.label_definitions;
+
+        for (const definition of labelDefinitions) {
+            if (definition.target !== 'document')
+                continue;
+            classificationLabeler.addLabelButton(
+                definition.name,
+                definition.color,
+                definition.type,
+                false,
+            )
+        }
+    }
+
+    private _addPageLabelers() {
+        if (!this._document || !this._project) {
+            throw new Error("Document or project data is not available.");
+        }
+        if (!this._pageTab) {
+            throw new Error("Page tab is not initialized.");
+        }
+
+        for (const page of this._document.data.pages) {
+            const classificationLabeler = new ClassificationLabeler();
+            classificationLabeler.setAttribute('heading', `Page ${page.page} Classification`);
+            this._pageTab.appendChild(classificationLabeler);
+
+            classificationLabeler.addCheckButton();
+            const viewButton = classificationLabeler.addViewButton();
+            viewButton.addEventListener('click', this._onPageViewButtonClick(page.page));
+
+            const labelDefinitions = this._project.config.label_definitions;
+
+            for (const definition of labelDefinitions) {
+                if (definition.target !== 'page')
+                    continue;
+                classificationLabeler.addLabelButton(
+                    definition.name,
+                    definition.color,
+                    definition.type,
+                    false,
+                )
+            }
+        }
+    }
+
+    private _addBlockLabelers() {
         if (!this._document || !this._project) {
             throw new Error("Document or project data is not available.");
         }
 
         for (const page of this._document.data.pages) {
             for (const block of page.blocks) {
-                this._documentViewer.addHighlight(
+                const highlight = this._documentViewer.addHighlight(
                     page.page,
                     block.position.left,
                     block.position.top,
                     block.position.width,
                     block.position.height,
-                    `Block ${block.id}`
+                    `Block ${block.id}`,
+                    block.id
                 );
+
+
+                const classificationLabeler = new ClassificationLabeler();
+                classificationLabeler.setAttribute('heading', `Block ${block.id} Classification`);
+                this._blockTab?.appendChild(classificationLabeler);
+
+                classificationLabeler.addCheckButton();
+
+                const viewButton = classificationLabeler.addViewButton();
+                viewButton.addEventListener('click', this._onBlockViewButtonClick(highlight));
+
+
+                highlight.addEventListener('click', this._onHighlightClick("Block", classificationLabeler));
+
+
+                const labelDefinitions = this._project.config.label_definitions;
+                for (const definition of labelDefinitions) {
+                    if (definition.target !== 'block')
+                        continue;
+                    if (definition.type === 'text')
+                        continue;
+                    const button = classificationLabeler.addLabelButton(
+                        definition.name,
+                        definition.color,
+                        definition.type,
+                        false,
+                    )
+                    button.addEventListener('click', this._onClassificationLabelButtonClick(highlight, block.labels, definition.name));
+
+                }
             }
         }
     }
 
-    private _addTabsToTabContainer() {
-        if (!this._document || !this._project) {
-            throw new Error("Document or project data is not available.");
+    /**
+     * On click event listener for document highlights.
+     */
+    private _onHighlightClick(associatedTab: string, associatedLabeler: HTMLElement): EventListener {
+        return (event: Event) => {
+            event.stopPropagation();
+
+            this._tabContainer.switchToTab(associatedTab);
+
+            associatedLabeler.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
+    }
 
-        console.log(this._project)
+    /**
+     * On click event listener for classification laben buttons.
+     */
+    private _onClassificationLabelButtonClick(associatedHighlight: HTMLElement, associatedLabelList: (LabelSchema | TextLabelSchema)[], labelName: string): EventListener {
+        return (event: Event) => {
+            event.stopPropagation();
 
-        if (this._project.config.label_definitions.some(
-            (definition) => definition.target === 'document')) {
-            const documentTab = document.createElement('div');
-            documentTab.slot = 'Document';
-            documentTab.classList.add("loading");
-            documentTab.innerHTML = `<h2>Document Labels</h2>`;
-            this._tabContainer.appendChild(documentTab);
+            associatedHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            associatedLabelList.push({
+                name: labelName,
+            });
         }
+    }
 
-        if (this._project.config.label_definitions.some(
-            (definition) => definition.target === 'page')) {
-            const pageTab = document.createElement('div');
-            pageTab.slot = 'Page';
-            pageTab.classList.add("loading");
-            this._tabContainer.appendChild(pageTab);
+    /**
+     * On click event listener for classification laben buttons.
+     */
+    private _onPageViewButtonClick(page: number): EventListener {
+        return (event: Event) => {
+            event.stopPropagation();
+
+            const pageElement = this._documentViewer.getPage(page);
+            if (!pageElement) {
+                throw new Error(`Page ${page} not found in the document viewer.`);
+                return;
+            }
+
+            pageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            pageElement.classList.add('pulsing');
+            pageElement.addEventListener('animationend', () => {
+                pageElement.classList.remove('pulsing');
+            }, { once: true });
+
         }
+    }
 
-        if (this._project.config.label_definitions.some(
-            (definition) => definition.target === 'block')) {
-            const blockTab = document.createElement('div');
-            blockTab.slot = 'Block';
-            blockTab.classList.add("loading");
-            this._tabContainer.appendChild(blockTab);
+    /**
+     * On click event listener for classification laben buttons.
+     */
+    private _onBlockViewButtonClick(associatedViewerElement: HTMLElement): EventListener {
+        return (event: Event) => {
+            event.stopPropagation();
+
+            associatedViewerElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            associatedViewerElement.classList.add('pulsing');
+            associatedViewerElement.addEventListener('animationend', () => {
+                associatedViewerElement.classList.remove('pulsing');
+            }, { once: true });
+
         }
-
-        this._tabContainer.updateTabs();
     }
 
     /**

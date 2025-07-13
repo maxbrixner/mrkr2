@@ -1,3 +1,9 @@
+/* -------------------------------------------------------------------------- */
+
+import { getRelativeLuminance, hexToRgbA } from './color_helpers.js';
+
+/* -------------------------------------------------------------------------- */
+
 interface LabelButtonAttributes {
     color: string;
     disabled?: boolean;
@@ -7,6 +13,8 @@ interface LabelButtonAttributes {
     target?: string;
     targetType?: "document" | "page" | "block";
 }
+
+/* -------------------------------------------------------------------------- */
 
 export class LabelButton extends HTMLElement implements LabelButtonAttributes {
     public color: string = '#000000';
@@ -91,6 +99,10 @@ export class LabelButton extends HTMLElement implements LabelButtonAttributes {
         this.addEventListener('click', this._onClick.bind(this));
     }
 
+    disconnectedCallback() {
+        this.removeEventListener('click', this._onClick.bind(this));
+    }
+
     private _onClick(event: MouseEvent) {
         if (this.disabled) return;
 
@@ -109,9 +121,9 @@ export class LabelButton extends HTMLElement implements LabelButtonAttributes {
     }
 
     private _updateColor() {
-        const backgroundColor = this._hexToRgbA(this.color, 0.2);
-        const borderColor = this._hexToRgbA(this.color, 1);
-        const luminance = this._getRelativeLuminance(borderColor);
+        const backgroundColor = hexToRgbA(this.color, 0.2);
+        const borderColor = hexToRgbA(this.color, 1);
+        const luminance = getRelativeLuminance(borderColor);
         // Ensure the font color is readable against the background
         // If the luminance is low, use a light color, otherwise use a dark color
         const fontColor = luminance < 0.5 ? '#ffffff' : '#00000'
@@ -127,51 +139,10 @@ export class LabelButton extends HTMLElement implements LabelButtonAttributes {
         }
     }
 
-    private _hexToRgbA(hex: string, alpha: number = 1): string {
-        if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
-            let c = hex.substring(1);
-            if (c.length === 3) {
-                c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
-            }
-            const num = parseInt(c, 16);
-            let r = (num >> 16) & 255;
-            let g = (num >> 8) & 255;
-            let b = num & 255;
-            return 'rgba('
-                + [r, g, b].join(',')
-                + ', ' + alpha + ')';
-        }
-        throw new Error('Color must be in hex format');
-    }
-
-    /**
-     * Calculates the relative luminance of an RGB color.
-     * The formula is based on WCAG 2.1 guidelines.
-     * @param r Red component (0-255).
-     * @param g Green component (0-255).
-     * @param b Blue component (0-255).
-     * @returns The relative luminance (0-1).
-     */
-    private _getRelativeLuminance(color: string): number {
-        //get r,g,b from rgba(r,g,b,a) string
-        const rgba = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)/);
-        if (!rgba) {
-            throw new Error('Invalid color format. Expected rgba(r,g,b,a) or rgb(r,g,b)');
-        }
-        const r = parseInt(rgba[1], 10);
-        const g = parseInt(rgba[2], 10);
-        const b = parseInt(rgba[3], 10);
-        const sRGB = [r, g, b].map(v => {
-            v /= 255;
-            return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
-        });
-        return 0.2126 * sRGB[0] + 0.7152 * sRGB[1] + 0.0722 * sRGB[2];
-    }
-
-    disconnectedCallback() {
-        this.removeEventListener('click', this._onClick.bind(this));
-    }
-
 }
 
+/* -------------------------------------------------------------------------- */
+
 customElements.define('label-button', LabelButton);
+
+/* -------------------------------------------------------------------------- */

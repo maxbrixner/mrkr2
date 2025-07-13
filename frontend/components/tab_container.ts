@@ -193,6 +193,7 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
 
             const tab = document.createElement('button');
             tab.classList.add('tab');
+            tab.name = slotName;
             tab.ariaLabel = slotName;
             tab.textContent = slotName;
 

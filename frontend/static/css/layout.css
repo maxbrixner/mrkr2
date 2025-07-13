@@ -44,6 +44,7 @@ header {
     background-color: var(--surface-color);
     top: 0;
     min-width: var(--min-layout-width);
+    user-select: none;
 }
 
 main {
@@ -58,10 +59,24 @@ header.labeling-header {
     display: grid;
     gap: 2rem;
     grid-template-areas:
-        "logo path options";
+        "logo path buttons";
     grid-template-columns: min-content 1fr min-content;
     padding: .5rem 1rem;
     border-bottom: 1px solid var(--border-color);
+}
+
+header>span.path {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+header>span.buttons {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: min-content;
+    gap: 1rem;
+    align-items: center;
 }
 
 main.labeling-main {
