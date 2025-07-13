@@ -1,6 +1,8 @@
 # Mrkr
 
-A tool to label pages, blocks and text within images and PDF files
+A tool to label pages, blocks and text within images and PDF files.
+
+The backend is based on FastAPI and the frontend uses WebComponents written in TypeScript.
 
 ## License
 
