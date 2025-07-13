@@ -127,6 +127,9 @@ export class ClassificationLabeler extends HTMLElement implements Classification
             .title {
                 font-weight: 500;
                 font-size: 0.9rem;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
 
             .classification-container {

@@ -394,7 +394,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         }
 
         const classificationLabeler = new ClassificationLabeler();
-        classificationLabeler.setAttribute('heading', 'Document Classification');
+        classificationLabeler.setAttribute('heading', 'Document');
         classificationLabeler.addCheckButton();
         this._documentTab.appendChild(classificationLabeler);
 
@@ -403,15 +403,19 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         for (const definition of labelDefinitions) {
             if (definition.target !== 'document')
                 continue;
+
+            const labelStatus = this._document.data.labels.some(label => label.name === definition.name);
+
             const labelButton = classificationLabeler.addLabelButton(
                 definition.name,
                 definition.color,
                 definition.type,
-                false,
+                labelStatus,
             )
             labelButton.addEventListener('click', this._onClassificationLabelButtonClick(
                 this._document.data.labels,
-                definition.name
+                definition.name,
+                definition.type as "classification_multiple" | "classification_single"
             ));
         }
     }
@@ -426,7 +430,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
         for (const page of this._document.data.pages) {
             const classificationLabeler = new ClassificationLabeler();
-            classificationLabeler.setAttribute('heading', `Page ${page.page} Classification`);
+            classificationLabeler.setAttribute('heading', `Page ${page.page}`);
             this._pageLabelers[page.page] = classificationLabeler;
             this._pageTab.appendChild(classificationLabeler);
 
@@ -439,12 +443,21 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             for (const definition of labelDefinitions) {
                 if (definition.target !== 'page')
                     continue;
-                classificationLabeler.addLabelButton(
+
+                const labelStatus = page.labels.some(label => label.name === definition.name);
+
+                const labelButton = classificationLabeler.addLabelButton(
                     definition.name,
                     definition.color,
                     definition.type,
-                    false,
+                    labelStatus
                 )
+
+                labelButton.addEventListener('click', this._onClassificationLabelButtonClick(
+                    page.labels,
+                    definition.name,
+                    definition.type as "classification_multiple" | "classification_single"
+                ));
             }
         }
     }
@@ -468,7 +481,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
 
                 const classificationLabeler = new ClassificationLabeler();
-                classificationLabeler.setAttribute('heading', `Block ${block.id} Classification`);
+                classificationLabeler.setAttribute('heading', `Block ${block.id}`);
                 this._blockTab?.appendChild(classificationLabeler);
 
                 classificationLabeler.addCheckButton();
@@ -492,7 +505,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                         definition.type,
                         false,
                     )
-                    button.addEventListener('click', this._onClassificationLabelButtonClick(block.labels, definition.name));
+                    //button.addEventListener('click', this._onClassificationLabelButtonClick(block.labels, definition.name));
 
                 }
             }
@@ -519,15 +532,56 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
     /**
      * On click event listener for classification laben buttons.
      */
-    private _onClassificationLabelButtonClick(associatedLabelList: (LabelSchema | TextLabelSchema)[], labelName: string): EventListener {
+    private _onClassificationLabelButtonClick(associatedLabelList: (LabelSchema | TextLabelSchema)[], labelName: string, labelType: "classification_multiple" | "classification_single"): EventListener {
         return (event: Event) => {
             event.stopPropagation();
+            const labelButton = event.currentTarget as LabelButton;
 
-            associatedLabelList.push({
-                name: labelName,
-            });
+            if (!labelButton) {
+                throw new Error("Label button not found in the event target.");
+            }
+
+            const currentStatus = labelButton.getAttribute('active') || false;
+
+            if (currentStatus === 'true') {
+                let i = 0;
+                while (i < associatedLabelList.length) {
+                    if (associatedLabelList[i].name === labelName) {
+                        associatedLabelList.splice(i, 1);
+                    } else {
+                        i++;
+                    }
+                }
+                labelButton.setAttribute('active', 'false');
+            } else {
+                associatedLabelList.push({
+                    name: labelName,
+                });
+
+                if (labelType === 'classification_single') {
+                    let i = 0;
+                    while (i < associatedLabelList.length) {
+                        if (associatedLabelList[i].name !== labelName) {
+                            associatedLabelList.splice(i, 1);
+                        } else {
+                            i++;
+                        }
+                    }
+                    const siblings = labelButton.parentElement?.children;
+                    for (const sibling of siblings || []) {
+                        if (sibling instanceof LabelButton &&
+                            sibling !== labelButton) {
+                            sibling.setAttribute('active', 'false');
+                        }
+                    }
+                }
+                labelButton.setAttribute('active', 'true');
+
+            }
+
         }
     }
+
 
     /**
      * On click event listener for classification laben buttons.
@@ -539,7 +593,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             const pageElement = this._documentViewer.getPage(page);
             if (!pageElement) {
                 throw new Error(`Page ${page} not found in the document viewer.`);
-                return;
             }
 
             pageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
