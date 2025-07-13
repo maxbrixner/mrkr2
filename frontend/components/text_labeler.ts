@@ -47,6 +47,7 @@ export class TextLabeler extends ClassificationLabeler implements Classification
                 flex-direction: column;
                 gap: 4px;
                 padding: 8px;
+                user-select: text;
             }
         `;
 

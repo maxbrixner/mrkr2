@@ -504,7 +504,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
                 const checkButton = textLabeler.addCheckButton();
 
-                textLabeler.addText(block.content);
+                textLabeler.addText(this._formatBlockText(block));
 
                 highlight.addEventListener('click', this._onHighlightClick("Block", textLabeler));
 
@@ -541,6 +541,10 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 }
             }
         }
+    }
+
+    private _formatBlockText(block: BlockLabelDataSchema): string {
+        return block.content.replace(/\n/g, '<br>');
     }
 
     /**
