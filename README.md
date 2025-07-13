@@ -6,7 +6,7 @@ A tool to label pages, blocks and text within images and PDF files
 
 mrkr © 2025 by Max Brixner is licensed under CC BY-NC 4.0.
 
-To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/ or read the [licence file](LICENSE).
+To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/ or read the [license file](LICENSE).
 
 ## Getting Started 🚀
 
