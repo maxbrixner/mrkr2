@@ -6,6 +6,7 @@ import { TabContainer } from './tab_container.js';
 import { ClassificationLabeler } from './classification_labeler.js';
 import { TextLabeler } from './text_labeler.js';
 import { LabelButton } from './label_button.js';
+import { combineHexColors, getRelativeLuminance, hexToRgbA, hexToRgb } from './color_helpers.js';
 
 /* -------------------------------------------------------------------------- */
 
@@ -110,6 +111,15 @@ interface ProjectSchema {
     created: string
     updated: string
     config: ProjectConfigSchema
+}
+
+/* -------------------------------------------------------------------------- */
+
+interface ColoredSpan {
+    start: number;
+    end: number;
+    backgroundColor: string;
+    color: string;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -492,9 +502,8 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                     block.id
                 );
 
-
                 const textLabeler = new TextLabeler();
-                textLabeler.setAttribute('heading', `Block ${block.id}`);
+                textLabeler.setAttribute('heading', `Block`);
                 this._blockTab?.appendChild(textLabeler);
 
                 const editButton = textLabeler.addEditButton();
@@ -504,13 +513,12 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
                 const checkButton = textLabeler.addCheckButton();
 
-                textLabeler.addText(this._formatBlockText(block));
+                const labelDefinitions = this._project.config.label_definitions;
+
+                textLabeler.addText(this._formatBlockText(block, labelDefinitions));
 
                 highlight.addEventListener('click', this._onHighlightClick("Block", textLabeler));
 
-
-
-                const labelDefinitions = this._project.config.label_definitions;
                 for (const definition of labelDefinitions) {
                     if (definition.target !== 'block')
                         continue;
@@ -537,14 +545,84 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                         )
 
 
+                        button.addEventListener('click', this._onTextLabelButtonClick(
+                            block.labels,
+                            textLabeler,
+                            block,
+                            labelDefinitions,
+                            definition.name,
+                        ));
+
                     }
                 }
             }
         }
     }
 
-    private _formatBlockText(block: BlockLabelDataSchema): string {
-        return block.content.replace(/\n/g, '<br>');
+    private _formatBlockText(block: BlockLabelDataSchema, labelDefinitions: LabelDefinitionSchema[]): string {
+        let content = block.content
+
+
+        if (!block.labels || block.labels.length === 0) {
+            content = content.replace(/\n/g, '<br>');
+            return `<span>${content}</span>`;
+        }
+
+        const labels = block.labels.filter(label => 'start' in label && 'end' in label) as TextLabelSchema[];
+
+        const points = new Set<number>([0, content.length]);
+        labels.forEach(label => {
+            points.add(label.start);
+            points.add(label.end);
+        });
+
+        const sortedPoints = Array.from(points).sort((a, b) => a - b);
+
+        const segments: ColoredSpan[] = [];
+        for (let i = 0; i < sortedPoints.length - 1; i++) {
+            const start = sortedPoints[i];
+            const end = sortedPoints[i + 1];
+            const mid = (start + end) / 2;
+
+            const overlappingLabels = labels.filter(label => mid >= label.start && mid < label.end);
+
+            let backgroundColor = 'transparent'; // Default for non-labeled text
+            let color = '#000000';
+            if (overlappingLabels.length === 1) {
+                backgroundColor = hexToRgbA(labelDefinitions.find(def => def.name === overlappingLabels[0].name)?.color || "#ffffff", 0.2);
+                const luminance = getRelativeLuminance(backgroundColor);
+                color = "#000000"; ///"luminance < 0.5 ? '#ffffff' : '#00000'"
+            } else if (overlappingLabels.length > 1) {
+                const colors: { [key: string]: string } = {};
+                overlappingLabels.forEach(label => {
+                    const definition = labelDefinitions.find(def => def.name === label.name);
+                    if (definition) {
+                        colors[label.name] = definition.color;
+                    }
+                });
+                backgroundColor = hexToRgbA(combineHexColors(Object.values(colors)));
+                //const luminance = getRelativeLuminance(hexToRgbA(backgroundColor));
+                color = "#000000";//luminance < 0.5 ? '#ffffff' : '#00000'
+            }
+
+            segments.push({ start, end, backgroundColor, color });
+
+
+        }
+
+        let html = '';
+        segments.forEach(segment => {
+            if (segment.start < segment.end) {
+                const segmentText = content.substring(segment.start, segment.end);
+                if (segment.color !== 'transparent') {
+                    html += `<span style="background-color: ${segment.backgroundColor}; color: ${segment.color}">${segmentText}</span>`;
+                } else {
+                    html += `<span>${segmentText}</span>`;
+                }
+            }
+        });
+
+        return html;
     }
 
     /**
@@ -617,6 +695,31 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         }
     }
 
+    /**
+     * On click event listener for classification laben buttons.
+     */
+    private _onTextLabelButtonClick(associatedLabelList: (LabelSchema | TextLabelSchema)[], associatedLabeler: TextLabeler, associatedBlock: BlockLabelDataSchema, labelDefinitions: LabelDefinitionSchema[], labelName: string): EventListener {
+        return (event: Event) => {
+            event.stopPropagation();
+
+            const selection = associatedLabeler.getSelection();
+
+            if (!selection) {
+                console.warn("No text selection found.");
+                return;
+            }
+
+            associatedLabelList.push({
+                name: labelName,
+                start: selection.start,
+                end: selection.end,
+            });
+
+            associatedLabeler.removeSelection();
+
+            associatedLabeler.addText(this._formatBlockText(associatedBlock, labelDefinitions));
+        }
+    }
 
     /**
      * On click event listener for classification laben buttons.
@@ -667,7 +770,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 .then((success: boolean) => {
                     if (success) {
                         // todo: show success message
-                        console.log("Label data submitted successfully.");
+                        console.info("Label data submitted successfully.");
                     } else {
                         // todo: show error message
                         console.error("Failed to submit label data.");

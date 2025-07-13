@@ -12,6 +12,14 @@ export interface TextLabelerAttributes extends ClassificationLabelerAttributes {
 
 /* -------------------------------------------------------------------------- */
 
+export interface TextSelection {
+    start: number;
+    end: number;
+    text: string;
+}
+
+/* -------------------------------------------------------------------------- */
+
 export class TextLabeler extends ClassificationLabeler implements ClassificationLabelerAttributes {
     private _textLabelsContainer: HTMLDivElement = document.createElement('div');
     private _textContainer: HTMLDivElement = document.createElement('div');
@@ -35,7 +43,7 @@ export class TextLabeler extends ClassificationLabeler implements Classification
 
         this._style.textContent += `
             .text-labels-container {
-                border-top: 1px solid var(--label-fragment-border-color);
+                
                 display: flex;
                 gap: 8px;
                 padding: 8px;
@@ -43,23 +51,26 @@ export class TextLabeler extends ClassificationLabeler implements Classification
             }
 
             .text-container {
-                display: flex;
-                flex-direction: column;
-                gap: 4px;
-                padding: 8px;
+                border-top: 1px solid var(--label-fragment-border-color);
+                gap: 0.5rem;
+                padding: 0.5rem;
                 user-select: text;
+                white-space: pre-wrap;
+                word-break: break-word;
             }
         `;
+
+
+        if (this._textContainer) {
+            this._textContainer.classList.add('text-container');
+            this.shadowRoot.appendChild(this._textContainer);
+        }
 
         if (this._textLabelsContainer) {
             this._textLabelsContainer.classList.add('text-labels-container');
             this.shadowRoot.appendChild(this._textLabelsContainer);
         }
 
-        if (this._textContainer) {
-            this._textContainer.classList.add('text-container');
-            this.shadowRoot.appendChild(this._textContainer);
-        }
 
     }
 
@@ -114,6 +125,74 @@ export class TextLabeler extends ClassificationLabeler implements Classification
         this._textLabelsContainer.appendChild(button);
 
         return (button);
+    }
+
+    public getSelection(): TextSelection | null {
+        const selection = (this.shadowRoot as any).getSelection();
+        if (!selection || selection.rangeCount === 0) {
+            return null;
+        }
+
+        const range = selection.getRangeAt(0);
+        const commonAncestor = range.commonAncestorContainer;
+
+        console.log("selection", selection);
+        console.log("range", range);
+
+        // Only handle the case where the selection is within a single text node
+        if (commonAncestor != this._textContainer && !this._textContainer.contains(commonAncestor)) {
+            console.error("Selection is not within the text container.");
+            return null;
+        }
+
+        let start = 0;
+        let end = 0;
+        let startFound = false;
+        let endFound = false;
+
+        const spanNodes = this._textContainer.childNodes;
+        for (let spanNode of spanNodes) {
+            const textNodes = spanNode.childNodes;
+            for (let textNode of textNodes) {
+                if (textNode.nodeType !== Node.TEXT_NODE && !startFound) {
+                    start += 1;
+                }
+                if (textNode.nodeType !== Node.TEXT_NODE && !endFound) {
+                    end += 1;
+                }
+                if (textNode.nodeType !== Node.TEXT_NODE) {
+                    continue;
+                }
+                if (textNode !== range.startContainer && !startFound) {
+                    start += textNode.textContent?.length || 0;
+                }
+                if (textNode !== range.endContainer && !endFound) {
+                    end += textNode.textContent?.length || 0;
+                }
+                if (textNode === range.startContainer) {
+                    start += range.startOffset;
+                    startFound = true;
+                }
+                if (textNode === range.endContainer) {
+                    end += range.endOffset;
+                    endFound = true;
+                    break;
+                }
+            }
+        }
+
+        return {
+            text: selection.toString(),
+            start: start,
+            end: end
+        };
+    }
+
+    public removeSelection(): void {
+        const selection = (this.shadowRoot as any).getSelection(); // Warning: this only works in Chrome-Browsers, see https://stackoverflow.com/questions/62054839/shadowroot-getselection
+        if (selection) {
+            selection.removeAllRanges();
+        }
     }
 
 }

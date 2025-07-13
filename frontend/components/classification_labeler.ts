@@ -88,7 +88,6 @@ export class ClassificationLabeler extends HTMLElement implements Classification
             .header {
                 align-items: center;
                 background-color: var(--label-fragment-title-background-color);
-                border-bottom: 1px solid var(--label-fragment-border-color);
                 color: var(--label-fragment-title-color);
                 display: grid;
                 gap: 1rem;
@@ -113,10 +112,15 @@ export class ClassificationLabeler extends HTMLElement implements Classification
             }
 
             .classification-container {
+                border-top: 1px solid var(--label-fragment-border-color);
                 display: flex;
                 flex-wrap: wrap;
                 gap: 0.5em;
                 padding: 0.5em;
+            }
+
+            .classification-container:empty {
+                display: none;
             }
         `;
 
