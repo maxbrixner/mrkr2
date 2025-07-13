@@ -130,6 +130,8 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
     private _pageTab?: HTMLElement = undefined;
     private _blockTab?: HTMLElement = undefined;
 
+    private _pageLabelers: { [page: number]: ClassificationLabeler } = {};
+
     private _submitButton?: HTMLElement = undefined;
 
     /**
@@ -219,6 +221,24 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 scrollbar-width: thin;
                 width: 100%;
             }
+
+            .pulsing {
+                animation: pulse .8s ease-in-out 0s 2 alternate;
+            }
+
+            @keyframes pulse {
+                0% {
+                    outline: 0px solid transparent;
+                }
+
+                50% {
+                    outline: 3px solid var(--document-viewer-highlight-focus-outline-color);               
+                }
+
+                100% {
+                    outline: 0px solid transparent;
+                }
+            }
         `;
 
         this.shadowRoot.appendChild(style);
@@ -276,6 +296,15 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         event.stopPropagation();
         const customEvent = event as CustomEvent<PageClickedEvent>;
         this._tabContainer.switchToTab("Page");
+        const associatedLabeler = this._pageLabelers[customEvent.detail.page];
+        if (!associatedLabeler) {
+            throw new Error(`Page labeler for page ${customEvent.detail.page} not found.`);
+        }
+        associatedLabeler.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        associatedLabeler.classList.add('pulsing');
+        associatedLabeler.addEventListener('animationend', () => {
+            associatedLabeler.classList.remove('pulsing');
+        }, { once: true });
     }
 
     /**
@@ -398,6 +427,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         for (const page of this._document.data.pages) {
             const classificationLabeler = new ClassificationLabeler();
             classificationLabeler.setAttribute('heading', `Page ${page.page} Classification`);
+            this._pageLabelers[page.page] = classificationLabeler;
             this._pageTab.appendChild(classificationLabeler);
 
             classificationLabeler.addCheckButton();
@@ -479,6 +509,10 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             this._tabContainer.switchToTab(associatedTab);
 
             associatedLabeler.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            associatedLabeler.classList.add('pulsing');
+            associatedLabeler.addEventListener('animationend', () => {
+                associatedLabeler.classList.remove('pulsing');
+            }, { once: true });
         }
     }
 
@@ -487,7 +521,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
      */
     private _onClassificationLabelButtonClick(associatedLabelList: (LabelSchema | TextLabelSchema)[], labelName: string): EventListener {
         return (event: Event) => {
-            console.log("sdhksjahdjk")
             event.stopPropagation();
 
             associatedLabelList.push({

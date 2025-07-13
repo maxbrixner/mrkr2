@@ -163,6 +163,7 @@ export class ClassificationLabeler extends HTMLElement implements Classification
 
         const button = new IconButton();
         button.setAttribute("img", "/static/img/eye-outline.svg");
+        button.ariaLabel = "View in document";
 
         this._buttonsDiv.appendChild(button);
 
@@ -179,6 +180,7 @@ export class ClassificationLabeler extends HTMLElement implements Classification
 
         const button = new IconButton();
         button.setAttribute("img", "/static/img/square-outline.svg");
+        button.ariaLabel = "Mark as done";
 
         this._buttonsDiv.appendChild(button);
 
@@ -203,6 +205,7 @@ export class ClassificationLabeler extends HTMLElement implements Classification
         button.setAttribute("name", name);
         button.setAttribute("type", type);
         button.setAttribute("active", active.toString());
+        button.ariaLabel = name;
 
         const span = document.createElement('span');
         span.slot = "label";

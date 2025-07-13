@@ -44,6 +44,9 @@ async def get_document(
 
     document_schema = schemas.DocumentSchema(**document.model_dump())
 
+    import asyncio
+    await asyncio.sleep(0.1)  # Simulate async operation
+
     return document_schema
 
 # ---------------------------------------------------------------------------- #
@@ -73,6 +76,9 @@ async def get_document_content(
 
     file_provider = providers.get_file_provider(
         project_config=document.project.config)
+
+    import asyncio
+    await asyncio.sleep(0.1)  # Simulate async operation
 
     async with file_provider(document.path) as provider:
         images = await provider.read_as_base64_images()
@@ -109,6 +115,9 @@ async def update_label_data(
     session.add(document)
     session.commit()
     session.refresh(document)
+
+    import asyncio
+    await asyncio.sleep(0.1)  # Simulate async operation
 
     return {
         "message": "Label data updated successfully.",

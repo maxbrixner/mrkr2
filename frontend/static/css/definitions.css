@@ -45,6 +45,8 @@
     --styled-button-border-width: 1px;
     --styled-button-font-weight: 600;
     --styled-button-padding: var(--spacing-medium) var(--spacing-large);
+
+    --styled-button-border-color-disabled: var(--border-color);
     --styled-button-background-disabled: var(--disabled-color);
     --styled-button-color-disabled: var(--disabled-text-color);
 
@@ -55,7 +57,7 @@
 
     --styled-button-background-color-primary: var(--primary-color);
     --styled-button-border-color-primary: var(--primary-color);
-    --styled-button-border-color-hover-primary: var(--secondary-color);
+    --styled-button-border-color-hover-primary: black;
     --styled-button-color-primary: white;
 
 

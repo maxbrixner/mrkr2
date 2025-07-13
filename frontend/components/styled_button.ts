@@ -112,9 +112,14 @@ export class StyledButton extends HTMLElement implements StyledButtonAttributes 
             }
 
             button:disabled {
+                border-color: var(--styled-button-border-color-disabled, #000000);
                 background-color: var(--styled-button-background-disabled, #f0f0f0);
                 color: var(--styled-button-color-disabled, #888888);
                 cursor: not-allowed;
+            }
+
+            button:disabled:hover {
+                border-color: var(--styled-button-border-color-disabled, #000000);
             }
 
         `;

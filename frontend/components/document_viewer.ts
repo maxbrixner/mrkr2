@@ -128,7 +128,6 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
 
             .page > img {
                 display: block;
-                height: auto;
                 width: 100%;
                 z-index: 1;
             }
@@ -254,13 +253,13 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         const pageElement = document.createElement('button');
         pageElement.classList.add('page');
         pageElement.style.gridRow = `${page}`;
-        pageElement.style.aspectRatio = `${aspect_ratio}`;
         pageElement.title = `Page ${page}`;
 
         const mime = this._getMimeFromFormat(format);
 
         const imageElement = document.createElement('img');
         imageElement.src = `data:${mime};base64,${content}`;
+        imageElement.style.aspectRatio = `${aspect_ratio}`;
         imageElement.alt = `Page ${page}`;
 
         pageElement.appendChild(imageElement);

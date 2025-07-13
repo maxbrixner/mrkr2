@@ -167,11 +167,14 @@ class MrkrClient():
     def create_project(
         self,
         name: str,
-        config: schemas.ProjectConfigSchema
+        config: Dict | schemas.ProjectConfigSchema
     ) -> int | None:
         """
         Create a new project. Returns the project ID.
         """
+        if isinstance(config, dict):
+            config = schemas.ProjectConfigSchema(**config)
+
         project = schemas.ProjectCreateSchema(
             name=name,
             config=config
