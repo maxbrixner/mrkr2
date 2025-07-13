@@ -15,5 +15,5 @@ __pycache__
 # Compiled JavaScript files
 frontend/static/js/*.js
 
-# Temporary SDK test files
-test_sdk.py
+# Demo project creation
+demo.py
