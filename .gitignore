@@ -17,3 +17,4 @@ frontend/static/js/*.js
 
 # Demo project creation
 demo.py
+demo/
