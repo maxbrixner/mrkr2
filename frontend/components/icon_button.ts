@@ -39,7 +39,6 @@ export class IconButton extends StyledButton implements IconButtonAttributes {
     }
 
     protected _updateStyle() {
-        console.log('Updating style for IconButton');
         super._updateStyle();
         this._style.textContent += `
             .icon-button {

@@ -50,7 +50,6 @@ export class StyledButton extends HTMLElement implements StyledButtonAttributes 
         propertyName: string,
         oldValue: string | null,
         newValue: string | null) {
-        console.log(`Attribute changed: ${propertyName} from ${oldValue} to ${newValue}`);
         if (!this._ButtonElement) return;
         if (oldValue === newValue) return;
         if (propertyName === 'autofocus') {

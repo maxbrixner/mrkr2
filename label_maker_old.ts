@@ -12,6 +12,7 @@ import { StyledButton } from './styled_button.js';
 interface LabelMakerAttributes {
     projectUrl?: string,
     documentUrl?: string,
+    updateUrl?: string,
 }
 
 /* -------------------------------------------------------------------------- */

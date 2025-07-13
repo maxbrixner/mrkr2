@@ -28,7 +28,8 @@
 <main class="labeling-main">
     <label-maker document-url="{{ url_for('get_document', document_id=document.id) }}"
         project-url="{{ url_for('get_project', project_id=document.project.id) }}"
-        image-url="{{ url_for('get_document_content', document_id=document.id) }}">
+        image-url="{{ url_for('get_document_content', document_id=document.id) }}"
+        update-url="{{ url_for('update_label_data', document_id=document.id) }}">
     </label-maker>
 </main>
 {% endblock %}

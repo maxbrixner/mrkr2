@@ -12,6 +12,7 @@ interface LabelMakerAttributes {
     projectUrl?: string,
     documentUrl?: string,
     imageUrl?: string,
+    updateUrl?: string,
 }
 
 /* -------------------------------------------------------------------------- */
@@ -116,6 +117,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
     public projectUrl?: string = undefined;
     public documentUrl?: string = undefined;
     public imageUrl?: string = undefined
+    public updateUrl?: string = undefined;
 
     private _document?: DocumentSchema = undefined;
     private _project?: ProjectSchema = undefined;
@@ -144,7 +146,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
      * Returns an array of attribute names that this component observes.
      */
     static get observedAttributes() {
-        return ['document-url', 'project-url', 'image-url'];
+        return ['document-url', 'project-url', 'image-url', 'update-url'];
     }
 
     /**
@@ -161,6 +163,8 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             this.imageUrl = newValue || undefined;
             if (this.imageUrl)
                 this._documentViewer.setAttribute("url", this.imageUrl);
+        } else if (propertyName === 'update-url') {
+            this.updateUrl = newValue || undefined;
         }
     }
 
@@ -174,6 +178,8 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         if (!this._submitButton) {
             throw new Error("Submit button not found in the document.");
         }
+
+        this._submitButton.addEventListener('click', this._onSubmitButtonClick());
     }
 
     /**
@@ -368,12 +374,16 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         for (const definition of labelDefinitions) {
             if (definition.target !== 'document')
                 continue;
-            classificationLabeler.addLabelButton(
+            const labelButton = classificationLabeler.addLabelButton(
                 definition.name,
                 definition.color,
                 definition.type,
                 false,
             )
+            labelButton.addEventListener('click', this._onClassificationLabelButtonClick(
+                this._document.data.labels,
+                definition.name
+            ));
         }
     }
 
@@ -452,7 +462,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                         definition.type,
                         false,
                     )
-                    button.addEventListener('click', this._onClassificationLabelButtonClick(highlight, block.labels, definition.name));
+                    button.addEventListener('click', this._onClassificationLabelButtonClick(block.labels, definition.name));
 
                 }
             }
@@ -475,11 +485,11 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
     /**
      * On click event listener for classification laben buttons.
      */
-    private _onClassificationLabelButtonClick(associatedHighlight: HTMLElement, associatedLabelList: (LabelSchema | TextLabelSchema)[], labelName: string): EventListener {
+    private _onClassificationLabelButtonClick(associatedLabelList: (LabelSchema | TextLabelSchema)[], labelName: string): EventListener {
         return (event: Event) => {
+            console.log("sdhksjahdjk")
             event.stopPropagation();
 
-            associatedHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
             associatedLabelList.push({
                 name: labelName,
             });
@@ -525,6 +535,34 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
     }
 
     /**
+     * On click event listener for classification laben buttons.
+     */
+    private _onSubmitButtonClick(): EventListener {
+        return (event: Event) => {
+            event.stopPropagation();
+
+            this._submitButton?.setAttribute('disabled', 'true');
+            this._submitLabelData()
+                .then((success: boolean) => {
+                    if (success) {
+                        // todo: show success message
+                        console.log("Label data submitted successfully.");
+                    } else {
+                        // todo: show error message
+                        console.error("Failed to submit label data.");
+                    }
+                })
+                .catch((error: Error) => {
+                    // todo
+                    console.error(`Error submitting label data: ${error.message}`);
+                })
+                .finally(() => {
+                    this._submitButton?.removeAttribute('disabled');
+                });
+        }
+    }
+
+    /**
      * Fetches document from the specified URL.
      */
     private async _queryDocument(): Promise<DocumentSchema> {
@@ -564,6 +602,39 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         }
 
         return content;
+    }
+
+    /**
+     * Updates label data using the label data URL.
+     */
+    private async _submitLabelData(): Promise<boolean> {
+        if (!this.updateUrl) {
+            throw new Error(`Label data update URL is not set`);
+        }
+        if (!this._document || !this._document.data) {
+            throw new Error(`Document data is not available`);
+        }
+        const response = await fetch(
+            this.updateUrl,
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(this._document.data)
+            }
+        );
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+
+        const content: DocumentLabelDataSchema | null = await response.json();
+
+        if (!content) {
+            throw new Error(`Failed to submit label data`);
+        }
+
+        return (true);
     }
 
 }

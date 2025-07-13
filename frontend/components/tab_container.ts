@@ -33,14 +33,14 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
      * Handles changes to the attributes of the component.
      */
     attributeChangedCallback() {
-        //
+        //..
     }
 
     /**
      * Called when the component is added to the DOM.
      */
     connectedCallback() {
-        console.log("bbb")
+        // ...
     }
 
     /**
