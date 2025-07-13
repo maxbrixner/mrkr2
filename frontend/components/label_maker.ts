@@ -490,6 +490,9 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             throw new Error("Document or project data is not available.");
         }
 
+        const labelDefinitions = this._project.config.label_definitions;
+
+
         for (const page of this._document.data.pages) {
             for (const block of page.blocks) {
                 const highlight = this._documentViewer.addHighlight(
@@ -506,14 +509,16 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 textLabeler.setAttribute('heading', `Block`);
                 this._blockTab?.appendChild(textLabeler);
 
+
+
                 const editButton = textLabeler.addEditButton();
+                editButton.addEventListener('click', this._onBlockEditButtonClick(textLabeler, block, labelDefinitions));
 
                 const viewButton = textLabeler.addViewButton();
                 viewButton.addEventListener('click', this._onBlockViewButtonClick(highlight));
 
                 const checkButton = textLabeler.addCheckButton();
 
-                const labelDefinitions = this._project.config.label_definitions;
 
                 textLabeler.addText(this._formatBlockText(block, labelDefinitions));
 
@@ -754,6 +759,22 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             associatedViewerElement.addEventListener('animationend', () => {
                 associatedViewerElement.classList.remove('pulsing');
             }, { once: true });
+
+        }
+    }
+
+    /**
+     * On click event listener for classification laben buttons.
+     */
+    private _onBlockEditButtonClick(associatedLabeler: TextLabeler, associatedBlock: BlockLabelDataSchema, labelDefinitions: LabelDefinitionSchema[]): EventListener {
+        return (event: Event) => {
+            event.stopPropagation();
+
+            // clear the label list in place
+            associatedBlock.labels.length = 0;
+            associatedLabeler.addText(this._formatBlockText(associatedBlock, labelDefinitions));
+
+            associatedLabeler.makeTextEditable();
 
         }
     }

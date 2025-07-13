@@ -58,6 +58,10 @@ export class TextLabeler extends ClassificationLabeler implements Classification
                 white-space: pre-wrap;
                 word-break: break-word;
             }
+
+            .text-container:focus {
+                outline: 1px solid var(--primary-color); /* todo */
+            }   
         `;
 
 
@@ -194,6 +198,15 @@ export class TextLabeler extends ClassificationLabeler implements Classification
             selection.removeAllRanges();
         }
     }
+
+    public makeTextEditable(): void {
+        this._textContainer.contentEditable = 'true';
+        this._textContainer.focus();
+        this._textContainer.addEventListener('blur', () => {
+            this._textContainer.contentEditable = 'false';
+        }, { once: true });
+    }
+
 
 }
 
