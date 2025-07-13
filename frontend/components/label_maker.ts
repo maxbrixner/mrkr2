@@ -497,16 +497,20 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 for (const definition of labelDefinitions) {
                     if (definition.target !== 'block')
                         continue;
+
+                    // todo: text
                     if (definition.type === 'text')
                         continue;
-                    const button = classificationLabeler.addLabelButton(
-                        definition.name,
-                        definition.color,
-                        definition.type,
-                        false,
-                    )
-                    //button.addEventListener('click', this._onClassificationLabelButtonClick(block.labels, definition.name));
 
+                    if (definition.type === 'classification_single' || definition.type === 'classification_multiple') {
+                        const button = classificationLabeler.addLabelButton(
+                            definition.name,
+                            definition.color,
+                            definition.type,
+                            false,
+                        )
+                        button.addEventListener('click', this._onClassificationLabelButtonClick(block.labels, definition.name, definition.type));
+                    }
                 }
             }
         }
