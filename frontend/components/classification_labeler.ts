@@ -5,39 +5,20 @@ import { IconButton } from './icon_button.js';
 
 /* -------------------------------------------------------------------------- */
 
-interface ClassificationLabelerAttributes {
+export interface ClassificationLabelerAttributes {
     heading?: string
 }
 
 /* -------------------------------------------------------------------------- */
 
-interface LabelSchema {
-    name: string
-}
-
-/* -------------------------------------------------------------------------- */
-
-interface ColoredSpan {
-    start: number;
-    end: number;
-    color: string;
-}
-
-/* -------------------------------------------------------------------------- */
-
-interface TextLabelSchema extends LabelSchema {
-    start: number
-    end: number
-}
-
-/* -------------------------------------------------------------------------- */
 
 export class ClassificationLabeler extends HTMLElement implements ClassificationLabelerAttributes {
     public heading?: string = undefined;
-    private _headerDiv: HTMLDivElement = document.createElement('div');
-    private _buttonsDiv: HTMLDivElement = document.createElement('div');
-    private _titleDiv: HTMLSpanElement = document.createElement('div');
-    private _classificationContainer: HTMLDivElement = document.createElement('div');
+    protected _headerDiv: HTMLDivElement = document.createElement('div');
+    protected _buttonsDiv: HTMLDivElement = document.createElement('div');
+    protected _titleDiv: HTMLSpanElement = document.createElement('div');
+    protected _classificationContainer: HTMLDivElement = document.createElement('div');
+    protected _style: HTMLStyleElement = document.createElement('style');
 
     /**
      * Creates an instance of LabelFragment.
@@ -90,13 +71,12 @@ export class ClassificationLabeler extends HTMLElement implements Classification
     /**
      * Populates the shadow root with the component's structure.
      */
-    private _populateShadowRoot() {
+    protected _populateShadowRoot() {
         if (!this.shadowRoot) {
             throw new Error("Shadow Root is not initialized.");
         }
 
-        const style = document.createElement('style');
-        style.textContent = `
+        this._style.textContent = `
             :host {
                 border: 1px solid var(--label-fragment-border-color);
                 border-radius: var(--label-fragment-border-radius);
@@ -140,7 +120,7 @@ export class ClassificationLabeler extends HTMLElement implements Classification
             }
         `;
 
-        this.shadowRoot?.appendChild(style);
+        this.shadowRoot?.appendChild(this._style);
 
         this._headerDiv.className = "header";
         this.shadowRoot?.appendChild(this._headerDiv);
@@ -160,10 +140,6 @@ export class ClassificationLabeler extends HTMLElement implements Classification
      * Adds a view button to the classification container.
      */
     public addViewButton(): HTMLElement {
-        if (!this._classificationContainer) {
-            throw new Error("Classification container is not initialized.");
-        }
-
         const button = new IconButton();
         button.setAttribute("img", "/static/img/eye-outline.svg");
         button.ariaLabel = "View in document";
@@ -177,10 +153,6 @@ export class ClassificationLabeler extends HTMLElement implements Classification
      * Adds a view button to the classification container.
      */
     public addCheckButton(): HTMLElement {
-        if (!this._classificationContainer) {
-            throw new Error("Classification container is not initialized.");
-        }
-
         const button = new IconButton();
         button.setAttribute("img", "/static/img/square-outline.svg");
         button.ariaLabel = "Mark as done";
@@ -193,16 +165,12 @@ export class ClassificationLabeler extends HTMLElement implements Classification
     /**
      * Adds a label button to the classification container.
      */
-    public addLabelButton(
+    public addClassificationButton(
         name: string,
         color: string,
-        type: 'classification_single' | 'classification_multiple' | 'text',
+        type: 'classification_single' | 'classification_multiple',
         active: boolean
     ): HTMLElement {
-        if (!this._classificationContainer) {
-            throw new Error("Classification container is not initialized.");
-        }
-
         const button = new LabelButton();
         button.setAttribute("color", color);
         button.setAttribute("name", name);

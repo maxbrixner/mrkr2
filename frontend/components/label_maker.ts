@@ -4,6 +4,7 @@ import { ResizablePanes } from './resizable_panes.js';
 import { DocumentViewer, PagesCreatedEvent, PageClickedEvent, HighlightClickedEvent } from './document_viewer.js';
 import { TabContainer } from './tab_container.js';
 import { ClassificationLabeler } from './classification_labeler.js';
+import { TextLabeler } from './text_labeler.js';
 import { LabelButton } from './label_button.js';
 
 /* -------------------------------------------------------------------------- */
@@ -404,9 +405,14 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             if (definition.target !== 'document')
                 continue;
 
+            if (definition.type === 'text') {
+                continue; // Text labels are not permitted for documents
+            }
+
+
             const labelStatus = this._document.data.labels.some(label => label.name === definition.name);
 
-            const labelButton = classificationLabeler.addLabelButton(
+            const labelButton = classificationLabeler.addClassificationButton(
                 definition.name,
                 definition.color,
                 definition.type,
@@ -434,9 +440,12 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             this._pageLabelers[page.page] = classificationLabeler;
             this._pageTab.appendChild(classificationLabeler);
 
-            classificationLabeler.addCheckButton();
+
             const viewButton = classificationLabeler.addViewButton();
             viewButton.addEventListener('click', this._onPageViewButtonClick(page.page));
+
+
+            const checkButton = classificationLabeler.addCheckButton();
 
             const labelDefinitions = this._project.config.label_definitions;
 
@@ -444,9 +453,13 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 if (definition.target !== 'page')
                     continue;
 
+                if (definition.type === 'text') {
+                    continue; // Text labels are not permitted for pages
+                }
+
                 const labelStatus = page.labels.some(label => label.name === definition.name);
 
-                const labelButton = classificationLabeler.addLabelButton(
+                const labelButton = classificationLabeler.addClassificationButton(
                     definition.name,
                     definition.color,
                     definition.type,
@@ -480,17 +493,21 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 );
 
 
-                const classificationLabeler = new ClassificationLabeler();
-                classificationLabeler.setAttribute('heading', `Block ${block.id}`);
-                this._blockTab?.appendChild(classificationLabeler);
+                const textLabeler = new TextLabeler();
+                textLabeler.setAttribute('heading', `Block ${block.id}`);
+                this._blockTab?.appendChild(textLabeler);
 
-                classificationLabeler.addCheckButton();
+                const editButton = textLabeler.addEditButton();
 
-                const viewButton = classificationLabeler.addViewButton();
+                const viewButton = textLabeler.addViewButton();
                 viewButton.addEventListener('click', this._onBlockViewButtonClick(highlight));
 
+                const checkButton = textLabeler.addCheckButton();
 
-                highlight.addEventListener('click', this._onHighlightClick("Block", classificationLabeler));
+                textLabeler.addText(block.content);
+
+                highlight.addEventListener('click', this._onHighlightClick("Block", textLabeler));
+
 
 
                 const labelDefinitions = this._project.config.label_definitions;
@@ -498,18 +515,28 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                     if (definition.target !== 'block')
                         continue;
 
-                    // todo: text
-                    if (definition.type === 'text')
-                        continue;
 
                     if (definition.type === 'classification_single' || definition.type === 'classification_multiple') {
-                        const button = classificationLabeler.addLabelButton(
+
+                        const labelStatus = block.labels.some(label => label.name === definition.name);
+
+                        const button = textLabeler.addClassificationButton(
+                            definition.name,
+                            definition.color,
+                            definition.type,
+                            labelStatus,
+                        )
+
+                        button.addEventListener('click', this._onClassificationLabelButtonClick(block.labels, definition.name, definition.type));
+                    } else if (definition.type === 'text') {
+                        const button = textLabeler.addTextLabelButton(
                             definition.name,
                             definition.color,
                             definition.type,
                             false,
                         )
-                        button.addEventListener('click', this._onClassificationLabelButtonClick(block.labels, definition.name, definition.type));
+
+
                     }
                 }
             }

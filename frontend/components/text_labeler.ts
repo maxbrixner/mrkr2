@@ -1,0 +1,124 @@
+/* -------------------------------------------------------------------------- */
+
+import { LabelButton } from './label_button.js';
+import { IconButton } from './icon_button.js';
+import { ClassificationLabeler, ClassificationLabelerAttributes } from './classification_labeler.js';
+
+/* -------------------------------------------------------------------------- */
+
+export interface TextLabelerAttributes extends ClassificationLabelerAttributes {
+    heading?: string
+}
+
+/* -------------------------------------------------------------------------- */
+
+export class TextLabeler extends ClassificationLabeler implements ClassificationLabelerAttributes {
+    private _textLabelsContainer: HTMLDivElement = document.createElement('div');
+    private _textContainer: HTMLDivElement = document.createElement('div');
+
+    /**
+     * Creates an instance of LabelFragment.
+     */
+    constructor() {
+        super();
+    }
+
+    /**
+     * Populates the shadow root with the component's structure.
+     */
+    protected _populateShadowRoot() {
+        if (!this.shadowRoot) {
+            throw new Error("Shadow Root is not initialized.");
+        }
+
+        super._populateShadowRoot();
+
+        this._style.textContent += `
+            .text-labels-container {
+                border-top: 1px solid var(--label-fragment-border-color);
+                display: flex;
+                gap: 8px;
+                padding: 8px;
+                flex-wrap: wrap;
+            }
+
+            .text-container {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                padding: 8px;
+            }
+        `;
+
+        if (this._textLabelsContainer) {
+            this._textLabelsContainer.classList.add('text-labels-container');
+            this.shadowRoot.appendChild(this._textLabelsContainer);
+        }
+
+        if (this._textContainer) {
+            this._textContainer.classList.add('text-container');
+            this.shadowRoot.appendChild(this._textContainer);
+        }
+
+    }
+
+    /**
+     * Adds a view button to the text container.
+     */
+    public addText(innerHTML: string): HTMLElement {
+        this._textContainer.innerHTML = innerHTML;
+
+        return (this._textContainer);
+    }
+
+    /**
+     * Adds an edit button to the text container.
+     */
+    public addEditButton(): HTMLElement {
+        if (!this._buttonsDiv) {
+            throw new Error("Classification container is not initialized.");
+        }
+
+        const button = new IconButton();
+        button.setAttribute("img", "/static/img/create-outline.svg");
+        button.ariaLabel = "Edit text";
+
+        this._buttonsDiv.appendChild(button);
+
+        return (button);
+    }
+
+    /**
+     * Adds a label button to the classification container.
+     */
+    public addTextLabelButton(
+        name: string,
+        color: string,
+        type: 'classification_single' | 'classification_multiple' | 'text',
+        active: boolean
+    ): HTMLElement {
+        const button = new LabelButton();
+        button.setAttribute("color", color);
+        button.setAttribute("name", name);
+        button.setAttribute("type", type);
+        button.setAttribute("active", active.toString());
+        button.ariaLabel = name;
+
+        const span = document.createElement('span');
+        span.slot = "label";
+        span.textContent = name;
+
+        button.appendChild(span);
+
+        this._textLabelsContainer.appendChild(button);
+
+        return (button);
+    }
+
+}
+
+/* -------------------------------------------------------------------------- */
+
+customElements.define('text-labeler', TextLabeler);
+
+/* -------------------------------------------------------------------------- */
