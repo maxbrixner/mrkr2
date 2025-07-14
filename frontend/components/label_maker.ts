@@ -774,8 +774,17 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             associatedBlock.labels.length = 0;
             associatedLabeler.addText(this._formatBlockText(associatedBlock, labelDefinitions));
 
-            associatedLabeler.makeTextEditable();
+            associatedLabeler.makeTextEditable(this._onBlockTextBlur(associatedBlock, associatedLabeler, labelDefinitions));
 
+        }
+    }
+
+    private _onBlockTextBlur(associatedBlock: BlockLabelDataSchema, associatedLabeler: TextLabeler, labelDefinitions: LabelDefinitionSchema[]) {
+        return (text: string) => {
+            console.log(`text |${text}|`)
+            associatedBlock.content = text.trim();
+            // for good measure
+            associatedLabeler.addText(this._formatBlockText(associatedBlock, labelDefinitions));
         }
     }
 

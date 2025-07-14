@@ -199,11 +199,39 @@ export class TextLabeler extends ClassificationLabeler implements Classification
         }
     }
 
-    public makeTextEditable(): void {
+    public makeTextEditable(onBlurCallback: CallableFunction | null = null): void {
         this._textContainer.contentEditable = 'true';
         this._textContainer.focus();
         this._textContainer.addEventListener('blur', () => {
             this._textContainer.contentEditable = 'false';
+
+            let text = "";
+            const spanNodes = this._textContainer.childNodes;
+            console.log(this._textContainer.innerHTML);
+            console.log("spanNodes", spanNodes)
+            for (let spanNode of spanNodes) {
+                const textNodes = spanNode.childNodes;
+
+                // in empty nodes, if user adds text, the text idiotically gets inserted before the span.
+                if (spanNode.nodeType == Node.TEXT_NODE) {
+                    text += spanNode.textContent;
+                    continue;
+                }
+
+                console.log("textNodes", textNodes)
+                for (let textNode of textNodes) {
+                    if (textNode.nodeType !== Node.TEXT_NODE) {
+                        text += "\n"
+                    } else {
+                        text += textNode.textContent;
+                    }
+                }
+            }
+
+
+            if (onBlurCallback) {
+                onBlurCallback(text);
+            }
         }, { once: true });
     }
 
