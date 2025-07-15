@@ -722,7 +722,10 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
             associatedLabeler.removeSelection();
 
+            const color = labelDefinitions.find(def => def.name === labelName)?.color || '#000000';
+
             associatedLabeler.addText(this._formatBlockText(associatedBlock, labelDefinitions));
+            associatedLabeler.addTextLabelToList(labelName, color, selection.text)
         }
     }
 
@@ -770,8 +773,10 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         return (event: Event) => {
             event.stopPropagation();
 
+            // todo: deactivate the label buttons
+
             // clear the label list in place
-            associatedBlock.labels.length = 0;
+            associatedBlock.labels.length = 0; // todo: only remove text labels, not classification? Otherwise also unactivate the classification buttons!
             associatedLabeler.addText(this._formatBlockText(associatedBlock, labelDefinitions));
 
             associatedLabeler.makeTextEditable(this._onBlockTextBlur(associatedBlock, associatedLabeler, labelDefinitions));
@@ -781,8 +786,11 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
     private _onBlockTextBlur(associatedBlock: BlockLabelDataSchema, associatedLabeler: TextLabeler, labelDefinitions: LabelDefinitionSchema[]) {
         return (text: string) => {
-            console.log(`text |${text}|`)
+            associatedBlock.labels.length = 0; // todo: only remove text labels, not classification? Otherwise also unactivate the classification buttons!
             associatedBlock.content = text.trim();
+
+            // todo: reactivate the label buttons
+
             // for good measure
             associatedLabeler.addText(this._formatBlockText(associatedBlock, labelDefinitions));
         }

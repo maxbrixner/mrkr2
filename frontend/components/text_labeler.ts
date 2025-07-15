@@ -23,6 +23,7 @@ export interface TextSelection {
 export class TextLabeler extends ClassificationLabeler implements ClassificationLabelerAttributes {
     private _textLabelsContainer: HTMLDivElement = document.createElement('div');
     private _textContainer: HTMLDivElement = document.createElement('div');
+    private _textLabelListContainer: HTMLDivElement = document.createElement('div');
 
     /**
      * Creates an instance of LabelFragment.
@@ -62,6 +63,29 @@ export class TextLabeler extends ClassificationLabeler implements Classification
             .text-container:focus {
                 outline: 1px solid var(--primary-color); /* todo */
             }   
+
+            .text-label-list-container {
+                align-items: center;
+                display: grid;
+                border-top: 1px solid var(--label-fragment-border-color);
+                padding: 0.5rem;
+                gap: 0.5rem;
+                grid-template-columns: auto 1fr min-content;
+                grid-auto-rows: min-content;
+                font-size: 0.8rem;
+            }
+
+            .text-label-list-container:empty {
+                border-top: none;
+                padding: 0;
+            }
+
+            .text-label-list-container > span {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            }
         `;
 
 
@@ -75,6 +99,10 @@ export class TextLabeler extends ClassificationLabeler implements Classification
             this.shadowRoot.appendChild(this._textLabelsContainer);
         }
 
+        if (this._textLabelListContainer) {
+            this._textLabelListContainer.classList.add('text-label-list-container');
+            this.shadowRoot.appendChild(this._textLabelListContainer);
+        }
 
     }
 
@@ -131,6 +159,31 @@ export class TextLabeler extends ClassificationLabeler implements Classification
         return (button);
     }
 
+    public addTextLabelToList(
+        name: string,
+        color: string,
+        content: string
+    ): [HTMLSpanElement, HTMLSpanElement, IconButton] {
+
+
+        const labelName = document.createElement("span")
+        labelName.style.color = color;
+        labelName.textContent = name;
+
+        const labelContent = document.createElement("span");
+        labelContent.textContent = content;
+
+        const deleteButton = new IconButton();
+        deleteButton.setAttribute("img", "/static/img/delete.svg");
+
+        this._textLabelListContainer.appendChild(labelName);
+        this._textLabelListContainer.appendChild(labelContent);
+        this._textLabelListContainer.appendChild(deleteButton);
+
+        return ([labelName, labelContent, deleteButton])
+    }
+
+
     public getSelection(): TextSelection | null {
         const selection = (this.shadowRoot as any).getSelection();
         if (!selection || selection.rangeCount === 0) {
@@ -139,9 +192,6 @@ export class TextLabeler extends ClassificationLabeler implements Classification
 
         const range = selection.getRangeAt(0);
         const commonAncestor = range.commonAncestorContainer;
-
-        console.log("selection", selection);
-        console.log("range", range);
 
         // Only handle the case where the selection is within a single text node
         if (commonAncestor != this._textContainer && !this._textContainer.contains(commonAncestor)) {
@@ -207,8 +257,6 @@ export class TextLabeler extends ClassificationLabeler implements Classification
 
             let text = "";
             const spanNodes = this._textContainer.childNodes;
-            console.log(this._textContainer.innerHTML);
-            console.log("spanNodes", spanNodes)
             for (let spanNode of spanNodes) {
                 const textNodes = spanNode.childNodes;
 
@@ -218,7 +266,6 @@ export class TextLabeler extends ClassificationLabeler implements Classification
                     continue;
                 }
 
-                console.log("textNodes", textNodes)
                 for (let textNode of textNodes) {
                     if (textNode.nodeType !== Node.TEXT_NODE) {
                         text += "\n"
