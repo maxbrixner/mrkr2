@@ -841,6 +841,8 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
             associatedLabeler.makeTextEditable(this._onBlockTextBlur(associatedBlock, associatedLabeler, labelDefinitions));
 
+            associatedLabeler.clearLabelList();
+
         }
     }
 

@@ -201,6 +201,13 @@ export class TextLabeler extends ClassificationLabeler implements Classification
         return this._textLabelListContainer;
     }
 
+    public clearLabelList(): void {
+        if (!this._textLabelListContainer) {
+            throw new Error("Text label list container is not initialized.");
+        }
+        this._textLabelListContainer.innerHTML = '';
+    }
+
     public getSelection(): TextSelection | null {
         const selection = (this.shadowRoot as any).getSelection();
         if (!selection || selection.rangeCount === 0) {
