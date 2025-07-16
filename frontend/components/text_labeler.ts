@@ -168,7 +168,7 @@ export class TextLabeler extends ClassificationLabeler implements Classification
         name: string,
         color: string,
         content: string
-    ): HTMLDivElement {
+    ): [HTMLDivElement, IconButton] {
 
 
         const labelName = document.createElement("span")
@@ -190,7 +190,7 @@ export class TextLabeler extends ClassificationLabeler implements Classification
 
         this._textLabelListContainer.appendChild(labelListItem);
 
-        return (labelListItem);
+        return ([labelListItem, deleteButton]);
     }
 
 

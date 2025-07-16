@@ -20,6 +20,7 @@ interface LabelMakerAttributes {
 /* -------------------------------------------------------------------------- */
 
 interface LabelSchema {
+    id?: string // only for internal pruposes, not present in database
     name: string
 }
 
@@ -714,7 +715,12 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 return;
             }
 
+            // todo: avoid duplicates! This would lead to the delete button not work anymore
+
+            const labelId = crypto.randomUUID();
+
             associatedLabelList.push({
+                id: labelId,
                 name: labelName,
                 start: selection.start,
                 end: selection.end,
@@ -725,7 +731,31 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             const color = labelDefinitions.find(def => def.name === labelName)?.color || '#000000';
 
             associatedLabeler.addText(this._formatBlockText(associatedBlock, labelDefinitions));
-            associatedLabeler.addTextLabelToList(labelName, color, selection.text)
+            const labelItemContainer = associatedLabeler.addTextLabelToList(labelName, color, selection.text)
+
+            const labelItem = labelItemContainer[0];
+            const deleteButton = labelItemContainer[1];
+
+            deleteButton.addEventListener("click", this._onTextLabelDeleteButtonClick(associatedBlock, labelDefinitions, associatedLabeler, labelItem, associatedLabelList, labelId))
+        }
+    }
+
+    private _onTextLabelDeleteButtonClick(associatedBlock: BlockLabelDataSchema, labelDefinitions: LabelDefinitionSchema[], associatedLabeler: TextLabeler, associatedLabelItem: HTMLDivElement, associatedLabelList: (LabelSchema | TextLabelSchema)[], associatedId: string): EventListener {
+        return (event: Event) => {
+            event.stopPropagation();
+
+            const label = associatedLabelList.find(item => item.id === associatedId)
+
+            if (!label)
+                throw new Error(`Label with id ${associatedId} not found in the associated label list.`);
+
+            const index = associatedLabelList.indexOf(label, 0)
+
+            associatedLabelList.splice(index, 1);
+            associatedLabelItem.remove();
+            associatedLabeler.addText(this._formatBlockText(associatedBlock, labelDefinitions));
+
+
         }
     }
 
