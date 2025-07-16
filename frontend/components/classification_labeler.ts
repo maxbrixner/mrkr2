@@ -7,6 +7,7 @@ import { IconButton } from './icon_button.js';
 
 export interface ClassificationLabelerAttributes {
     heading?: string
+    done?: boolean
 }
 
 /* -------------------------------------------------------------------------- */
@@ -14,10 +15,12 @@ export interface ClassificationLabelerAttributes {
 
 export class ClassificationLabeler extends HTMLElement implements ClassificationLabelerAttributes {
     public heading?: string = undefined;
+    public done?: boolean = false;
     protected _headerDiv: HTMLDivElement = document.createElement('div');
     protected _buttonsDiv: HTMLDivElement = document.createElement('div');
     protected _titleDiv: HTMLSpanElement = document.createElement('div');
     protected _classificationContainer: HTMLDivElement = document.createElement('div');
+    protected _checkButton?: IconButton = new IconButton();
     protected _style: HTMLStyleElement = document.createElement('style');
 
     /**
@@ -34,7 +37,7 @@ export class ClassificationLabeler extends HTMLElement implements Classification
      * Returns an array of attribute names that this component observes.
      */
     static get observedAttributes() {
-        return ['heading'];
+        return ['heading', 'done'];
     }
 
     /**
@@ -49,16 +52,22 @@ export class ClassificationLabeler extends HTMLElement implements Classification
         if (propertyName === 'heading') {
             this.heading = newValue || undefined;
             this._titleDiv.textContent = this.heading || "Label Element";
+        } else if (propertyName === 'done') {
+            console.log("sjkhdkjfhkjh");
+            this.done = newValue === 'true';
+            console.log("done", this.done);
+            this._updateStatus();
         }
-
-        this._populateShadowRoot();
     }
 
     /**
      * Called when the component is added to the DOM.
      */
     connectedCallback() {
-        // ...
+        this._populateShadowRoot();
+
+        this._updateStatus();
+
     }
 
     /**
@@ -119,6 +128,10 @@ export class ClassificationLabeler extends HTMLElement implements Classification
                 padding: 0.5em;
             }
 
+            .done {
+                display: none;
+            }
+
             .classification-container:empty {
                 display: none;
             }
@@ -157,13 +170,13 @@ export class ClassificationLabeler extends HTMLElement implements Classification
      * Adds a view button to the classification container.
      */
     public addCheckButton(): HTMLElement {
-        const button = new IconButton();
-        button.setAttribute("img", "/static/img/square-outline.svg");
-        button.ariaLabel = "Mark as done";
+        if (!this._checkButton) {
+            throw new Error("Check button is not defined.");
+        }
 
-        this._buttonsDiv.appendChild(button);
+        this._buttonsDiv.appendChild(this._checkButton);
 
-        return (button);
+        return (this._checkButton);
     }
 
     /**
@@ -191,6 +204,48 @@ export class ClassificationLabeler extends HTMLElement implements Classification
         this._classificationContainer.appendChild(button);
 
         return (button);
+    }
+
+    public toggleDone(): boolean {
+
+        if (!this._classificationContainer) {
+            throw new Error("Classification container is not defined.");
+        }
+
+        if (!this._checkButton) {
+            throw new Error("Check button is not defined.");
+        }
+
+        if (!this._classificationContainer.classList.contains('done')) {
+            this._classificationContainer.classList.add('done');
+            this._checkButton.setAttribute("img", "/static/img/checkbox-outline.svg");
+            this._checkButton.ariaLabel = "Mark as not done";
+            return true;
+        } else {
+            this._classificationContainer.classList.remove('done');
+            this._checkButton.setAttribute("img", "/static/img/square-outline.svg");
+            this._checkButton.ariaLabel = "Mark as done";
+            return false;
+        }
+
+    }
+
+    protected _updateStatus(): void {
+        if (!this._checkButton)
+            return;
+
+        if (this.done) {
+            this._classificationContainer.classList.add('done');
+            console.log("a", this._classificationContainer.classList);
+            this._checkButton.setAttribute("img", "/static/img/checkbox-outline.svg");
+            this._checkButton.ariaLabel = "Mark as not done";
+        } else {
+            this._classificationContainer.classList.remove('done');
+            console.log("b", this._classificationContainer.classList);
+
+            this._checkButton.setAttribute("img", "/static/img/square-outline.svg");
+            this._checkButton.ariaLabel = "Mark as done";
+        }
     }
 
 }

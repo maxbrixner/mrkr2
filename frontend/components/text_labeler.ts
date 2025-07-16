@@ -24,6 +24,7 @@ export class TextLabeler extends ClassificationLabeler implements Classification
     private _textLabelsContainer: HTMLDivElement = document.createElement('div');
     private _textContainer: HTMLDivElement = document.createElement('div');
     private _textLabelListContainer: HTMLDivElement = document.createElement('div');
+    private _editButton = new IconButton();
 
     /**
      * Creates an instance of LabelFragment.
@@ -44,11 +45,14 @@ export class TextLabeler extends ClassificationLabeler implements Classification
 
         this._style.textContent += `
             .text-labels-container {
-                
                 display: flex;
                 gap: 8px;
                 padding: 8px;
                 flex-wrap: wrap;
+            }
+
+            .text-labels-container.done {
+                display: none;
             }
 
             .text-container {
@@ -58,6 +62,10 @@ export class TextLabeler extends ClassificationLabeler implements Classification
                 user-select: text;
                 white-space: pre-wrap;
                 word-break: break-word;
+            }
+
+            .text-container.done {
+                display: none;
             }
 
             .text-container:focus {
@@ -75,8 +83,11 @@ export class TextLabeler extends ClassificationLabeler implements Classification
             }
 
             .text-label-list-container:empty {
-                border-top: none;
-                padding: 0;
+                display: none;
+            }
+
+            .text-label-list-container.done {
+                display: none;
             }
             
             .text-label-list-item {
@@ -128,13 +139,13 @@ export class TextLabeler extends ClassificationLabeler implements Classification
             throw new Error("Classification container is not initialized.");
         }
 
-        const button = new IconButton();
-        button.setAttribute("img", "/static/img/create-outline.svg");
-        button.ariaLabel = "Edit text";
 
-        this._buttonsDiv.appendChild(button);
+        this._editButton.setAttribute("img", "/static/img/create-outline.svg");
+        this._editButton.ariaLabel = "Edit text";
 
-        return (button);
+        this._buttonsDiv.appendChild(this._editButton);
+
+        return (this._editButton);
     }
 
     /**
@@ -306,6 +317,24 @@ export class TextLabeler extends ClassificationLabeler implements Classification
         }, { once: true });
     }
 
+    protected _updateStatus(): void {
+        if (!this._checkButton)
+            return;
+
+        super._updateStatus();
+
+        if (this.done) {
+            this._textContainer.classList.add('done');
+            this._textLabelsContainer.classList.add('done');
+            this._textLabelListContainer.classList.add('done');
+            this._editButton.setAttribute("disabled", "true");
+        } else {
+            this._textContainer.classList.remove('done');
+            this._textLabelsContainer.classList.remove('done');
+            this._textLabelListContainer.classList.remove('done');
+            this._editButton.setAttribute("disabled", "false");
+        }
+    }
 
 }
 

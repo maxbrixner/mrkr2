@@ -234,6 +234,7 @@ async def _create_document_data(
         pages=_initialize_label_pages(
             ocr_result=ocr_result,
         ),
+        label_status=schemas.LabelStatus.open,
         labels=[]
     )
 
@@ -332,6 +333,7 @@ def _initialize_label_blocks(
             schemas.BlockLabelDataSchema(
                 id=item.id,
                 labels=[],
+                label_status=schemas.LabelStatus.open,
                 position=schemas.PositionSchema(
                     left=item.left,
                     top=item.top,
@@ -366,6 +368,7 @@ def _initialize_label_pages(
                 id=item.id,
                 page=item.page,
                 labels=[],
+                label_status=schemas.LabelStatus.open,
                 blocks=_initialize_label_blocks(
                     ocr_result=ocr_result,
                     page=item.page

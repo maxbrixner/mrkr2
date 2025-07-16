@@ -1,12 +1,23 @@
 # ---------------------------------------------------------------------------- #
 
 import pydantic
+import enum
 import uuid
 import datetime
 from typing import Any, List, Optional
 
 # ---------------------------------------------------------------------------- #
 
+
+class LabelStatus(str, enum.Enum):
+    """
+    Enum for label status.
+    """
+    open = "open"
+    done = "done"
+
+
+# ---------------------------------------------------------------------------- #
 
 class LabelSchema(pydantic.BaseModel):
     """
@@ -95,6 +106,11 @@ class BlockLabelDataSchema(pydantic.BaseModel):
         ...,
         description="List of labels associated with the block."
     )
+    label_status: LabelStatus = pydantic.Field(
+        ...,
+        description="The labeling status for the block.",
+        examples=["done"]
+    )
     content: str = pydantic.Field(
         ...,
         description="Text content of the block.",
@@ -126,6 +142,11 @@ class PageLabelDataSchema(pydantic.BaseModel):
         ...,
         description="List of labels associated with the page.",
     )
+    label_status: LabelStatus = pydantic.Field(
+        ...,
+        description="The labeling status for the page.",
+        examples=["done"]
+    )
     blocks: List[BlockLabelDataSchema] = pydantic.Field(
         ...,
         description="List of labeled blocks on the page.",
@@ -145,6 +166,11 @@ class DocumentLabelDataSchema(pydantic.BaseModel):
     labels: List[LabelSchema] = pydantic.Field(
         ...,
         description="List of labels associated with the document."
+    )
+    label_status: LabelStatus = pydantic.Field(
+        ...,
+        description="The labeling status for the document.",
+        examples=["done"]
     )
     pages: List[PageLabelDataSchema] = pydantic.Field(
         ...,

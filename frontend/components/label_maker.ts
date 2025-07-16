@@ -57,6 +57,7 @@ interface BlockLabelDataSchema {
     id: string
     position: PositionSchema
     labels: (LabelSchema | TextLabelSchema)[]
+    label_status: 'done' | 'open'
     content: string
 }
 
@@ -67,6 +68,7 @@ interface PageLabelDataSchema {
     page: number
     properties: PagePropertiesSchema
     labels: LabelSchema[]
+    label_status: 'done' | 'open'
     blocks: BlockLabelDataSchema[]
 }
 
@@ -74,6 +76,7 @@ interface PageLabelDataSchema {
 
 interface DocumentLabelDataSchema {
     labels: LabelSchema[]
+    label_status: 'done' | 'open'
     pages: PageLabelDataSchema[]
 }
 
@@ -407,7 +410,14 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
         const classificationLabeler = new ClassificationLabeler();
         classificationLabeler.setAttribute('heading', 'Document');
-        classificationLabeler.addCheckButton();
+
+        if (this._document.data.label_status === 'done') {
+            classificationLabeler.setAttribute('done', 'true');
+        }
+
+        const checkButton = classificationLabeler.addCheckButton();
+        checkButton.addEventListener('click', this._onCheckButtonClick(this._document.data, classificationLabeler));
+
         this._documentTab.appendChild(classificationLabeler);
 
         const labelDefinitions = this._project.config.label_definitions;
@@ -451,12 +461,17 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             this._pageLabelers[page.page] = classificationLabeler;
             this._pageTab.appendChild(classificationLabeler);
 
+            if (page.label_status === 'done') {
+                classificationLabeler.setAttribute('done', 'true');
+            }
 
             const viewButton = classificationLabeler.addViewButton();
             viewButton.addEventListener('click', this._onPageViewButtonClick(page.page));
 
 
             const checkButton = classificationLabeler.addCheckButton();
+            checkButton.addEventListener('click', this._onCheckButtonClick(page, classificationLabeler));
+
 
             const labelDefinitions = this._project.config.label_definitions;
 
@@ -510,6 +525,9 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 textLabeler.setAttribute('heading', `Block`);
                 this._blockTab?.appendChild(textLabeler);
 
+                if (block.label_status === 'done') {
+                    textLabeler.setAttribute('done', 'true');
+                }
 
 
                 const editButton = textLabeler.addEditButton();
@@ -519,6 +537,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 viewButton.addEventListener('click', this._onBlockViewButtonClick(highlight));
 
                 const checkButton = textLabeler.addCheckButton();
+                checkButton.addEventListener('click', this._onCheckButtonClick(block, textLabeler));
 
 
                 textLabeler.addText(this._formatBlockText(block, labelDefinitions));
@@ -855,6 +874,23 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
             // for good measure
             associatedLabeler.addText(this._formatBlockText(associatedBlock, labelDefinitions));
+        }
+    }
+
+    private _onCheckButtonClick(associatedItem: DocumentLabelDataSchema | PageLabelDataSchema | BlockLabelDataSchema, associatedLabeler: ClassificationLabeler | TextLabeler): EventListener {
+        return (event: Event) => {
+            event.stopPropagation();
+
+            if (associatedItem.label_status === 'done') {
+                associatedLabeler.setAttribute("done", "false");
+                associatedItem.label_status = 'open';
+                console.log(this._document?.data.label_status);
+            } else {
+                associatedLabeler.setAttribute("done", "true");
+                associatedItem.label_status = 'done';
+                console.log(this._document?.data.label_status);
+
+            }
         }
     }
 
