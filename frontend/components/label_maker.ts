@@ -525,6 +525,8 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
                 highlight.addEventListener('click', this._onHighlightClick("Block", textLabeler));
 
+                this._addTextLabelsToList(textLabeler, block, labelDefinitions);
+
                 for (const definition of labelDefinitions) {
                     if (definition.target !== 'block')
                         continue;
@@ -629,6 +631,34 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         });
 
         return html;
+    }
+
+
+    private _addTextLabelsToList(labeler: TextLabeler, block: BlockLabelDataSchema, labelDefinitions: LabelDefinitionSchema[]) {
+        if (!labeler || !block || !labelDefinitions) {
+            throw new Error("Labeler, block or label definitions are not available.");
+        }
+
+        for (const label of block.labels) {
+            if (!('start' in label && 'end' in label)) continue; // Only text labels
+
+            const definition = labelDefinitions.find(def => def.name === label.name);
+            if (!definition) continue;
+
+            const color = definition.color || '#000000';
+            const content = block.content.substring(label.start, label.end);
+
+            const labelItemContainer = labeler.addTextLabelToList(label.name, color, content)
+
+            const labelItem = labelItemContainer[0];
+            const deleteButton = labelItemContainer[1];
+
+            const labelId = label.id || crypto.randomUUID(); // Ensure label has an ID
+            label.id = labelId; // Assign ID to the label for internal use
+
+            deleteButton.addEventListener("click", this._onTextLabelDeleteButtonClick(block, labelDefinitions, labeler, labelItem, block.labels, labelId))
+        }
+
     }
 
     /**
