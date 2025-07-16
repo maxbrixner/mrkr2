@@ -65,12 +65,11 @@ export class TextLabeler extends ClassificationLabeler implements Classification
             }   
 
             .text-label-list-container {
-                align-items: center;
                 display: grid;
                 border-top: 1px solid var(--label-fragment-border-color);
                 padding: 0.5rem;
                 gap: 0.5rem;
-                grid-template-columns: auto 1fr min-content;
+                grid-template-columns: 1fr;
                 grid-auto-rows: min-content;
                 font-size: 0.8rem;
             }
@@ -79,12 +78,18 @@ export class TextLabeler extends ClassificationLabeler implements Classification
                 border-top: none;
                 padding: 0;
             }
+            
+            .text-label-list-item {
+                align-items: center;
+                display: grid;
+                gap: 0.5rem;
+                grid-template-columns: auto 1fr min-content;
+            }
 
-            .text-label-list-container > span {
+            .text-label-list-item > span {
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
-            }
             }
         `;
 
@@ -163,24 +168,29 @@ export class TextLabeler extends ClassificationLabeler implements Classification
         name: string,
         color: string,
         content: string
-    ): [HTMLSpanElement, HTMLSpanElement, IconButton] {
+    ): HTMLDivElement {
 
 
         const labelName = document.createElement("span")
         labelName.style.color = color;
         labelName.textContent = name;
 
+        const labelListItem = document.createElement("div");
+        labelListItem.classList.add("text-label-list-item")
+
         const labelContent = document.createElement("span");
         labelContent.textContent = content;
 
         const deleteButton = new IconButton();
-        deleteButton.setAttribute("img", "/static/img/delete.svg");
+        deleteButton.setAttribute("img", "/static/img/close-outline.svg");
 
-        this._textLabelListContainer.appendChild(labelName);
-        this._textLabelListContainer.appendChild(labelContent);
-        this._textLabelListContainer.appendChild(deleteButton);
+        labelListItem.appendChild(labelName);
+        labelListItem.appendChild(labelContent);
+        labelListItem.appendChild(deleteButton);
 
-        return ([labelName, labelContent, deleteButton])
+        this._textLabelListContainer.appendChild(labelListItem);
+
+        return (labelListItem);
     }
 
 
