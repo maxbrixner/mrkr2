@@ -44,7 +44,7 @@ async def get_project(
         ...,
         description="The unique identifier for the project (as an integer).",
         examples=[1]
-    ),
+    )
 ) -> schemas.ProjectSchema:
     """
     Retrieve a new project.
@@ -96,5 +96,32 @@ async def scan_project(
     return {
         "message": f"Scan scheduled for project {project_id}."
     }
+
+# ---------------------------------------------------------------------------- #
+
+
+@router.get("/{project_id}/list-documents", summary="List Documents")
+async def list_project_documents(
+    session: database.DatabaseDependency,
+    project_id: int = fastapi.Path(
+        ...,
+        description="The unique identifier for the project (as an integer).",
+        examples=[1]
+    )
+) -> List[schemas.DocumentListSchema]:
+    """
+    List all documents in a project.
+    """
+    project = crud.get_project(session=session, id=project_id)
+
+    if not project:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
+
+    documents = project.documents
+
+    return [schemas.DocumentListSchema(**doc.model_dump()) for doc in documents]
 
 # ---------------------------------------------------------------------------- #

@@ -225,6 +225,34 @@ class DocumentSchema(pydantic.BaseModel):
 # ---------------------------------------------------------------------------- #
 
 
+class DocumentListSchema(pydantic.BaseModel):
+    """
+    API-Schema for a list of documents, stripped of the labeling data.
+    """
+    id: int = pydantic.Field(
+        ...,
+        description="The unique identifier for the document (as an integer).",
+        examples=[1]
+    )
+    created: datetime.datetime = pydantic.Field(
+        ...,
+        description="The timestamp when the document was created.",
+        examples=["2023-10-01T12:00:00Z"]
+    )
+    updated: datetime.datetime = pydantic.Field(
+        ...,
+        description="The timestamp when the document was last updated.",
+        examples=["2023-10-01T12:00:00Z"]
+    )
+    path: str = pydantic.Field(
+        ...,
+        description="The path to the document file within its source.",
+        examples=["/documents/my_document.pdf"]
+    )
+
+# ---------------------------------------------------------------------------- #
+
+
 class PageContentSchema(pydantic.BaseModel):
     """
     API-Schema for a page's content as a base64 encoded image.

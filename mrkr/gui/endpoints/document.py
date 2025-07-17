@@ -11,24 +11,24 @@ import mrkr.database as database
 # ---------------------------------------------------------------------------- #
 
 
-router = fastapi.APIRouter(tags=[schemas.Tags.labeling])
+router = fastapi.APIRouter(prefix="/document", tags=[schemas.Tags.document])
 
 # ---------------------------------------------------------------------------- #
 
 
 @router.get(
-    "/label/{document_id}",
-    summary="Label a document",
+    "/{document_id}/label",
+    summary="GUI to label a document",
     response_class=fastapi.responses.HTMLResponse
 )
-async def label(
+async def document_page(
     document_id: int,
     request: fastapi.Request,
     templates: services.TemplatesDependency,
     session: database.DatabaseDependency
 ) -> fastapi.responses.HTMLResponse:
     """
-    GUI to label a file.
+    GUI to label a document.
     """
     document = crud.get_document(
         session=session,
