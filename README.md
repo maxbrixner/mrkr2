@@ -93,37 +93,74 @@ with sdk.MrkrClient(log_level="DEBUG") as client:
     # create demo project
     project_id = client.create_project(
         name="Demo Project",
-        config=sdk.schemas.ProjectSchema(
-            label_setup={
-                "type": "blockwise",
-                "config": {}
-            },
-            file_provider={
+        config={
+            "label_definitions": [
+                {
+                    "type": "classification_single",
+                    "target": "document",
+                    "name": "Letter",
+                    "color": "#4CAF50"
+                },
+                {
+                    "type": "classification_single",
+                    "target": "document",
+                    "name": "Email",
+                    "color": "#2196F3"
+                },
+                {
+                    "type": "classification_multiple",
+                    "target": "page",
+                    "name": "Cover Page",
+                    "color": "#FF9800"
+                },
+                {
+                    "type": "classification_multiple",
+                    "target": "page",
+                    "name": "Attachment",
+                    "color": "#F44336"
+                },
+                {
+                    "type": "text",
+                    "target": "block",
+                    "name": "Name",
+                    "color": "#607D8B"
+                },
+                {
+                    "type": "text",
+                    "target": "block",
+                    "name": "IBAN",
+                    "color": "#8BC34A"
+                },
+                {
+                    "type": "text",
+                    "target": "block",
+                    "name": "Street",
+                    "color": "#3F51B5"
+                }
+            ],
+            "file_provider": {
                 "type": "local",
                 "config": {
                     "path": "demo",
-                    "pdf_dpi": 200
+                    "pdf_dpi": 200,
+                    "image_format": "WebP"
                 }
             },
-            ocr_provider={
+            "ocr_provider": {
                 "type": "tesseract",
                 "config": {
                     "language": "eng"
                 }
             }
-        )
+        }
     )
+
     print(f"Created project with ID: {project_id}")
 
-    # Scan the project for files
+    # scan demo project
     client.scan_project(
         project_id=project_id
     )
-    print(f"Scanned project with ID: {project_id}")
 
-    # Run an OCR scan
-    client.schedule_ocr(
-        project_id=project_id
-    )
-    print(f"Scheduled OCR run for project ID: {project_id}")
+    print(f"Scan initiated for project with ID: {project_id}")
 ```
