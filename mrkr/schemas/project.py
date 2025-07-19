@@ -298,6 +298,34 @@ class ProjectSchema(pydantic.BaseModel):
 # ---------------------------------------------------------------------------- #
 
 
+class ProjectListSchema(pydantic.BaseModel):
+    """
+    API-Schema for a list of projects, stripped of the configuration.
+    """
+    id: int = pydantic.Field(
+        ...,
+        description="The unique identifier of the project.",
+        examples=[1]
+    )
+    name: str = pydantic.Field(
+        ...,
+        description="The name of the project.",
+        examples=["My Project"]
+    )
+    created: datetime.datetime = pydantic.Field(
+        ...,
+        description="The timestamp when the project was created.",
+        examples=["2023-10-01T12:00:00Z"]
+    )
+    updated: datetime.datetime = pydantic.Field(
+        ...,
+        description="The timestamp when the project was last updated.",
+        examples=["2023-10-01T12:00:00Z"]
+    )
+
+# ---------------------------------------------------------------------------- #
+
+
 class ProjectCreateSchema(pydantic.BaseModel):
     """
     Schema for creating a new user.

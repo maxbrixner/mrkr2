@@ -10,9 +10,7 @@
 <header class="project-header">
     <h1>mrkr</h1>
     <span class="path">
-        <styled-link href="{{ url_for('projects_page') }}">Projects</styled-link>
-        &nbsp;&nbsp;/&nbsp;&nbsp;
-        <b>{{project.name}}</b>
+        <b>Projects</b>
     </span>
     <span class="buttons">
         <styled-button>Options</styled-button>
@@ -24,18 +22,18 @@
 <main class="project-main">
     <div class="toolbar">
         <div button></div>
-        <input type="text" id="filter" placeholder="Filter documents..." autocomplete="off" autocorrect="off"
+        <input type="text" id="filter" placeholder="Filter projects..." autocomplete="off" autocorrect="off"
             autocapitalize="off" spellcheck="false" aria-label="Filter documents">
     </div>
-    <filtered-table content-url="{{ url_for('list_project_documents', project_id=project.id) }}"
-        table-config='{"idColumn": "id", "headers": {"id": "ID", "created": "Created at", "updated": "Updated at", "path": "Path"}, "filterElement": "filter"}'>Hallo</filtered-table>
+    <filtered-table content-url="{{ url_for('list_projects') }}"
+        table-config='{"idColumn": "id", "headers": {"id": "ID", "name": "Name", "created": "Created at", "updated": "Updated at", "path": "Path"}, "filterElement": "filter"}'>Hallo</filtered-table>
 </main>
 
 <script>
     document.addEventListener('row-clicked', (event) => {
         const detail = event.detail;
         console.log(`Row clicked in table ${detail.tableId}: ${detail.rowId}`);
-        const url = "{{ url_for('document_page', document_id='[ID]') }}";
+        const url = "{{ url_for('project_documents_page', project_id='[ID]') }}";
         // Replace [ID] with the actual row ID
         window.location.href = url.replace("[ID]", detail.rowId);
     });

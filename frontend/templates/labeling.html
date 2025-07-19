@@ -10,7 +10,7 @@
 <header class="labeling-header">
     <h1>mrkr</h1>
     <span class="path">
-        <styled-link href="https://www.google.com">Projects</styled-link>
+        <styled-link href="{{ url_for('projects_page') }}">Projects</styled-link>
         &nbsp;&nbsp;/&nbsp;&nbsp;
         <styled-link
             href="{{ url_for('project_documents_page', project_id=document.project.id) }}">{{document.project.name}}</styled-link>

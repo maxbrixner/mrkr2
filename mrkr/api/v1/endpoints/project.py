@@ -37,6 +37,56 @@ async def create_project(
 # ---------------------------------------------------------------------------- #
 
 
+@router.get("/list-projects", summary="List Projects")
+async def list_projects(
+    session: database.DatabaseDependency,
+    order_by: schemas.OrderBy = fastapi.Query(
+        schemas.OrderBy.id,
+        description="Field to order the projects by. Default is 'id'.",
+        examples=["created", "id"]
+    ),
+    order: schemas.Order = fastapi.Query(
+        schemas.Order.asc,
+        description="Order direction, either 'asc' or 'desc'. Default is 'asc'.",
+        examples=["asc"]
+    ),
+    limit: int = fastapi.Query(
+        100,
+        description="Maximum number of projects to return. Default is 100.",
+        ge=1,
+        examples=[50]
+    ),
+    offset: int = fastapi.Query(
+        0,
+        description="Number of projects to skip before starting to collect "
+                    "the result set. Default is 0.",
+        ge=0,
+        examples=[10]
+    ),
+    filter: str = fastapi.Query(
+        None,
+        description="Filter projects. Default is None.",
+        examples=["pdf"]
+    )
+) -> List[schemas.ProjectListSchema]:
+    """
+    List all documents in a project.
+    """
+    projects = crud.get_filtered_projects(
+        session=session,
+        order_by=order_by,
+        order=order,
+        limit=limit,
+        offset=offset,
+        filter=filter
+    )
+
+    return [schemas.ProjectListSchema(
+        **project.model_dump()) for project in projects]
+
+# ---------------------------------------------------------------------------- #
+
+
 @router.get("/{project_id}", summary="Get Project")
 async def get_project(
     session: database.DatabaseDependency,

@@ -152,11 +152,11 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
                 outline: 1px solid var(--primary-color, #007bff);
             }
 
-            tr:nth-child(2n+1) {
+            tr:nth-child(2n) {
                 background-color: #fdfdfc; /* todo */
             }
 
-            tr:nth-child(2n) {
+            tr:nth-child(2n+1) {
                 background-color: #f9f8f6; /* todo */
             }
 

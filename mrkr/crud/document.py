@@ -50,7 +50,8 @@ def get_project_filtered_documents(
     filter: str | None = None
 ) -> Sequence[models.Document]:
     """
-    Retrieve all documents for a specific project from the database.
+    Retrieve all documents for a specific project from the database but
+    apply filters and limits.
     """
     if not filter:
         return session.exec(
@@ -66,10 +67,7 @@ def get_project_filtered_documents(
         return session.exec(
             sqlmodel.select(models.Document).where(
                 models.Document.project_id == project_id,
-                sqlmodel.or_(
-                    models.Document.path.ilike(f"%{filter}%"),  # type: ignore
-                    models.Document.path.ilike(f"%{id}%"),  # type: ignore
-                )
+                models.Document.path.ilike(f"%{filter}%")  # type: ignore
             ).order_by(
                 sqlmodel.asc(getattr(models.Document, order_by))
                 if order == schemas.Order.asc else

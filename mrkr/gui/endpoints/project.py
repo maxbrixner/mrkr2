@@ -17,6 +17,31 @@ router = fastapi.APIRouter(prefix="/project", tags=[schemas.Tags.project])
 
 
 @router.get(
+    "/",
+    summary="GUI to list all projects",
+    response_class=fastapi.responses.HTMLResponse
+)
+async def projects_page(
+    request: fastapi.Request,
+    templates: services.TemplatesDependency,
+    session: database.DatabaseDependency
+) -> fastapi.responses.HTMLResponse:
+    """
+    GUI to list all projects.
+    """
+    # ...
+
+    return templates.TemplateResponse(
+        "projects.html",
+        context={
+            "request": request
+        }
+    )
+
+# ---------------------------------------------------------------------------- #
+
+
+@router.get(
     "/{project_id}/documents",
     summary="GUI to list a project's documents",
     response_class=fastapi.responses.HTMLResponse
