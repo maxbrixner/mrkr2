@@ -1,7 +1,7 @@
 # ---------------------------------------------------------------------------- #
 
 import sqlmodel
-from typing import Sequence
+from typing import Dict, Sequence
 
 # ---------------------------------------------------------------------------- #
 
@@ -46,13 +46,39 @@ def get_filtered_projects(
     else:
         return session.exec(
             sqlmodel.select(models.Project).where(
-                models.Project.name.ilike(f"%{filter}%"),  # type: ignore
+                sqlmodel.or_(
+                    models.Project.name.ilike(f"%{filter}%"),  # type: ignore
+                    sqlmodel.cast(models.Project.id, sqlmodel.String).ilike(
+                        f"%{filter}%")  # type: ignore
+                )
             ).order_by(
                 sqlmodel.asc(getattr(models.Project, order_by))
                 if order == schemas.Order.asc else
                 sqlmodel.desc(getattr(models.Project, order_by))
             ).limit(limit).offset(offset)
         ).all()
+
+# ---------------------------------------------------------------------------- #
+
+
+def get_project_status(
+    session: sqlmodel.Session,
+    id: int
+) -> Dict[models.DocumentStatus, int]:
+    """
+    Get a project's status by counting all document statuses.
+    """
+    documents = session.exec(
+        sqlmodel.select(models.Document).where(
+            models.Document.project_id == id,
+        )).all()
+
+    result = {}
+    for status in models.DocumentStatus:
+        count = sum(1 for doc in documents if doc.status == status)
+        result[status] = count
+
+    return result
 
 # ---------------------------------------------------------------------------- #
 

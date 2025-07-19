@@ -1,8 +1,7 @@
 # ---------------------------------------------------------------------------- #
 
 import sqlmodel
-import datetime
-from typing import List, Sequence
+from typing import Sequence
 
 # ---------------------------------------------------------------------------- #
 
@@ -67,7 +66,15 @@ def get_project_filtered_documents(
         return session.exec(
             sqlmodel.select(models.Document).where(
                 models.Document.project_id == project_id,
-                models.Document.path.ilike(f"%{filter}%")  # type: ignore
+                sqlmodel.or_(
+                    models.Document.path.ilike(f"%{filter}%"),  # type: ignore
+                    sqlmodel.cast(
+                        models.Document.status, sqlmodel.String).ilike(
+                        f"%{filter}%"),  # type: ignore
+                    sqlmodel.cast(
+                        models.Document.id, sqlmodel.String).ilike(
+                        f"%{filter}%")  # type: ignore
+                )
             ).order_by(
                 sqlmodel.asc(getattr(models.Document, order_by))
                 if order == schemas.Order.asc else
@@ -89,6 +96,7 @@ def create_document(
     database_document = models.Document(
         project_id=project_id,
         path=path,
+        status=models.DocumentStatus.processing
     )
 
     session.add(database_document)
@@ -103,12 +111,14 @@ def update_document(
     session: sqlmodel.Session,
     document: models.Document,
     path: str,
+    status: models.DocumentStatus,
     data: schemas.DocumentLabelDataSchema
 ) -> models.Document:
     """
     Update a documents metacontent in the database.
     """
     document.path = path
+    document.status = status
     document.data = data.model_dump()
 
     session.add(document)

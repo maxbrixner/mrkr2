@@ -15,6 +15,8 @@ export interface FilteredTableConfig {
     headers?: { [key: string]: string };
     filterElement?: string;
     idColumn?: string;
+    display?: { [key: string]: "text" | "chip" };
+    chips?: { [key: string]: string };
 }
 
 export interface RowClickedEvent {
@@ -188,6 +190,13 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
                 cursor: pointer;
                 padding: 1.5rem 0.5rem;
             }
+            
+            .chip {
+                display: inline-block;
+                padding: 0.2rem 0.5rem;
+                border-radius: 1rem;
+                font-size: 0.8rem;    
+            }
 
             @keyframes spin {
                 0% {
@@ -300,7 +309,18 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
 
             for (const key in item) {
                 const td = document.createElement('td');
-                td.textContent = item[key];
+
+                const display: 'text' | 'chip' = this._configParsed?.display?.[key] || 'text';
+
+                if (display === 'text') {
+                    td.textContent = item[key];
+                } else {
+                    const divElement = document.createElement('div');
+                    divElement.classList.add('chip');
+                    divElement.textContent = item[key];
+                    divElement.style.backgroundColor = this._configParsed?.chips?.[item[key]] || '#e0e0e0'; // Default color if not specified
+                    td.appendChild(divElement);
+                }
 
                 tr.appendChild(td);
             }

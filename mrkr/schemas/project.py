@@ -312,6 +312,21 @@ class ProjectListSchema(pydantic.BaseModel):
         description="The name of the project.",
         examples=["My Project"]
     )
+    done: int = pydantic.Field(
+        default=0,
+        description="The number of documents in the project that are done.",
+        examples=[10]
+    )
+    open: int = pydantic.Field(
+        default=0,
+        description="The number of documents in the project that are open.",
+        examples=[5]
+    )
+    in_review: int = pydantic.Field(
+        default=0,
+        description="The number of documents in the project that are in review.",
+        examples=[2]
+    )
     created: datetime.datetime = pydantic.Field(
         ...,
         description="The timestamp when the project was created.",

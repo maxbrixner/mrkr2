@@ -84,10 +84,10 @@ async def scan_project(
                 force=force,
                 session=session)
 
+        logger.debug(f"Scan of project {project_id} successful.")
     except Exception as exception:
         logger.error(f"Error scanning project {project_id}: {exception}")
 
-    logger.debug(f"Scan of project {project_id} successful.")
 
 # ---------------------------------------------------------------------------- #
 
@@ -144,10 +144,10 @@ async def scan_document(
             logger.debug(
                 f"Document {document.id} already scanned."
             )
+
+        logger.debug(f"Scan of document {document_id} successful.")
     except Exception as exception:
         logger.error(f"Error scanning document {document_id}: {exception}")
-
-    logger.debug(f"Scan of document {document_id} successful.")
 
 # ---------------------------------------------------------------------------- #
 
@@ -242,6 +242,7 @@ async def _create_document_data(
         session=session,
         document=document,
         path=document.path,
+        status=models.DocumentStatus.open,
         data=label_content
     )
 

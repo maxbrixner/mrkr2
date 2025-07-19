@@ -2,6 +2,7 @@
 
 import sqlmodel
 import datetime
+import enum
 from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import JSON
 from typing import Optional
@@ -9,6 +10,15 @@ from typing import Optional
 # ---------------------------------------------------------------------------- #
 
 from .project import Project
+
+# ---------------------------------------------------------------------------- #
+
+
+class DocumentStatus(str, enum.Enum):
+    processing = "processing"
+    open = "open"
+    in_review = "in review"
+    done = "done"
 
 # ---------------------------------------------------------------------------- #
 
@@ -30,6 +40,10 @@ class Document(sqlmodel.SQLModel, table=True):
     )
     path: str = sqlmodel.Field(
         description="The path to the document file within its source."
+    )
+    status: DocumentStatus = sqlmodel.Field(
+        ...,
+        description="The status of the document."
     )
     data: Optional[dict] = sqlmodel.Field(
         default=None,

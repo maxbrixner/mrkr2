@@ -81,8 +81,20 @@ async def list_projects(
         filter=filter
     )
 
-    return [schemas.ProjectListSchema(
-        **project.model_dump()) for project in projects]
+    result = []
+    for project in projects:
+        status = crud.get_project_status(
+            session=session, id=project.id)
+
+        project_schema = schemas.ProjectListSchema(**project.model_dump())
+
+        project_schema.done = status[models.DocumentStatus.done]
+        project_schema.open = status[models.DocumentStatus.open]
+        project_schema.in_review = status[models.DocumentStatus.in_review]
+
+        result.append(project_schema)
+
+    return result
 
 # ---------------------------------------------------------------------------- #
 

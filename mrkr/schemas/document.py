@@ -8,6 +8,10 @@ from typing import Any, List, Optional
 
 # ---------------------------------------------------------------------------- #
 
+import mrkr.models as models
+
+# ---------------------------------------------------------------------------- #
+
 
 class LabelStatus(str, enum.Enum):
     """
@@ -217,6 +221,11 @@ class DocumentSchema(pydantic.BaseModel):
         description="The path to the document file within its source.",
         examples=["/documents/my_document.pdf"]
     )
+    status: models.DocumentStatus = pydantic.Field(
+        ...,
+        description="The status of the document.",
+        examples=["open"]
+    )
     data: DocumentLabelDataSchema = pydantic.Field(
         ...,
         description="The label data for the document",
@@ -238,6 +247,11 @@ class DocumentListSchema(pydantic.BaseModel):
         ...,
         description="The path to the document file within its source.",
         examples=["/documents/my_document.pdf"]
+    )
+    status: models.DocumentStatus = pydantic.Field(
+        ...,
+        description="The status of the document.",
+        examples=["open"]
     )
     created: datetime.datetime = pydantic.Field(
         ...,
