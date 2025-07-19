@@ -22,8 +22,8 @@
 <main class="project-main">
     <div class="toolbar">
         <div button></div>
-        <input type="text" id="filter" placeholder="Filter projects..." autocomplete="off" autocorrect="off"
-            autocapitalize="off" spellcheck="false" aria-label="Filter documents">
+        <input type="text" name="filter-projects" id="filter" placeholder="Filter projects..." autocomplete="off"
+            autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Filter projects">
     </div>
     <filtered-table content-url="{{ url_for('list_projects') }}"
         table-config='{"idColumn": "id", "headers": {"id": "ID", "name": "Name", "done": "Done", "open": "Open", "in_review": "In Review", "created": "Created at", "updated": "Updated at", "path": "Path"}, "filterElement": "filter"}'>Hallo</filtered-table>
