@@ -220,7 +220,17 @@ async def list_project_documents(
         filter=filter
     )
 
-    return [schemas.DocumentListSchema(
-        **document.model_dump()) for document in documents]
+    result = []
+    for document in documents:
+        document_schema = schemas.DocumentListSchema(**document.model_dump())
+
+        if document.assignee:
+            document_schema.assignee_name = document.assignee.name
+        if document.reviewer:
+            document_schema.reviewer_name = document.reviewer.name
+
+        result.append(document_schema)
+
+    return result
 
 # ---------------------------------------------------------------------------- #

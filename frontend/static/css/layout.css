@@ -104,6 +104,14 @@ main.project-main>div.toolbar {
     border-bottom: 1px solid var(--border-color);
 }
 
+main.project-main>div.toolbar>div.buttons {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: min-content;
+    gap: .5rem;
+    align-items: center;
+}
+
 main.project-main>div.toolbar>input {
     border: var(--border-color) 1px solid;
     padding: 0.5rem;

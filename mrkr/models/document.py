@@ -50,7 +50,23 @@ class Document(sqlmodel.SQLModel, table=True):
         sa_column=Column(JSON),
         description="The label data for the document"
     )
+    assignee_id: Optional[int] = sqlmodel.Field(
+        default=None,
+        foreign_key="user.id",
+        description="The ID of the user assigned to this document."
+    )
+    reviewer_id: Optional[int] = sqlmodel.Field(
+        default=None,
+        foreign_key="user.id",
+        description="The ID of the user reviewing this document."
+    )
 
     project: Project = sqlmodel.Relationship()
+    assignee: Optional["User"] = sqlmodel.Relationship(  # type: ignore
+        sa_relationship_kwargs={"foreign_keys": "[Document.assignee_id]"}
+    )  # type: ignore
+    reviewer: Optional["User"] = sqlmodel.Relationship(  # type: ignore
+        sa_relationship_kwargs={"foreign_keys": "[Document.reviewer_id]"}
+    )
 
 # ---------------------------------------------------------------------------- #

@@ -110,6 +110,9 @@ export class StyledButton extends HTMLElement implements StyledButtonAttributes 
                 font-weight: var(--styled-button-font-weight, normal);
                 padding: var(--styled-button-padding, 0.5rem 1rem);
                 font-family: inherit;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
             button:disabled {

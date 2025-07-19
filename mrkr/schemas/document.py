@@ -253,6 +253,16 @@ class DocumentListSchema(pydantic.BaseModel):
         description="The status of the document.",
         examples=["open"]
     )
+    assignee_name: Optional[str] = pydantic.Field(
+        default=None,
+        description="The name of the user assigned to this document.",
+        examples=["John Doe"]
+    )
+    reviewer_name: Optional[str] = pydantic.Field(
+        default=None,
+        description="The name of the user reviewing this document.",
+        examples=["Jane Smith"]
+    )
     created: datetime.datetime = pydantic.Field(
         ...,
         description="The timestamp when the document was created.",

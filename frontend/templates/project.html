@@ -23,12 +23,16 @@
 {% block main %}
 <main class="project-main">
     <div class="toolbar">
-        <div button></div>
+        <div class="buttons">
+            <styled-button disabled>Assign to...</styled-button>
+            <styled-button disabled>Review by...</styled-button>
+            <styled-button disabled>Mark as...</styled-button>
+        </div>
         <input type="text" name="filter-documents" id="filter" placeholder="Filter documents..." autocomplete="off"
             autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Filter documents">
     </div>
     <filtered-table content-url="{{ url_for('list_project_documents', project_id=project.id) }}"
-        table-config='{"idColumn": "id", "headers": {"id": "ID", "status": "Status", "created": "Created at", "updated": "Updated at", "path": "Path"}, "filterElement": "filter", "display": {"status": "chip"}, "chips": {"processing": "#90A4AE", "open": "#80DEEA", "done": "#4CAF50", "in review": "#FFC107"}}'>Hallo</filtered-table>
+        table-config='{"idColumn": "id", "headers": {"id": "ID", "status": "Status", "assignee_name": "Assignee", "reviewer_name": "Reviewer", "created": "Created at", "updated": "Updated at", "path": "Path"}, "filterElement": "filter", "display": {"status": "chip"}, "chips": {"processing": "#90A4AE", "open": "#80DEEA", "done": "#4CAF50", "in review": "#FFC107"}}'>Hallo</filtered-table>
 </main>
 
 <script>
