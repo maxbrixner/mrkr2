@@ -4,11 +4,12 @@ import requests
 import logging
 import time
 import functools
-from typing import Any, Callable, Dict, Optional, Self
+from typing import Any, Callable, Dict, Optional, Self, List
 
 # ---------------------------------------------------------------------------- #
 
 import mrkr.schemas as schemas
+import mrkr.models as models
 from mrkr.services import ColonLevelFormatter
 
 # ---------------------------------------------------------------------------- #
@@ -156,7 +157,7 @@ class MrkrClient():
                 f"Response status: {response.status_code}. "
                 f"Response content: {response.text}")
 
-    def get_health(self) -> str:
+    def get_health(self) -> schemas.HealthEnum:
         """
         Check the health of the API.
         """
@@ -200,5 +201,64 @@ class MrkrClient():
             method="POST",
             endpoint=f"/project/{project_id}/scan"
         )
+
+    def list_projects(
+        self
+    ) -> List[schemas.ProjectListSchema]:
+        """
+        List all projects.
+        """
+        response = self._call_api(
+            method="GET",
+            endpoint="/project/list-projects"
+        )
+        return [schemas.ProjectListSchema.model_validate(item)
+                for item in response.json()]
+
+    def list_project_documents(
+        self,
+        project_id: int
+    ) -> List[schemas.DocumentListSchema]:
+        """
+        List all documents for a given project.
+        """
+        response = self._call_api(
+            method="GET",
+            endpoint=f"/project/{project_id}/list-documents"
+        )
+        return [schemas.DocumentListSchema.model_validate(item)
+                for item in response.json()]
+
+    def create_user(
+        self,
+        user: Dict | schemas.UserCreateSchema
+    ) -> int | None:
+        """
+        Create a new user.
+        """
+        if isinstance(user, dict):
+            user = schemas.UserCreateSchema(**user)
+
+        response = self._call_api(
+            method="POST",
+            endpoint="/user",
+            json=user.model_dump()
+        )
+
+        return response.json().get("user_id", None)
+
+    def list_users(
+        self
+    ) -> List[schemas.UserListSchema]:
+        """
+        List all users.
+        """
+        response = self._call_api(
+            method="GET",
+            endpoint="/user/list-users"
+        )
+
+        return [schemas.UserListSchema.model_validate(item)
+                for item in response.json()]
 
 # ---------------------------------------------------------------------------- #

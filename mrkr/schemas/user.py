@@ -24,3 +24,31 @@ class UserCreateSchema(pydantic.BaseModel):
 
 
 # ---------------------------------------------------------------------------- #
+
+
+class UserListSchema(pydantic.BaseModel):
+    """
+    Schema for listing users.
+    """
+    id: int = pydantic.Field(
+        ...,
+        description="Unique identifier for the user.",
+        examples=[1]
+    )
+    username: str = pydantic.Field(
+        ...,
+        description="Username of the user.",
+        examples=["john.doe"]
+    )
+    email: str = pydantic.Field(
+        ...,
+        description="Email address of the user.",
+        examples=["john.doe@example.com"]
+    )
+    disabled: bool = pydantic.Field(
+        ...,
+        description="Indicates if the user account is disabled.",
+        examples=[False]
+    )
+
+# ---------------------------------------------------------------------------- #

@@ -1,7 +1,7 @@
 # ---------------------------------------------------------------------------- #
 
 import fastapi
-from typing import Dict
+from typing import Dict, List
 
 # ---------------------------------------------------------------------------- #
 
@@ -27,7 +27,7 @@ async def user_login() -> None:
 # ---------------------------------------------------------------------------- #
 
 
-@router.post("/create", summary="Create User")
+@router.post("", summary="Create User")
 async def user_create(
     user: schemas.UserCreateSchema,
     session: database.DatabaseDependency
@@ -35,7 +35,23 @@ async def user_create(
     """
     Create a new user.
     """
-    crud.create_user(session=session, user=user)
-    return {"message": f"User '{user.username}' created successfully."}
+    database_user = crud.create_user(session=session, user=user)
+    return {
+        "message": f"User '{user.username}' created successfully.",
+        "user_id": database_user.id
+    }
+
+# ---------------------------------------------------------------------------- #
+
+
+@router.get("/list-users", summary="List Users")
+async def list_users(
+    session: database.DatabaseDependency
+) -> List[schemas.UserListSchema]:
+    """
+    List all users.
+    """
+    users = crud.list_users(session=session)
+    return [schemas.UserListSchema(**user.model_dump()) for user in users]
 
 # ---------------------------------------------------------------------------- #

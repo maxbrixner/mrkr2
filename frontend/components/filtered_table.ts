@@ -264,6 +264,7 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.classList.add('select-checkbox');
+        checkbox.name = 'select-all-or-none';
         th.appendChild(checkbox);
         tr.appendChild(th);
 
@@ -302,6 +303,7 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
             const td = document.createElement('td');
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
+            checkbox.name = 'select-row';
             checkbox.classList.add('select-checkbox');
             checkbox.value = item.id; // Assuming each item has an 'id' property
             td.appendChild(checkbox);

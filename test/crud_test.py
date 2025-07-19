@@ -37,7 +37,7 @@ class UserCrudTest(TestCase):
         assert isinstance(user, models.User)
         assert user.username == "testuser"
         assert user.email == "test@example.com"
-        assert user.password == "testpassword"
+        assert user.password != "testpassword"
         assert user.disabled == False
 
 

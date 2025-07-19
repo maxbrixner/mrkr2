@@ -7,5 +7,6 @@ from .static import StaticFilesWithHeaders
 from .dependencies import ConfigDependency, TemplatesDependency, \
     WorkerPoolDependency
 from .worker import get_worker_pool, WorkerPool
+from .security import hash_password, check_password
 
 # ---------------------------------------------------------------------------- #

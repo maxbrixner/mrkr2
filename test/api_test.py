@@ -49,7 +49,7 @@ class TestV1API(TestCase):
         successfully.
         """
         response = self.client.post(
-            f"{self.api_version}/user/create",
+            f"{self.api_version}/user",
             json={
                 "username": "testuser",
                 "email": "test@example.com",
