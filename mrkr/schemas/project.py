@@ -297,6 +297,7 @@ class ProjectSchema(pydantic.BaseModel):
 
 # ---------------------------------------------------------------------------- #
 
+
 class ProjectCreateSchema(pydantic.BaseModel):
     """
     Schema for creating a new user.
@@ -311,5 +312,26 @@ class ProjectCreateSchema(pydantic.BaseModel):
         ...,
         description="Configuration for the project."
     )
+
+# ---------------------------------------------------------------------------- #
+
+
+class OrderBy(str, enum.Enum):
+    """
+    Enum for ordering fields.
+    """
+    id = "id"
+    created = "created"
+    updated = "updated"
+
+# ---------------------------------------------------------------------------- #
+
+
+class Order(str, enum.Enum):
+    """
+    Enum for ordering fields.
+    """
+    asc = "asc"
+    desc = "desc"
 
 # ---------------------------------------------------------------------------- #

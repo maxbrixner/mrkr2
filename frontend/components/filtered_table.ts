@@ -88,7 +88,6 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
                 width: auto;
                 height: auto;
                 min-width: 100%;
-                min-height: 100%;
             }
 
             table.loading::before {
@@ -102,6 +101,41 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
                 margin: 4rem auto;
                 width: 30px;
             }
+
+            tr {
+                height: min-content;
+            }
+
+            tr:nth-child(2n+1) {
+                background-color: #fdfdfc; /* todo */
+            }
+
+            tr:nth-child(2n) {
+                background-color: #f9f8f6; /* todo */
+            }
+
+            tr:hover {
+                background-color: #f0f3fe;
+                cursor: pointer;
+            }
+
+            th, td {
+                border-collapse: collapse;
+                text-align: left;
+                height: min-content;
+                font-size: .9rem;
+            }
+
+            th {
+                padding: 0.5rem;
+            }
+
+            td {
+                cursor: pointer;
+                padding: 2rem 0.5rem;
+            }
+
+
 
             @keyframes spin {
                 0% {
@@ -133,8 +167,9 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
             // Process and render content in the table
             // This part is left for implementation based on content structure
             console.log("Content fetched:", content);
-            this._addHeaders(content);
             this._table.classList.remove('loading');
+            this._addHeaders(content);
+            this._addData(content);
 
         }).catch(error => {
             console.error("Error fetching content:", error);
@@ -146,16 +181,36 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
         if (content.length === 0) {
             return;
         }
+        const tr = document.createElement('tr');
+
         for (const key of Object.keys(content[0])) {
             const th = document.createElement('th');
-            console.log(this._configParsed)
             const text = this._configParsed['headers'][key] || key;
 
             th.textContent = text;
 
-            this._table.appendChild(th);
+            tr.appendChild(th);
         }
 
+        this._table.appendChild(tr)
+
+    }
+
+    private _addData(content: any[]) {
+        if (content.length === 0) {
+            return;
+        }
+
+        for (const item of content) {
+            const tr = document.createElement('tr');
+            for (const key in item) {
+                const td = document.createElement('td');
+                td.textContent = item[key];
+
+                tr.appendChild(td);
+            }
+            this._table.appendChild(tr)
+        }
     }
 
     /**

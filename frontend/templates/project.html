@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block header %}
-<header class="labeling-header">
+<header class="project-header">
     <h1>mrkr</h1>
     <span class="path">
         <styled-link href="https://www.google.com">Projects</styled-link>
@@ -21,7 +21,7 @@
 {% endblock %}
 
 {% block main %}
-<main class="labeling-main">
+<main class="project-main">
     <filtered-table content-url="{{ url_for('list_project_documents', project_id=project.id) }}"
         table-config='{"headers": {"id": "ID", "created": "Created at", "updated": "Updated at", "path": "Path"}}'>Hallo</filtered-table>
 </main>

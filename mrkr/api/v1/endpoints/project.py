@@ -107,6 +107,34 @@ async def list_project_documents(
         ...,
         description="The unique identifier for the project (as an integer).",
         examples=[1]
+    ),
+    order_by: schemas.OrderBy = fastapi.Query(
+        schemas.OrderBy.id,
+        description="Field to order the documents by. Default is 'id'.",
+        examples=["created", "id"]
+    ),
+    order: schemas.Order = fastapi.Query(
+        schemas.Order.asc,
+        description="Order direction, either 'asc' or 'desc'. Default is 'asc'.",
+        examples=["asc"]
+    ),
+    limit: int = fastapi.Query(
+        100,
+        description="Maximum number of documents to return. Default is 100.",
+        ge=1,
+        examples=[50]
+    ),
+    offset: int = fastapi.Query(
+        0,
+        description="Number of documents to skip before starting to collect "
+                    "the result set. Default is 0.",
+        ge=0,
+        examples=[10]
+    ),
+    filter: str = fastapi.Query(
+        None,
+        description="Filter documents. Default is None.",
+        examples=["pdf"]
     )
 ) -> List[schemas.DocumentListSchema]:
     """
@@ -120,8 +148,17 @@ async def list_project_documents(
             detail="Project not found"
         )
 
-    documents = project.documents
+    documents = crud.get_project_filtered_documents(
+        session=session,
+        project_id=project_id,
+        order_by=order_by,
+        order=order,
+        limit=limit,
+        offset=offset,
+        filter=filter
+    )
 
-    return [schemas.DocumentListSchema(**doc.model_dump()) for doc in documents]
+    return [schemas.DocumentListSchema(
+        **document.model_dump()) for document in documents]
 
 # ---------------------------------------------------------------------------- #

@@ -234,6 +234,11 @@ class DocumentListSchema(pydantic.BaseModel):
         description="The unique identifier for the document (as an integer).",
         examples=[1]
     )
+    path: str = pydantic.Field(
+        ...,
+        description="The path to the document file within its source.",
+        examples=["/documents/my_document.pdf"]
+    )
     created: datetime.datetime = pydantic.Field(
         ...,
         description="The timestamp when the document was created.",
@@ -244,11 +249,7 @@ class DocumentListSchema(pydantic.BaseModel):
         description="The timestamp when the document was last updated.",
         examples=["2023-10-01T12:00:00Z"]
     )
-    path: str = pydantic.Field(
-        ...,
-        description="The path to the document file within its source.",
-        examples=["/documents/my_document.pdf"]
-    )
+
 
 # ---------------------------------------------------------------------------- #
 

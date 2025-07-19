@@ -40,6 +40,43 @@ def get_project_documents(
 # ---------------------------------------------------------------------------- #
 
 
+def get_project_filtered_documents(
+    session: sqlmodel.Session,
+    project_id: int,
+    order_by: schemas.OrderBy = schemas.OrderBy.id,
+    order: schemas.Order = schemas.Order.asc,
+    limit: int = 100,
+    offset: int = 0,
+    filter: str | None = None
+) -> Sequence[models.Document]:
+    """
+    Retrieve all documents for a specific project from the database.
+    """
+    if not filter:
+        return session.exec(
+            sqlmodel.select(models.Document).where(
+                models.Document.project_id == project_id
+            ).order_by(
+                sqlmodel.asc(getattr(models.Document, order_by))
+                if order == schemas.Order.asc else
+                sqlmodel.desc(getattr(models.Document, order_by))
+            ).limit(limit).offset(offset)
+        ).all()
+    else:
+        return session.exec(
+            sqlmodel.select(models.Document).where(
+                models.Document.project_id == project_id,
+                models.Document.path.contains(filter)  # type: ignore
+            ).order_by(
+                sqlmodel.asc(getattr(models.Document, order_by))
+                if order == schemas.Order.asc else
+                sqlmodel.desc(getattr(models.Document, order_by))
+            ).limit(limit).offset(offset)
+        ).all()
+
+# ---------------------------------------------------------------------------- #
+
+
 def create_document(
     session: sqlmodel.Session,
     project_id: int,

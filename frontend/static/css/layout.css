@@ -54,7 +54,8 @@ main {
     height: 100%;
 }
 
-header.labeling-header {
+header.labeling-header,
+header.project-header {
     align-items: center;
     display: grid;
     gap: 2rem;
@@ -80,6 +81,12 @@ header>span.buttons {
 }
 
 main.labeling-main {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 100%;
+}
+
+main.project-main {
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 100%;
