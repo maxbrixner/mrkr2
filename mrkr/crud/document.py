@@ -66,7 +66,10 @@ def get_project_filtered_documents(
         return session.exec(
             sqlmodel.select(models.Document).where(
                 models.Document.project_id == project_id,
-                models.Document.path.contains(filter)  # type: ignore
+                sqlmodel.or_(
+                    models.Document.path.ilike(f"%{filter}%"),  # type: ignore
+                    models.Document.path.ilike(f"%{id}%"),  # type: ignore
+                )
             ).order_by(
                 sqlmodel.asc(getattr(models.Document, order_by))
                 if order == schemas.Order.asc else

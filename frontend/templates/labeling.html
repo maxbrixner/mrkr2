@@ -12,7 +12,8 @@
     <span class="path">
         <styled-link href="https://www.google.com">Projects</styled-link>
         &nbsp;&nbsp;/&nbsp;&nbsp;
-        <styled-link href="https://www.google.com">{{document.project.name}}</styled-link>
+        <styled-link
+            href="{{ url_for('project_documents_page', project_id=document.project.id) }}">{{document.project.name}}</styled-link>
         &nbsp;&nbsp;/&nbsp;&nbsp;
         <b>Document #{{document.id}}</b>
     </span>

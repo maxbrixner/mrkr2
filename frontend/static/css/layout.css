@@ -88,6 +88,25 @@ main.labeling-main {
 
 main.project-main {
     display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 100%;
+    grid-template-areas:
+        "toolbar"
+        "table";
+    grid-template-rows: auto 1fr;
+}
+
+main.project-main>div.toolbar {
+    grid-area: toolbar;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: var(--background-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+main.project-main>div.toolbar>input {
+    border: var(--border-color) 1px solid;
+    padding: 0.5rem;
+    border-radius: var(--border-radius-medium);
+    outline: none;
 }

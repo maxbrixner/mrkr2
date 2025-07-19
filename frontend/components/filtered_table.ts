@@ -2,7 +2,24 @@
 
 export interface FilteredTableAttributes {
     contentUrl?: string;
-    config?: string
+    config?: string;
+    filter?: string
+    orderBy?: string;
+    order?: 'asc' | 'desc';
+    limit?: number;
+    offset?: number;
+    delay?: number;
+}
+
+export interface FilteredTableConfig {
+    headers?: { [key: string]: string };
+    filterElement?: string;
+    idColumn?: string;
+}
+
+export interface RowClickedEvent {
+    tableId?: string;
+    rowId?: string;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -10,8 +27,15 @@ export interface FilteredTableAttributes {
 export class FilteredTable extends HTMLElement implements FilteredTableAttributes {
     public contentUrl?: string = undefined;
     public config?: string = undefined;
+    public filter?: string = undefined;
+    public orderBy?: string = undefined;
+    public order?: 'asc' | 'desc' = undefined;
+    public limit?: number = undefined;
+    public offset?: number = undefined;
+    public delay?: number = 500;
     private _configParsed: any = undefined;
     private _table = document.createElement('table');
+    private _filterTimeout: any = null;
 
 
     /**
@@ -44,10 +68,7 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
         }
         if (propertyName === 'table-config') {
             this.config = newValue || undefined;
-            if (this.config) {
-                this._configParsed = JSON.parse(this.config);
-
-            }
+            this._parseConfig();
             this._updateContent();
         }
     }
@@ -56,7 +77,25 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
      * Called when the component is added to the DOM.
      */
     connectedCallback() {
-        // ...
+        this._parseConfig();
+
+        if (this._configParsed && this._configParsed.filterElement) {
+            const filterElement = document.getElementById(this._configParsed.filterElement);
+            console.log("Filter Element:", filterElement, this._configParsed.filterElement);
+            if (filterElement) {
+                filterElement.addEventListener('input', (event: Event) => {
+                    //only do this after a delay of 500ms
+                    this._clearContent();
+                    clearTimeout((this as any)._filterTimeout);
+                    (this as any)._filterTimeout = setTimeout(() => {
+                        console.log("sdhjsh")
+                        const target = event.target as HTMLInputElement;
+                        this.filter = target.value;
+                        this._updateContent();
+                    }, this.delay);
+                });
+            }
+        }
     }
 
     /**
@@ -79,12 +118,13 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
                 height: 100%;
                 overflow: auto;
                 scrollbar-color: var(--document-viewer-scrollbar-color, inherit); /* todo */
-                scrollbar-gutter: stable;
                 scrollbar-width: thin;
                 user-select: none;
             }
 
             table {
+                border: none;
+                border-collapse: collapse;
                 width: auto;
                 height: auto;
                 min-width: 100%;
@@ -103,7 +143,13 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
             }
 
             tr {
+                outline: none;
                 height: min-content;
+            }
+
+            tr:focus:not(:has(th)),
+            tr:active:not(:has(th)) {
+                outline: 1px solid var(--primary-color, #007bff);
             }
 
             tr:nth-child(2n+1) {
@@ -114,28 +160,34 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
                 background-color: #f9f8f6; /* todo */
             }
 
-            tr:hover {
+            tr:hover:not(:has(th)) {
                 background-color: #f0f3fe;
                 cursor: pointer;
             }
 
             th, td {
-                border-collapse: collapse;
                 text-align: left;
                 height: min-content;
                 font-size: .9rem;
             }
 
             th {
+                font-weight: 500;
                 padding: 0.5rem;
+                /* add bottom shadow */
+                box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+                background-color: #f9f8f6; /* todo */
+                color: #333; /* todo */
+                position: sticky;
+                top: 0;
+                z-index: 1;
+                border-bottom: 1px solid transparent; /* makes the outline for rows work */
             }
 
             td {
                 cursor: pointer;
-                padding: 2rem 0.5rem;
+                padding: 1.5rem 0.5rem;
             }
-
-
 
             @keyframes spin {
                 0% {
@@ -155,12 +207,28 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
         this.shadowRoot.appendChild(this._table);
     }
 
+    private _parseConfig() {
+        if (!this.config) {
+            this._configParsed = {};
+            return;
+        }
+        try {
+            this._configParsed = JSON.parse(this.config);
+        } catch (error) {
+            throw new Error(`Failed to parse table config: ${error}`);
+        }
+    }
+
+    private _clearContent() {
+        this._table.innerHTML = '';
+        this._table.classList.add('loading');
+    }
+
     private _updateContent() {
         if (!this._configParsed || !this.contentUrl)
             return;
 
-        this._table.classList.add('loading');
-        this._table.innerHTML = ''; // Clear previous content
+        this._clearContent();
 
         this._queryContent().then(content => {
             this._table.classList.remove('loading');
@@ -183,6 +251,13 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
         }
         const tr = document.createElement('tr');
 
+        const th = document.createElement('th');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.classList.add('select-checkbox');
+        th.appendChild(checkbox);
+        tr.appendChild(th);
+
         for (const key of Object.keys(content[0])) {
             const th = document.createElement('th');
             const text = this._configParsed['headers'][key] || key;
@@ -203,13 +278,46 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
 
         for (const item of content) {
             const tr = document.createElement('tr');
+            tr.ariaLabel = `Row for ${item.id}`; // Assuming each item has an 'id' property
+            tr.tabIndex = 0; // Make the row focusable
+            tr.role = 'button'; // Set the role for accessibility
+
+            if (this._configParsed && this._configParsed.idColumn) {
+                tr.id = item[this._configParsed.idColumn] || crypto.randomUUID();
+            } else {
+                tr.id = item.id || crypto.randomUUID();
+            }
+
+            tr.addEventListener('click', this._onRowClickedEvent(tr.id));
+
+            const td = document.createElement('td');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.classList.add('select-checkbox');
+            checkbox.value = item.id; // Assuming each item has an 'id' property
+            td.appendChild(checkbox);
+            tr.appendChild(td);
+
             for (const key in item) {
                 const td = document.createElement('td');
                 td.textContent = item[key];
 
                 tr.appendChild(td);
             }
-            this._table.appendChild(tr)
+            this._table.appendChild(tr);
+        }
+    }
+
+    private _onRowClickedEvent(rowId: string) {
+        return (event: Event) => {
+            this.dispatchEvent(new CustomEvent<RowClickedEvent>('row-clicked', {
+                detail: {
+                    tableId: this.id || undefined,
+                    rowId: rowId
+                },
+                bubbles: true,
+                composed: true
+            }));
         }
     }
 
@@ -221,7 +329,12 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
             throw new Error("URL is not set for FilteredTable component.");
         }
 
-        const response = await fetch(this.contentUrl);
+        var url = new URL(this.contentUrl);
+        if (this.filter) {
+            url.searchParams.set('filter', this.filter);
+        }
+
+        const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }

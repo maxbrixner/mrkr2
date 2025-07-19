@@ -22,7 +22,23 @@
 
 {% block main %}
 <main class="project-main">
+    <div class="toolbar">
+        <div button></div>
+        <input type="text" id="filter" placeholder="Filter documents..." autocomplete="off" autocorrect="off"
+            autocapitalize="off" spellcheck="false" aria-label="Filter documents">
+    </div>
     <filtered-table content-url="{{ url_for('list_project_documents', project_id=project.id) }}"
-        table-config='{"headers": {"id": "ID", "created": "Created at", "updated": "Updated at", "path": "Path"}}'>Hallo</filtered-table>
+        table-config='{"idColumn": "id", "headers": {"id": "ID", "created": "Created at", "updated": "Updated at", "path": "Path"}, "filterElement": "filter"}'>Hallo</filtered-table>
 </main>
+
+<script>
+    document.addEventListener('row-clicked', (event) => {
+        const detail = event.detail;
+        console.log(`Row clicked in table ${detail.tableId}: ${detail.rowId}`);
+        const url = "{{ url_for('document_page', document_id='[ID]') }}";
+        // Replace [ID] with the actual row ID
+        window.location.href = url.replace("[ID]", detail.rowId);
+    });
+</script>
+
 {% endblock %}
