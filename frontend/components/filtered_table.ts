@@ -24,6 +24,10 @@ export interface RowClickedEvent {
     rowId?: string;
 }
 
+export interface SelectionChangedEvent {
+    atLeastOneSelected: boolean;
+}
+
 /* -------------------------------------------------------------------------- */
 
 export class FilteredTable extends HTMLElement implements FilteredTableAttributes {
@@ -83,14 +87,12 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
 
         if (this._configParsed && this._configParsed.filterElement) {
             const filterElement = document.getElementById(this._configParsed.filterElement);
-            console.log("Filter Element:", filterElement, this._configParsed.filterElement);
             if (filterElement) {
                 filterElement.addEventListener('input', (event: Event) => {
                     //only do this after a delay of 500ms
                     this._clearContent();
                     clearTimeout((this as any)._filterTimeout);
                     (this as any)._filterTimeout = setTimeout(() => {
-                        console.log("sdhjsh")
                         const target = event.target as HTMLInputElement;
                         this.filter = target.value;
                         this._updateContent();
@@ -242,7 +244,6 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
             this._table.classList.remove('loading');
             // Process and render content in the table
             // This part is left for implementation based on content structure
-            console.log("Content fetched:", content);
             this._table.classList.remove('loading');
             this._addHeaders(content);
             this._addData(content);
@@ -297,7 +298,11 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
                 tr.id = item.id || crypto.randomUUID();
             }
 
-
+            tr.addEventListener('keydown', (event: KeyboardEvent) => {
+                if (event.key === 'Enter') {
+                    this._onRowClickedEvent(tr.id)(event);
+                }
+            });
 
             const td = document.createElement('td');
             const checkbox = document.createElement('input');
@@ -305,6 +310,9 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
             checkbox.name = 'select-row';
             checkbox.classList.add('select-checkbox');
             checkbox.value = item.id; // Assuming each item has an 'id' property
+
+            checkbox.addEventListener('change', this._onSelectionChangeEvent(tr.id));
+
             td.appendChild(checkbox);
             tr.appendChild(td);
 
@@ -336,6 +344,21 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
                 detail: {
                     tableId: this.id || undefined,
                     rowId: rowId
+                },
+                bubbles: true,
+                composed: true
+            }));
+        }
+    }
+
+
+    private _onSelectionChangeEvent(rowId: string) {
+        return (event: Event) => {
+            const checkboxes = Array.from(this._table.querySelectorAll('input[type="checkbox"][name="select-row"]')) as HTMLInputElement[];
+            const atLeastOneSelected = checkboxes.some(checkbox => checkbox.checked);
+            this.dispatchEvent(new CustomEvent<SelectionChangedEvent>('selection-changed', {
+                detail: {
+                    atLeastOneSelected: atLeastOneSelected
                 },
                 bubbles: true,
                 composed: true

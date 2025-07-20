@@ -53,9 +53,7 @@ export class ClassificationLabeler extends HTMLElement implements Classification
             this.heading = newValue || undefined;
             this._titleDiv.textContent = this.heading || "Label Element";
         } else if (propertyName === 'done') {
-            console.log("sjkhdkjfhkjh");
             this.done = newValue === 'true';
-            console.log("done", this.done);
             this._updateStatus();
         }
     }
@@ -236,13 +234,10 @@ export class ClassificationLabeler extends HTMLElement implements Classification
 
         if (this.done) {
             this._classificationContainer.classList.add('done');
-            console.log("a", this._classificationContainer.classList);
             this._checkButton.setAttribute("img", "/static/img/checkbox-outline.svg");
             this._checkButton.ariaLabel = "Mark as not done";
         } else {
             this._classificationContainer.classList.remove('done');
-            console.log("b", this._classificationContainer.classList);
-
             this._checkButton.setAttribute("img", "/static/img/square-outline.svg");
             this._checkButton.ariaLabel = "Mark as done";
         }

@@ -56,7 +56,6 @@ export class StyledButton extends HTMLElement implements StyledButtonAttributes 
             this._ButtonElement.autofocus = newValue !== null;
         }
         if (propertyName === 'disabled') {
-            console.log("Disabled attribute changed:", newValue);
             this._ButtonElement.disabled = newValue !== null && newValue !== "false";
         }
         if (propertyName === 'name') {

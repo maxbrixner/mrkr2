@@ -174,23 +174,28 @@ async def update_assignee(
 
         documents.append(document)
 
-    assignee = crud.get_user(session=session, id=update.assignee_id)
+    if update.assignee_id:
+        assignee = crud.get_user(session=session, id=update.assignee_id)
 
-    if not assignee:
-        raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_404_NOT_FOUND,
-            detail="Assignee not found"
-        )
+        if not assignee:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_404_NOT_FOUND,
+                detail="Assignee not found"
+            )
+
+        assignee_id = assignee.id
+    else:
+        assignee_id = None
 
     crud.batch_update_document_assignee(
         session=session,
         documents=documents,
-        assignee_id=assignee.id
+        assignee_id=assignee_id
     )
 
     return {
         "message": f"Assignee of {len(documents)} documents updated "
-        f"successfully to {assignee.username}.",
+        f"successfully.",
     }
 
 # ---------------------------------------------------------------------------- #
@@ -217,23 +222,28 @@ async def update_reviewer(
 
         documents.append(document)
 
-    reviewer = crud.get_user(session=session, id=update.reviewer_id)
+    if update.reviewer_id:
+        reviewer = crud.get_user(session=session, id=update.reviewer_id)
 
-    if not reviewer:
-        raise fastapi.HTTPException(
-            status_code=fastapi.status.HTTP_404_NOT_FOUND,
-            detail="Reviewer not found"
-        )
+        if not reviewer:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_404_NOT_FOUND,
+                detail="Reviewer not found"
+            )
+
+        reviewer_id = reviewer.id
+    else:
+        reviewer_id = None
 
     crud.batch_update_document_reviewer(
         session=session,
         documents=documents,
-        reviewer_id=reviewer.id
+        reviewer_id=reviewer_id
     )
 
     return {
         "message": f"Reviewer of {len(documents)} documents updated "
-        f"successfully to {reviewer.username}.",
+        f"successfully.",
     }
 
 # ---------------------------------------------------------------------------- #

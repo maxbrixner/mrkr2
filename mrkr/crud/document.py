@@ -63,11 +63,28 @@ def get_project_filtered_documents(
             ).limit(limit).offset(offset)
         ).all()
     else:
+        from sqlalchemy.orm import aliased
+        Assignee = aliased(models.User)
+        Reviewer = aliased(models.User)
+
         return session.exec(
-            sqlmodel.select(models.Document).where(
+            sqlmodel.select(models.Document)
+            .join(
+                Assignee,
+                models.Document.assignee_id == Assignee.id,  # type: ignore
+                isouter=True
+            )
+            .join(
+                Reviewer,
+                models.Document.reviewer_id == Reviewer.id,  # type: ignore
+                isouter=True
+            )
+            .where(
                 models.Document.project_id == project_id,
                 sqlmodel.or_(
                     models.Document.path.ilike(f"%{filter}%"),  # type: ignore
+                    Assignee.username.ilike(f"%{filter}%"),  # type: ignore
+                    Reviewer.username.ilike(f"%{filter}%"),  # type: ignore
                     sqlmodel.cast(
                         models.Document.status, sqlmodel.String).ilike(
                         f"%{filter}%"),  # type: ignore

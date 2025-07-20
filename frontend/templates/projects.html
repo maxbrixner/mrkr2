@@ -13,7 +13,6 @@
         <b>Projects</b>
     </span>
     <span class="buttons">
-        <styled-button>Options</styled-button>
     </span>
 </header>
 {% endblock %}
@@ -22,7 +21,7 @@
 <main class="project-main">
     <div class="toolbar">
         <div class="buttons">
-            <styled-button disabled>Schedule Scan</styled-button>
+            <styled-button id="schedule-scan-button" disabled>Schedule Scan</styled-button>
         </div>
         <input type="text" name="filter-projects" id="filter" placeholder="Filter projects..." autocomplete="off"
             autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Filter projects">
@@ -34,10 +33,13 @@
 <script>
     document.addEventListener('row-clicked', (event) => {
         const detail = event.detail;
-        console.log(`Row clicked in table ${detail.tableId}: ${detail.rowId}`);
         const url = "{{ url_for('project_documents_page', project_id='[ID]') }}";
-        // Replace [ID] with the actual row ID
         window.location.href = url.replace("[ID]", detail.rowId);
+    });
+
+    document.addEventListener('selection-changed', (event) => {
+        const detail = event.detail;
+        document.getElementById('schedule-scan-button')?.setAttribute('disabled', !detail.atLeastOneSelected);
     });
 </script>
 

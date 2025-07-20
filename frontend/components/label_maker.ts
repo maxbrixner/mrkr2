@@ -884,12 +884,9 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             if (associatedItem.label_status === 'done') {
                 associatedLabeler.setAttribute("done", "false");
                 associatedItem.label_status = 'open';
-                console.log(this._document?.data.label_status);
             } else {
                 associatedLabeler.setAttribute("done", "true");
                 associatedItem.label_status = 'done';
-                console.log(this._document?.data.label_status);
-
             }
         }
     }

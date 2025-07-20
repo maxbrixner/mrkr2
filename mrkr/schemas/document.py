@@ -341,8 +341,8 @@ class UpdateDocumentAssigneeSchema(pydantic.BaseModel):
         description="List of document IDs to update.",
         examples=[[1, 2, 3]]
     )
-    assignee_id: int = pydantic.Field(
-        ...,
+    assignee_id: Optional[int] = pydantic.Field(
+        default=None,
         description="The ID of the user to assign to the documents.",
         examples=[1]
     )
@@ -359,8 +359,8 @@ class UpdateDocumentReviewerSchema(pydantic.BaseModel):
         description="List of document IDs to update.",
         examples=[[1, 2, 3]]
     )
-    reviewer_id: int = pydantic.Field(
-        ...,
+    reviewer_id: Optional[int] = pydantic.Field(
+        default=None,
         description="The ID of the user to review to the documents.",
         examples=[1]
     )
