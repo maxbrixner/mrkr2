@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68.0", "setuptools_scm[toml]>=6.2"]
+requires = ["setuptools>=68.0", "setuptools_scm[toml]>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -21,18 +21,12 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
-    "License :: "CC BY-NC-ND 4.0"
+    "License :: CC BY-NC-ND 4.0",
     "Operating System :: OS Independent",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Utilities",
 ]
 
-# Project URLs for users
-[project.urls]
-Source = "https://github.com/maxbrixner/mrkr2"
-Issues = "https://github.com/maxbrixner/mrkr2/issues"
-
-# Runtime dependencies
 dependencies = [
   "fastapi>=0.115.12",
   "httpx>=0.28.1",
@@ -45,21 +39,25 @@ dependencies = [
   "sqlmodel>=0.0.24",
   "requests>=2.32.4",
   "uvicorn>=0.34.2",
-  "bcrypt>=4.3.0",
+  "bcrypt>=4.3.0"
 ]
+
+# Project URLs for users
+[project.urls]
+Source = "https://github.com/maxbrixner/mrkr2"
+Issues = "https://github.com/maxbrixner/mrkr2/issues"
 
 # Optional dependencies for specific features or development
 [project.optional-dependencies]
 dev = [
+  "build>=1.2.2",
   "mypy>=1.15.0",
-  "setuptools>=68.0.0"
-  "setuptools_scm[toml]>=8.3.1",
+  "setuptools>=68.0.0",
+  "setuptools_scm[toml]>=8.3.1"
 ]
 
 [tool.setuptools]
 packages = ["mrkr"]
 
 [tool.setuptools_scm]
-write_to = "my_awesome_package/_version.py"
-local_scheme = "dirty-tag"
-fallback_version = "0.0.0+unknown"
+version_file = "mrkr/_version.py"
