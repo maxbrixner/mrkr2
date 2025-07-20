@@ -4,16 +4,17 @@ A tool to label pages, blocks and text within images and PDF files.
 
 The backend is based on FastAPI and the frontend uses WebComponents written in TypeScript.
 
-## Getting Started 🚀
+## 1. Getting Started with Development 🚀
 
-### 1. Setup Environment
+### 1.1 Setup Environment
 
-Create a virtual environment:
+Create a virtual environment and install the dependencies:
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install .
+pip install .[dev]
 ```
 
 Enable the GIT hooks:
@@ -34,7 +35,7 @@ You also need to install tesseract and the language packs you might want to use.
 sudo pacman -S tesseract tesseract-data-eng
 ```
 
-### 2. Compile TypeScript Components
+### 1.2. Compile TypeScript Components
 
 Compile the TypeScript components for the frontend:
 
@@ -44,7 +45,7 @@ tsc -p ./frontend/
 
 Or, in Visual Studio Code, press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> to build.
 
-### 3. Start the Test Database
+### 1.3. Start the Test Database
 
 To begin, add a database password to the .env file. Once that's done, use Docker Compose to initiate the test database. The configuration for this can be found in the ``.deploy`` folder.
 
@@ -52,7 +53,17 @@ In Visual Studio Code, you can press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Alt</
 
 Feel free to configure any PostgreSQL database  of your choice (or any other database that supports JSON data types).
 
-### 4. Run Mrkr
+### 1.4. Build Mrkr
+
+Build Mrkr using setuptools:
+
+```bash
+python -m build
+```
+
+## 2. Using Mrkr 🚀
+
+### 2.1 Run Mrkr
 
 You can start the Mrkr server in several ways:
 
@@ -73,9 +84,12 @@ uvicorn --factory mrkr:create_app --reload --host 0.0.0.0 --port 8000
     - Press <kbd>Ctrl</kbd>+<kbd>F5</kbd> to start without debugging.
     - Press <kbd>F5</kbd> to start in debug mode.
 
-### 5. Use the SDK
+The GUI can be accessed at [localhost:8000/gui/project](localhost:8000/gui/project). The SwaggerUI can be accessed at [localhost:8000/docs](localhost:8000/docs).
 
-Mrkr comes with a Software Development Kit (SDK) that let's you control the Mrkr instance from python code. To use it, just import ``mrkr.sdk``.
+
+### 2.2 Use the SDK
+
+Mrkr comes with a Software Development Kit (SDK) that lets you control the Mrkr instance from python code. To use it, just import ``mrkr.sdk``.
 
 You can then use the client as follows:
 

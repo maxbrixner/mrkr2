@@ -31,11 +31,16 @@ def create_app() -> fastapi.FastAPI:
 
     config = services.get_configuration()
 
+    try:
+        from .._version import __version__ as version
+    except ImportError:
+        version = "unknown"
+
     app = fastapi.FastAPI(
         title=config.project.title,
         summary=config.project.summary,
         description=config.project.description,
-        version=config.project.version,
+        version=version,
         terms_of_service=config.project.terms_of_service,
         root_path=config.backend.root_path,
         openapi_url=f"/openapi.json",

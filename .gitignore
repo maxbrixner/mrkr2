@@ -18,3 +18,9 @@ frontend/static/js/*.js
 # Demo project creation
 demo.py
 demo
+
+# Build artifacts
+build/
+dist/
+mrkr.egg-info/
+mrkr/_version.py
