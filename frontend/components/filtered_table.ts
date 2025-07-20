@@ -308,6 +308,7 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.name = 'select-row';
+            checkbox.ariaLabel = `Select row ${tr.id}`;
             checkbox.classList.add('select-checkbox');
             checkbox.value = item.id; // Assuming each item has an 'id' property
 

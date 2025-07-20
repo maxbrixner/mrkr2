@@ -1,3 +1,12 @@
+@font-face {
+    font-family: 'Geist';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: block;
+    src: local('Geist'),
+        url('/static/font/Geist-VariableFont_wght.ttf') format('woff2'),
+}
+
 h1,
 h2,
 h3,
