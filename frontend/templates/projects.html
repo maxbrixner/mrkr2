@@ -54,11 +54,13 @@
                 body: JSON.stringify({ project_id: rowId })
             }).then(response => {
                 if (response.ok) {
-                    console.log(`Scan scheduled for project ${rowId}`);
+                    // todo
                 } else {
+                    // todo
                     console.error(`Failed to schedule scan for project ${rowId}`);
                 }
             }).catch(error => {
+                // todos
                 console.error(`Error scheduling scan for project ${rowId}:`, error);
             });
         });
