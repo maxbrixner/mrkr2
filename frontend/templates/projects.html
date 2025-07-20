@@ -26,7 +26,7 @@
         <input type="text" name="filter-projects" id="filter" placeholder="Filter projects..." autocomplete="off"
             autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Filter projects">
     </div>
-    <filtered-table content-url="{{ url_for('list_projects') }}"
+    <filtered-table id="filtered-table" content-url="{{ url_for('list_projects') }}"
         table-config='{"idColumn": "id", "headers": {"id": "ID", "name": "Name", "done": "Done", "open": "Open", "in_review": "In Review", "created": "Created at", "updated": "Updated at", "path": "Path"}, "filterElement": "filter"}'>Hallo</filtered-table>
 </main>
 
@@ -40,6 +40,28 @@
     document.addEventListener('selection-changed', (event) => {
         const detail = event.detail;
         document.getElementById('schedule-scan-button')?.setAttribute('disabled', !detail.atLeastOneSelected);
+    });
+
+    document.getElementById('schedule-scan-button')?.addEventListener('click', (event) => {
+        document.getElementById('filtered-table')?.getSelectedRows().forEach((rowId) => {
+            const url = "{{ url_for('scan_project', project_id='[ID]') }}";
+            const scanUrl = url.replace("[ID]", rowId);
+            fetch(scanUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ project_id: rowId })
+            }).then(response => {
+                if (response.ok) {
+                    console.log(`Scan scheduled for project ${rowId}`);
+                } else {
+                    console.error(`Failed to schedule scan for project ${rowId}`);
+                }
+            }).catch(error => {
+                console.error(`Error scheduling scan for project ${rowId}:`, error);
+            });
+        });
     });
 </script>
 

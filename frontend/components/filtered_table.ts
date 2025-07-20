@@ -366,6 +366,11 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
         }
     }
 
+    public getSelectedRows(): string[] {
+        const checkboxes = Array.from(this._table.querySelectorAll('input[type="checkbox"][name="select-row"]')) as HTMLInputElement[];
+        return checkboxes.filter(checkbox => checkbox.checked).map(checkbox => checkbox.value);
+    }
+
     /**
      * Queries the content of the table.
      */
