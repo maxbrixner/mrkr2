@@ -1,7 +1,7 @@
 # ---------------------------------------------------------------------------- #
 
 import sqlmodel
-from typing import Sequence
+from typing import List, Dict, Sequence, Optional
 
 # ---------------------------------------------------------------------------- #
 
@@ -107,23 +107,111 @@ def create_document(
 # ---------------------------------------------------------------------------- #
 
 
-def update_document(
+def update_document_data_and_status(
     session: sqlmodel.Session,
     document: models.Document,
-    path: str,
     status: models.DocumentStatus,
-    data: schemas.DocumentLabelDataSchema
+    data: schemas.DocumentLabelDataSchema | Dict,
 ) -> models.Document:
     """
-    Update a documents metacontent in the database.
+    Update a documents label data and status in the database.
     """
-    document.path = path
+    if isinstance(data, schemas.DocumentLabelDataSchema):
+        data = data.model_dump()
+
     document.status = status
-    document.data = data.model_dump()
+    document.data = data
 
     session.add(document)
     session.commit()
     session.refresh(document)
     return document
+
+# ---------------------------------------------------------------------------- #
+
+
+def update_document_assignee(
+    session: sqlmodel.Session,
+    document: models.Document,
+    assignee_id: Optional[int] = None
+) -> models.Document:
+    """
+    Update a documents assignee.
+    """
+    document.assignee_id = assignee_id
+
+    session.add(document)
+    session.commit()
+    session.refresh(document)
+    return document
+
+# ---------------------------------------------------------------------------- #
+
+
+def update_document_reviewer(
+    session: sqlmodel.Session,
+    document: models.Document,
+    reviewer_id: Optional[int] = None
+) -> models.Document:
+    """
+    Update a documents reviewer.
+    """
+    document.reviewer_id = reviewer_id
+
+    session.add(document)
+    session.commit()
+    session.refresh(document)
+    return document
+
+# ---------------------------------------------------------------------------- #
+
+
+def batch_update_document_assignee(
+    session: sqlmodel.Session,
+    documents: List[models.Document],
+    assignee_id: Optional[int] = None
+) -> None:
+    """
+    Update the assignee for a list of documents.
+    """
+    for document in documents:
+        document.assignee_id = assignee_id
+        session.add(document)
+
+    session.commit()
+
+# ---------------------------------------------------------------------------- #
+
+
+def batch_update_document_reviewer(
+    session: sqlmodel.Session,
+    documents: List[models.Document],
+    reviewer_id: Optional[int] = None
+) -> None:
+    """
+    Update the reviewer for a list of documents.
+    """
+    for document in documents:
+        document.reviewer_id = reviewer_id
+        session.add(document)
+
+    session.commit()
+
+# ---------------------------------------------------------------------------- #
+
+
+def batch_update_document_status(
+    session: sqlmodel.Session,
+    documents: List[models.Document],
+    status: models.DocumentStatus
+) -> None:
+    """
+    Update the status for a list of documents.
+    """
+    for document in documents:
+        document.status = status
+        session.add(document)
+
+    session.commit()
 
 # ---------------------------------------------------------------------------- #

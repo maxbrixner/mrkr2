@@ -330,3 +330,57 @@ class UpdateDocumentLabelDataSchema(DocumentLabelDataSchema):
     pass
 
 # ---------------------------------------------------------------------------- #
+
+
+class UpdateDocumentAssigneeSchema(pydantic.BaseModel):
+    """
+    API-Schema for document asignee updated.
+    """
+    document_ids: List[int] = pydantic.Field(
+        ...,
+        description="List of document IDs to update.",
+        examples=[[1, 2, 3]]
+    )
+    assignee_id: int = pydantic.Field(
+        ...,
+        description="The ID of the user to assign to the documents.",
+        examples=[1]
+    )
+
+# ---------------------------------------------------------------------------- #
+
+
+class UpdateDocumentReviewerSchema(pydantic.BaseModel):
+    """
+    API-Schema for document reviewer updates.
+    """
+    document_ids: List[int] = pydantic.Field(
+        ...,
+        description="List of document IDs to update.",
+        examples=[[1, 2, 3]]
+    )
+    reviewer_id: int = pydantic.Field(
+        ...,
+        description="The ID of the user to review to the documents.",
+        examples=[1]
+    )
+
+# ---------------------------------------------------------------------------- #
+
+
+class UpdateDocumentStatusSchema(pydantic.BaseModel):
+    """
+    API-Schema for document status updates.
+    """
+    document_ids: List[int] = pydantic.Field(
+        ...,
+        description="List of document IDs to update.",
+        examples=[[1, 2, 3]]
+    )
+    status: models.DocumentStatus = pydantic.Field(
+        ...,
+        description="The status of the document.",
+        examples=["open"]
+    )
+
+# ---------------------------------------------------------------------------- #

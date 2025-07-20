@@ -104,11 +104,12 @@ async def update_label_data(
             detail="Document not found"
         )
 
-    document.data = data.model_dump()
-
-    session.add(document)
-    session.commit()
-    session.refresh(document)
+    crud.update_document_data_and_status(
+        session=session,
+        document=document,
+        status=document.status,
+        data=data
+    )
 
     return {
         "message": "Label data updated successfully.",
@@ -147,6 +148,133 @@ async def scan_document(
 
     return {
         "message": f"Scan scheduled for document {document_id}."
+    }
+
+# ---------------------------------------------------------------------------- #
+
+
+@router.put("/assignee",
+            summary="Update the Assignee for a List of Documents")
+async def update_assignee(
+    session: database.DatabaseDependency,
+    update: schemas.UpdateDocumentAssigneeSchema,
+) -> Dict:
+    """
+    Update the assignee for a list of documents.
+    """
+    documents = []
+    for document_id in update.document_ids:
+        document = crud.get_document(session=session, id=document_id)
+
+        if not document:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_404_NOT_FOUND,
+                detail="Document not found"
+            )
+
+        documents.append(document)
+
+    assignee = crud.get_user(session=session, id=update.assignee_id)
+
+    if not assignee:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="Assignee not found"
+        )
+
+    crud.batch_update_document_assignee(
+        session=session,
+        documents=documents,
+        assignee_id=assignee.id
+    )
+
+    return {
+        "message": f"Assignee of {len(documents)} documents updated "
+        f"successfully to {assignee.username}.",
+    }
+
+# ---------------------------------------------------------------------------- #
+
+
+@router.put("/reviewer",
+            summary="Update the Reviewer for a List of Documents")
+async def update_reviewer(
+    session: database.DatabaseDependency,
+    update: schemas.UpdateDocumentReviewerSchema,
+) -> Dict:
+    """
+    Update the reviewer for a list of document.
+    """
+    documents = []
+    for document_id in update.document_ids:
+        document = crud.get_document(session=session, id=document_id)
+
+        if not document:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_404_NOT_FOUND,
+                detail="Document not found"
+            )
+
+        documents.append(document)
+
+    reviewer = crud.get_user(session=session, id=update.reviewer_id)
+
+    if not reviewer:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="Reviewer not found"
+        )
+
+    crud.batch_update_document_reviewer(
+        session=session,
+        documents=documents,
+        reviewer_id=reviewer.id
+    )
+
+    return {
+        "message": f"Reviewer of {len(documents)} documents updated "
+        f"successfully to {reviewer.username}.",
+    }
+
+# ---------------------------------------------------------------------------- #
+
+
+@router.put("/status",
+            summary="Update the Status for a List of Documents")
+async def update_status(
+    session: database.DatabaseDependency,
+    update: schemas.UpdateDocumentStatusSchema,
+) -> Dict:
+    """
+    Update the status for a list of document.
+    """
+    documents = []
+    for document_id in update.document_ids:
+        document = crud.get_document(session=session, id=document_id)
+
+        if not document:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_404_NOT_FOUND,
+                detail="Document not found"
+            )
+
+        documents.append(document)
+
+    if update.status == models.DocumentStatus.processing:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+            detail="Cannot set status to 'processing' manually."
+        )
+
+    crud.batch_update_document_status(
+        session=session,
+        documents=documents,
+        status=update.status
+    )
+
+    return {
+        "message": f"Status of {len(documents)} documents updated "
+        f"successfully to '{update.status.value}'.",
     }
 
 # ---------------------------------------------------------------------------- #

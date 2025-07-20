@@ -34,6 +34,18 @@ def create_user(
 # ---------------------------------------------------------------------------- #
 
 
+def get_user(
+    session: sqlmodel.Session,
+    id: int
+) -> models.User | None:
+    """
+    Get a user from the database by their ID.
+    """
+    return session.get(models.User, id)
+
+# ---------------------------------------------------------------------------- #
+
+
 def list_users(
     session: sqlmodel.Session
 ) -> Sequence[models.User]:

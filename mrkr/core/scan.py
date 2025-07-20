@@ -238,10 +238,9 @@ async def _create_document_data(
         labels=[]
     )
 
-    crud.update_document(
+    crud.update_document_data_and_status(
         session=session,
         document=document,
-        path=document.path,
         status=models.DocumentStatus.open,
         data=label_content
     )

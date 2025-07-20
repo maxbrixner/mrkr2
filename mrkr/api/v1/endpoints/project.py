@@ -225,9 +225,9 @@ async def list_project_documents(
         document_schema = schemas.DocumentListSchema(**document.model_dump())
 
         if document.assignee:
-            document_schema.assignee_name = document.assignee.name
+            document_schema.assignee_name = document.assignee.username
         if document.reviewer:
-            document_schema.reviewer_name = document.reviewer.name
+            document_schema.reviewer_name = document.reviewer.username
 
         result.append(document_schema)
 
