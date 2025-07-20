@@ -149,8 +149,7 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
                 height: min-content;
             }
 
-            tr:focus:not(:has(th)),
-            tr:active:not(:has(th)) {
+            tr:focus:not(:has(th)) {
                 outline: 1px solid var(--primary-color, #007bff);
             }
 
@@ -183,7 +182,7 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
                 position: sticky;
                 top: 0;
                 z-index: 1;
-                border-bottom: 1px solid transparent; /* makes the outline for rows work */
+                border-bottom: 3px solid transparent; /* makes the outline for rows work */
             }
 
             td {
@@ -298,7 +297,7 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
                 tr.id = item.id || crypto.randomUUID();
             }
 
-            tr.addEventListener('click', this._onRowClickedEvent(tr.id));
+
 
             const td = document.createElement('td');
             const checkbox = document.createElement('input');
@@ -311,6 +310,7 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
 
             for (const key in item) {
                 const td = document.createElement('td');
+                td.addEventListener('click', this._onRowClickedEvent(tr.id));
 
                 const display: 'text' | 'chip' = this._configParsed?.display?.[key] || 'text';
 
