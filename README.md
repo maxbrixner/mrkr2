@@ -29,10 +29,10 @@ Create an environment file:
 cp .env.example .env
 ```
 
-Install Tesseract and any required language packs. For Arch Linux, use:
+Install Poppler, Tesseract and any required language packs. A an example, for Arch Linux use:
 
 ```bash
-sudo pacman -S tesseract tesseract-data-eng
+sudo pacman -S poppler tesseract tesseract-data-eng tesseract-data-deu
 ```
 
 ### 1.2. Compile TypeScript Components
