@@ -290,12 +290,12 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
             const tr = document.createElement('tr');
             tr.ariaLabel = `Row for ${item.id}`; // Assuming each item has an 'id' property
             tr.tabIndex = 0; // Make the row focusable
-            tr.role = 'button'; // Set the role for accessibility
+            (tr as any).role = 'button'; // Set the role for accessibility
 
             if (this._configParsed && this._configParsed.idColumn) {
-                tr.id = item[this._configParsed.idColumn] || crypto.randomUUID();
+                tr.id = item[this._configParsed.idColumn] || (crypto as any).randomUUID();
             } else {
-                tr.id = item.id || crypto.randomUUID();
+                tr.id = item.id || (crypto as any).randomUUID();
             }
 
             tr.addEventListener('keydown', (event: KeyboardEvent) => {
@@ -385,7 +385,7 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
             url.searchParams.set('filter', this.filter);
         }
 
-        const response = await fetch(url);
+        const response = await fetch(url.toString());
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }

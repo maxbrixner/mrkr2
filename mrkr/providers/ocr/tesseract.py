@@ -108,13 +108,18 @@ class TesseractOcrProvider(BaseOcrProvider):
 
         loop = asyncio.get_running_loop()
 
+        if not isinstance(self._config,
+                          schemas.OcrProviderTesseractConfigSchema):
+            raise Exception("Invalid config schema for Tesseract.")
+
         output = await loop.run_in_executor(
             None,
             functools.partial(
                 pytesseract.image_to_data,
                 image=self._images[page-1],
                 output_type=pytesseract.Output.DICT,
-                config="--psm 1"
+                config="--psm 1",
+                lang=self._config.language
             )
         )
 
