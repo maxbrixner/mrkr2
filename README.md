@@ -2,11 +2,11 @@
 
 A tool to label pages, blocks and text within images and PDF files.
 
-The backend is based on FastAPI and the frontend uses WebComponents written in TypeScript.
+The backend is built with FastAPI, and the frontend uses WebComponents written in TypeScript.
 
 ## 1. Getting Started with Development 🚀
 
-### 1.1 Setup Environment
+### 1.1. Set Up the Environment
 
 Create a virtual environment and install the dependencies:
 
@@ -17,19 +17,19 @@ pip install .
 pip install .[dev]
 ```
 
-Enable the GIT hooks:
+Enable Git hooks:
 
 ```bash
 git config core.hooksPath .githooks
 ```
 
-Create an env-file:
+Create an environment file:
 
 ```bash
 cp .env.example .env
 ```
 
-You also need to install tesseract and the language packs you might want to use. As an example for ArchLinux:
+Install Tesseract and any required language packs. For Arch Linux, use:
 
 ```bash
 sudo pacman -S tesseract tesseract-data-eng
@@ -43,15 +43,16 @@ Compile the TypeScript components for the frontend:
 tsc -p ./frontend/
 ```
 
-Or, in Visual Studio Code, press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> to build.
+Alternatively, in Visual Studio Code, press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> to build.
 
 ### 1.3. Start the Test Database
 
-To begin, add a database password to the .env file. Once that's done, use Docker Compose to initiate the test database. The configuration for this can be found in the ``.deploy`` folder.
+Add a database password to the `.env` file.  
+Use Docker Compose to start the test database. The configuration is located in the `.deploy` folder.
 
-In Visual Studio Code, you can press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>R</kbd> to access the task runner and execute the tasks ``build dev database`` and ``run dev database``.
+Alternatively, in Visual Studio Code, you can use `Terminal > Run Task` to execute the `build dev database` and `run dev database` tasks.
 
-Feel free to configure any PostgreSQL database  of your choice (or any other database that supports JSON data types).
+You may also configure any PostgreSQL database of your choice (or another database that supports JSON data types).
 
 ### 1.4. Build Mrkr
 
@@ -61,44 +62,64 @@ Build Mrkr using setuptools:
 python -m build
 ```
 
-## 2. Using Mrkr 🚀
+### 1.5. Run Mrkr
 
-### 2.1 Run Mrkr
-
-You can start the Mrkr server in several ways:
+You can start the Mrkr server locally in several ways:
 
 - Using Python:
 
-```bash
-python -m mrkr
-```
+    ```bash
+    python -m mrkr
+    ```
 
 - Using Uvicorn:
 
-```bash
-uvicorn --factory mrkr:create_app --reload --host 0.0.0.0 --port 8000
-```
+    ```bash
+    uvicorn --factory mrkr:create_app --reload --host 0.0.0.0 --port 8000
+    ```
 
 - In Visual Studio Code:
 
     - Press <kbd>Ctrl</kbd>+<kbd>F5</kbd> to start without debugging.
     - Press <kbd>F5</kbd> to start in debug mode.
 
-The GUI can be accessed at [localhost:8000/gui/project](localhost:8000/gui/project). The SwaggerUI can be accessed at [localhost:8000/docs](localhost:8000/docs).
+The Swagger UI is available at [http://localhost:8000/docs](http://localhost:8000/docs), and the GUI is available at [http://localhost:8000/gui/project](http://localhost:8000/gui/project).
 
+## 2. Using Mrkr 🚀
 
-### 2.2 Use the SDK
+### 2.1. Run Mrkr with Docker
 
-Mrkr comes with a Software Development Kit (SDK) that lets you control the Mrkr instance from python code. To use it, just import ``mrkr.sdk``.
+The recommended way to use Mrkr is via Docker, which bundles the application and the database.
 
-You can then use the client as follows:
+1. Create an environment file:
+
+    ```bash
+    cp .env.example .env
+    ```
+
+2. Enter a database password in the `.env` file.
+
+3. Build and start the Docker container:
+
+    ```bash
+    docker compose -f .deploy/docker.app.yaml --env-file .env build
+    docker compose -f .deploy/docker.app.yaml --env-file .env up -d
+    ```
+
+Alternatively, in Visual Studio Code, you can use `Terminal > Run Task` to execute the `build docker` and `run docker` tasks.
+
+The Swagger UI is available at [http://localhost:8000/docs](http://localhost:8000/docs), and the GUI is available at [http://localhost:8000/gui/project](http://localhost:8000/gui/project).
+
+### 2.2. Use the SDK
+
+Mrkr includes a Software Development Kit (SDK) that allows you to control the Mrkr instance from Python code.  
+To use it, simply import `mrkr.sdk`:
 
 ```python
 import mrkr.sdk as sdk
 
 with sdk.MrkrClient(log_level="DEBUG") as client:
-
-    # create demo project
+    # Create a demo project
     project_id = client.create_project(
         name="Demo Project",
         config={
@@ -165,10 +186,7 @@ with sdk.MrkrClient(log_level="DEBUG") as client:
 
     print(f"Created project with ID: {project_id}")
 
-    # scan demo project
-    client.scan_project(
-        project_id=project_id
-    )
-
+    # Scan the demo project
+    client.scan_project(project_id=project_id)
     print(f"Scan initiated for project with ID: {project_id}")
 ```
