@@ -1,0 +1,36 @@
+services:
+  app:
+    build:
+      context: ../
+      dockerfile: ./.deploy/dockerfile
+    ports:
+      - 8000:8000
+    env_file: ../.env
+    command: [ "uvicorn", "--factory", "mrkr:create_app", "--host", "0.0.0.0", "--port", "8000" ]
+    restart: on-failure
+    healthcheck:
+      test: curl --fail http://localhost:8000/api/v1/utils/health || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - logs:/var/logs
+  database:
+    hostname: database
+    image: postgres
+    restart: always
+    environment:
+      PGDATA: /var/lib/postgresql/data/${POSTGRES_DATABASE}
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    env_file: ../.env
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
+  logs:
