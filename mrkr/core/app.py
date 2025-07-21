@@ -20,6 +20,17 @@ from mrkr.gui import router as routergui
 # ---------------------------------------------------------------------------- #
 
 
+def get_version() -> str:
+    try:
+        import importlib.metadata
+        version = importlib.metadata.version("mrkr")
+        return version
+    except ImportError:
+        return "unknown"
+
+# ---------------------------------------------------------------------------- #
+
+
 def create_app() -> fastapi.FastAPI:
     """
     Create and configure the FastAPI application instance.
@@ -31,16 +42,11 @@ def create_app() -> fastapi.FastAPI:
 
     config = services.get_configuration()
 
-    try:
-        from .._version import __version__ as version
-    except ImportError:
-        version = "unknown"
-
     app = fastapi.FastAPI(
         title=config.project.title,
         summary=config.project.summary,
         description=config.project.description,
-        version=version,
+        version=get_version(),
         terms_of_service=config.project.terms_of_service,
         root_path=config.backend.root_path,
         openapi_url=f"/openapi.json",
