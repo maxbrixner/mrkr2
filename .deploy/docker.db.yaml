@@ -1,5 +1,5 @@
 services:
-  testdb:
+  database:
     hostname: database
     image: postgres
     restart: always
