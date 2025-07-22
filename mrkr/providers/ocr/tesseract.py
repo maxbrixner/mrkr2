@@ -45,6 +45,7 @@ class TesseractOcrProvider(BaseOcrProvider):
     """
 
     _type_map: dict[int, schemas.OcrItemType]
+    _config: schemas.OcrProviderTesseractConfigSchema
 
     def __init__(
         self,
@@ -107,10 +108,6 @@ class TesseractOcrProvider(BaseOcrProvider):
         logger.debug(f"Performing OCR on page {page}.")
 
         loop = asyncio.get_running_loop()
-
-        if not isinstance(self._config,
-                          schemas.OcrProviderTesseractConfigSchema):
-            raise Exception("Invalid config schema for Tesseract.")
 
         output = await loop.run_in_executor(
             None,

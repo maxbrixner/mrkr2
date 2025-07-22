@@ -14,6 +14,14 @@ from .project import Project
 # ---------------------------------------------------------------------------- #
 
 
+class DocumentStatusPublic(str, enum.Enum):
+    open = "open"
+    in_review = "in review"
+    done = "done"
+
+# ---------------------------------------------------------------------------- #
+
+
 class DocumentStatus(str, enum.Enum):
     processing = "processing"
     open = "open"

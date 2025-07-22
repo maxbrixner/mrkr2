@@ -4,6 +4,7 @@
 <script type="module" src="{{ url_for('static', path='/js/styled_link.js') }}"></script>
 <script type="module" src="{{ url_for('static', path='/js/styled_button.js') }}"></script>
 <script type="module" src="{{ url_for('static', path='/js/filtered_table.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/remote_list_popup.js') }}"></script>
 {% endblock %}
 
 {% block header %}
@@ -31,7 +32,11 @@
             autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Filter documents">
     </div>
     <filtered-table content-url="{{ url_for('list_project_documents', project_id=project.id) }}"
-        table-config='{"idColumn": "id", "headers": {"id": "ID", "status": "Status", "assignee_name": "Assignee", "reviewer_name": "Reviewer", "created": "Created at", "updated": "Updated at", "path": "Path"}, "filterElement": "filter", "display": {"status": "chip"}, "chips": {"processing": "#90A4AE", "open": "#80DEEA", "done": "#4CAF50", "in review": "#FFC107"}}'>Hallo</filtered-table>
+        table-config='{"idColumn": "id", "headers": {"id": "ID", "status": "Status", "assignee_name": "Assignee", "reviewer_name": "Reviewer", "created": "Created at", "updated": "Updated at", "path": "Path"}, "filterElement": "filter", "display": {"status": "chip"}, "chips": {"processing": "#90A4AE", "open": "#80DEEA", "done": "#4CAF50", "in review": "#FFC107"}}'></filtered-table>
+
+    <remote-list-popup id="assign-to-popup" content-url="{{ url_for('list_users') }}"></remote-list-popup>
+    <remote-list-popup id="review-by-popup" content-url="{{ url_for('list_users') }}"></remote-list-popup>
+
 </main>
 
 <script>
@@ -47,6 +52,67 @@
         document.getElementById('review-by-button')?.setAttribute('disabled', !detail.atLeastOneSelected);
         document.getElementById('mark-as-button')?.setAttribute('disabled', !detail.atLeastOneSelected);
     });
+
+    document.getElementById('assign-to-button')?.addEventListener('click', (event) => {
+        const detail = event.detail;
+        document.getElementById('assign-to-popup')?.show(
+            callback = assignToCallback
+        );
+    });
+
+    document.getElementById('review-by-button')?.addEventListener('click', (event) => {
+        const detail = event.detail;
+        document.getElementById('review-by-popup')?.show(
+            callback = reviewByCallback
+        );
+    });
+
+    function assignToCallback(selected) {
+        console.log(selected);
+
+        const url = "{{ url_for('update_assignee') }}";
+
+        const selectedDocuments = document.querySelectorAll('filtered-table')[0].getSelectedRows();
+        const selectedUser = selected;
+        fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ document_ids: selectedDocuments, assignee_id: selectedUser })
+        }).then(response => {
+            if (response.ok) {
+                document.querySelectorAll('filtered-table')[0].updateContent();
+            } else {
+                console.error('Failed to assign documents');
+            }
+        });
+    }
+
+
+
+    function reviewByCallback(selected) {
+        console.log(selected);
+
+        const url = "{{ url_for('update_reviewer') }}";
+
+        const selectedDocuments = document.querySelectorAll('filtered-table')[0].getSelectedRows();
+        const selectedUser = selected;
+        fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ document_ids: selectedDocuments, reviewer_id: selectedUser })
+        }).then(response => {
+            if (response.ok) {
+                document.querySelectorAll('filtered-table')[0].updateContent();
+            } else {
+                console.error('Failed to assign documents');
+            }
+        });
+    }
+
 </script>
 
 {% endblock %}

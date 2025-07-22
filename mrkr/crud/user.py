@@ -47,13 +47,19 @@ def get_user(
 
 
 def list_users(
-    session: sqlmodel.Session
+    session: sqlmodel.Session,
+    list_all: bool = False
 ) -> Sequence[models.User]:
     """
     List users in the database.
     """
-    return session.exec(
-        sqlmodel.select(models.User)
-    ).all()
+    if list_all:
+        return session.exec(
+            sqlmodel.select(models.User)
+        ).all()
+    else:
+        return session.exec(
+            sqlmodel.select(models.User).where(models.User.disabled == False)
+        ).all()
 
 # ---------------------------------------------------------------------------- #

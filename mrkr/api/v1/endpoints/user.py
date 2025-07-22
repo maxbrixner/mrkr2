@@ -46,12 +46,13 @@ async def user_create(
 
 @router.get("/list-users", summary="List Users")
 async def list_users(
-    session: database.DatabaseDependency
+    session: database.DatabaseDependency,
+    list_all: bool = False
 ) -> List[schemas.UserListSchema]:
     """
     List all users.
     """
-    users = crud.list_users(session=session)
+    users = crud.list_users(session=session, list_all=list_all)
     return [schemas.UserListSchema(**user.model_dump()) for user in users]
 
 # ---------------------------------------------------------------------------- #
