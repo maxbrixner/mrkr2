@@ -16,8 +16,8 @@ __pycache__
 frontend/static/js/*.js
 
 # Demo project creation
-demo.py
-demo
+#demo.py
+#demo
 
 # Build artifacts
 build/
