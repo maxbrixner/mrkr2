@@ -7,6 +7,7 @@ import { ClassificationLabeler } from './classification_labeler.js';
 import { TextLabeler } from './text_labeler.js';
 import { LabelButton } from './label_button.js';
 import { combineHexColors, getRelativeLuminance, hexToRgbA, hexToRgb } from './color_helpers.js';
+import { MessageBox } from './message_box.js';
 
 /* -------------------------------------------------------------------------- */
 
@@ -334,7 +335,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 }
             })
             .catch((error: Error) => {
-                console.error(`Error fetching document: ${error.message}`);
+                (document.querySelector('message-box') as MessageBox)?.showMessage(`Unable to fetch document.`, 'error', error.message);
             });
 
         this._queryProject()
@@ -345,7 +346,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 }
             })
             .catch((error: Error) => {
-                console.error(`Error fetching project: ${error.message}`);
+                (document.querySelector('message-box') as MessageBox)?.showMessage(`Unable to fetch project.`, 'error', error.message);
             });
     }
 
@@ -902,16 +903,14 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             this._submitLabelData()
                 .then((success: boolean) => {
                     if (success) {
-                        // todo: show success message
-                        console.info("Label data submitted successfully.");
+                        (document.querySelector('message-box') as MessageBox)?.showMessage(`Label data submitted successfully.`, 'info');
                     } else {
                         // todo: show error message
-                        console.error("Failed to submit label data.");
+                        (document.querySelector('message-box') as MessageBox)?.showMessage(`Unable to submit label data.`, 'error', 'Server Error');
                     }
                 })
                 .catch((error: Error) => {
-                    // todo
-                    console.error(`Error submitting label data: ${error.message}`);
+                    (document.querySelector('message-box') as MessageBox)?.showMessage(`Unable to submit label data.`, 'error', error.message);
                 })
                 .finally(() => {
                     this._submitButton?.removeAttribute('disabled');

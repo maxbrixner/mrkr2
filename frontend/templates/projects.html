@@ -54,14 +54,12 @@
                 body: JSON.stringify({ project_id: rowId })
             }).then(response => {
                 if (response.ok) {
-                    // todo
+                    document.querySelector('message-box')?.showMessage(`The scan was scheduled successfully. It may take a while until all documents are processed.`, 'info');
                 } else {
-                    // todo
-                    console.error(`Failed to schedule scan for project ${rowId}`);
+                    document.querySelector('message-box')?.showMessage(`Unable to schedule scan.`, 'error', 'Server Error');
                 }
             }).catch(error => {
-                // todos
-                console.error(`Error scheduling scan for project ${rowId}:`, error);
+                document.querySelector('message-box')?.showMessage(`Unable to schedule scan.`, 'error', error.message);
             });
         });
     });

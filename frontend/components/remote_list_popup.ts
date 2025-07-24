@@ -1,5 +1,6 @@
 /* -------------------------------------------------------------------------- */
 
+import { MessageBox } from './message_box.js';
 import { StyledButton } from './styled_button.js';
 
 /* -------------------------------------------------------------------------- */
@@ -264,7 +265,8 @@ export class RemoteListPopup extends HTMLElement implements RemoteListPopupAttri
             })
             .catch(error => {
                 this._content.classList.remove('loading');
-                console.error("Failed to fetch content:", error); /* todo */
+                this._content.textContent = "Failed to load content";
+                console.error("Error fetching remote list content:", error);
             });
     }
 

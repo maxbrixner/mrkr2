@@ -1,5 +1,7 @@
 /* -------------------------------------------------------------------------- */
 
+import { MessageBox } from './message_box.js';
+
 export interface FilteredTableAttributes {
     contentUrl?: string;
     config?: string;
@@ -256,7 +258,7 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
             this._addHeaders(content);
             this._addData(content);
         }).catch(error => {
-            console.error("Error fetching content:", error);
+            (document.querySelector('message-box') as MessageBox)?.showMessage(`Unable to load table content.`, 'error', error.message);
             this._table.classList.remove('loading');
         });
     }
