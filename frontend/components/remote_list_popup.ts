@@ -203,14 +203,14 @@ export class RemoteListPopup extends HTMLElement implements RemoteListPopupAttri
     public show(callback: (selected: string | undefined) => void) {
         this._callback = callback;
         this._clearContent();
-        this._modular.showModal();
+        (this._modular as any).showModal();
         this._updateContent();
 
         this._applyButton.addEventListener("click", this._onApplyButtonClick.bind(this), { once: true });
     }
 
     public hide() {
-        this._modular.close();
+        (this._modular as any).close();
     }
 
     private _onCancelButtonClick(event: Event) {
