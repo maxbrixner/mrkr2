@@ -32,10 +32,14 @@
             autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Filter documents">
     </div>
     <filtered-table content-url="{{ url_for('list_project_documents', project_id=project.id) }}"
-        table-config='{"idColumn": "id", "headers": {"id": "ID", "status": "Status", "assignee_name": "Assignee", "reviewer_name": "Reviewer", "created": "Created at", "updated": "Updated at", "path": "Path"}, "filterElement": "filter", "display": {"status": "chip"}, "chips": {"processing": "#90A4AE", "open": "#80DEEA", "done": "#4CAF50", "in review": "#FFC107"}}'></filtered-table>
+        table-config='{"idColumn": "id", "headers": {"id": "ID", "status": "Status", "assignee_name": "Assignee", "reviewer_name": "Reviewer", "created": "Created at", "updated": "Updated at", "path": "Path"}, "filterElement": "filter", "display": {"status": "chip"}, "chips": {"processing": "#90A4AE", "open": "#80DEEA", "done": "#4CAF50", "review": "#FFC107"}}'></filtered-table>
 
-    <remote-list-popup id="assign-to-popup" content-url="{{ url_for('list_users') }}"></remote-list-popup>
-    <remote-list-popup id="review-by-popup" content-url="{{ url_for('list_users') }}"></remote-list-popup>
+    <remote-list-popup id="assign-to-popup" content-url="{{ url_for('list_users') }}" id-field="id"
+        display-field="username"></remote-list-popup>
+    <remote-list-popup id="review-by-popup" content-url="{{ url_for('list_users') }}" id-field="id"
+        display-field="username"></remote-list-popup>
+    <remote-list-popup id="mark-as-popup" content-url="{{ url_for('list_statuses') }}" id-field="name"
+        display-field="value"></remote-list-popup>
 
 </main>
 
@@ -64,6 +68,13 @@
         const detail = event.detail;
         document.getElementById('review-by-popup')?.show(
             callback = reviewByCallback
+        );
+    });
+
+    document.getElementById('mark-as-button')?.addEventListener('click', (event) => {
+        const detail = event.detail;
+        document.getElementById('mark-as-popup')?.show(
+            callback = markAsCallback
         );
     });
 
@@ -104,6 +115,28 @@
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ document_ids: selectedDocuments, reviewer_id: selectedUser })
+        }).then(response => {
+            if (response.ok) {
+                document.querySelectorAll('filtered-table')[0].updateContent();
+            } else {
+                console.error('Failed to assign documents');
+            }
+        });
+    }
+
+    function markAsCallback(selected) {
+        console.log(selected);
+
+        const url = "{{ url_for('update_status') }}";
+
+        const selectedDocuments = document.querySelectorAll('filtered-table')[0].getSelectedRows();
+        const selectedStatus = selected;
+        fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ document_ids: selectedDocuments, status: selectedStatus })
         }).then(response => {
             if (response.ok) {
                 document.querySelectorAll('filtered-table')[0].updateContent();

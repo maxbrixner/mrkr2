@@ -377,10 +377,26 @@ class UpdateDocumentStatusSchema(pydantic.BaseModel):
         description="List of document IDs to update.",
         examples=[[1, 2, 3]]
     )
-    status: models.DocumentStatus = pydantic.Field(
+    status: models.DocumentStatusPublic = pydantic.Field(
         ...,
         description="The status of the document.",
         examples=["open"]
+    )
+
+# ---------------------------------------------------------------------------- #
+
+
+class StatusListSchema(pydantic.BaseModel):
+    """
+    API-Schema for a list of document statuses.
+    """
+    name: str = pydantic.Field(
+        ...,
+        description="Name of the status."
+    )
+    value: str = pydantic.Field(
+        ...,
+        description="Value of the status."
     )
 
 # ---------------------------------------------------------------------------- #

@@ -220,13 +220,13 @@ def batch_update_document_reviewer(
 def batch_update_document_status(
     session: sqlmodel.Session,
     documents: List[models.Document],
-    status: models.DocumentStatus
+    status: models.DocumentStatusPublic | models.DocumentStatus
 ) -> None:
     """
     Update the status for a list of documents.
     """
     for document in documents:
-        document.status = status
+        document.status = models.DocumentStatus(status.value)
         session.add(document)
 
     session.commit()

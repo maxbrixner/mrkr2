@@ -16,7 +16,7 @@ from .project import Project
 
 class DocumentStatusPublic(str, enum.Enum):
     open = "open"
-    in_review = "in review"
+    review = "review"
     done = "done"
 
 # ---------------------------------------------------------------------------- #
@@ -25,7 +25,7 @@ class DocumentStatusPublic(str, enum.Enum):
 class DocumentStatus(str, enum.Enum):
     processing = "processing"
     open = "open"
-    in_review = "in review"
+    review = "review"
     done = "done"
 
 # ---------------------------------------------------------------------------- #

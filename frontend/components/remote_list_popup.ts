@@ -6,14 +6,16 @@ import { StyledButton } from './styled_button.js';
 
 export interface RemoteListPopupAttributes {
     contentUrl?: string;
-    filter?: string;
+    idField?: string
+    displayField?: string
 }
 
 /* -------------------------------------------------------------------------- */
 
 export class RemoteListPopup extends HTMLElement implements RemoteListPopupAttributes {
     public contentUrl?: string = undefined;
-    public filter?: string = undefined;
+    public idField?: string = undefined;
+    public displayField?: string = undefined;
     private _modular = document.createElement('dialog');
     private _content = document.createElement('fieldset');
     private _buttons = document.createElement('div');
@@ -39,7 +41,7 @@ export class RemoteListPopup extends HTMLElement implements RemoteListPopupAttri
      * Returns an array of attribute names that this component observes.
      */
     static get observedAttributes() {
-        return ['content-url'];
+        return ['content-url', 'id-field', 'display-field'];
     }
 
     /**
@@ -53,6 +55,10 @@ export class RemoteListPopup extends HTMLElement implements RemoteListPopupAttri
 
         if (propertyName === 'content-url') {
             this.contentUrl = newValue || undefined;
+        } else if (propertyName === 'id-field') {
+            this.idField = newValue || undefined;
+        } else if (propertyName === 'display-field') {
+            this.displayField = newValue || undefined;
         }
     }
 
@@ -230,10 +236,13 @@ export class RemoteListPopup extends HTMLElement implements RemoteListPopupAttri
             .then(content => {
                 this._content.classList.remove('loading');
 
+                if (!this.idField || !this.displayField)
+                    throw new Error("idField or displayField not defined")
+
                 for (const item of content) {
                     const itemElement = document.createElement('input');
                     itemElement.type = 'radio';
-                    const id = item['id'];
+                    const id = item[this.idField];
                     itemElement.id = `remote-list-${id}`;
                     itemElement.name = 'remote-list-choice';
                     itemElement.classList.add('remote-list-item');
@@ -247,7 +256,7 @@ export class RemoteListPopup extends HTMLElement implements RemoteListPopupAttri
                     this._content.appendChild(itemElement);
 
                     const labelElement = document.createElement('label');
-                    labelElement.textContent = item['username'];
+                    labelElement.textContent = item[this.displayField];
                     labelElement.setAttribute('for', `remote-list-${id}`);
                     this._content.appendChild(labelElement);
                 }
@@ -264,14 +273,10 @@ export class RemoteListPopup extends HTMLElement implements RemoteListPopupAttri
      */
     private async _queryContent(): Promise<any[]> {
         if (!this.contentUrl) {
-            throw new Error("URL is not set for FilteredTable component.");
+            throw new Error("URL is not set for RemoteeListPopup component.");
         }
 
         var url = new URL(this.contentUrl);
-        if (this.filter) {
-            url.searchParams.set('filter', this.filter);
-        }
-
         const response = await fetch(url.toString());
         if (!response.ok) {
             throw new Error(`Response status: ${response.status} `);

@@ -322,7 +322,7 @@ class ProjectListSchema(pydantic.BaseModel):
         description="The number of documents in the project that are open.",
         examples=[5]
     )
-    in_review: int = pydantic.Field(
+    review: int = pydantic.Field(
         default=0,
         description="The number of documents in the project that are in review.",
         examples=[2]
