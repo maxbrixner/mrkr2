@@ -4,7 +4,6 @@ export function hexToRgb(hex: string): { r: number; g: number; b: number } | nul
 
     // Check if the hex string has a valid length (3 or 6 characters)
     if (!/^[0-9A-Fa-f]{3}([0-9A-Fa-f]{3})?$/.test(cleanHex)) {
-        console.error(`Invalid hex color format: ${hex}`);
         return null;
     }
 

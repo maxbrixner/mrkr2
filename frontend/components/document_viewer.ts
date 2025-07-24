@@ -1,6 +1,10 @@
 
 /* -------------------------------------------------------------------------- */
 
+import { MessageBox } from './message_box.js';
+
+/* -------------------------------------------------------------------------- */
+
 interface DocumentViewerAttributes {
     url?: string;
 }
@@ -96,7 +100,6 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
 
         const style = document.createElement('style');
 
-        // todo: we do not need the document-viewer div - we can just use the host?
         style.textContent = `
             :host {
                 background-color: var(--document-viewer-background, #ffffff);
@@ -226,8 +229,7 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
 
             })
             .catch((error) => {
-                console.error("Error fetching document content:", error);
-                // todo: show error to user
+                (document.querySelector('message-box') as MessageBox)?.showMessage(`Unable to load document content.`, 'error', error.message);
             });
     }
 

@@ -95,7 +95,8 @@
             if (response.ok) {
                 document.querySelectorAll('filtered-table')[0].updateContent();
             } else {
-                console.error('Failed to assign documents');
+                document.querySelector('message-box')?.showMessage(`Unable to submit assigned user.`, 'error', error.message);
+
             }
         });
     }
@@ -119,7 +120,7 @@
             if (response.ok) {
                 document.querySelectorAll('filtered-table')[0].updateContent();
             } else {
-                console.error('Failed to assign documents');
+                document.querySelector('message-box')?.showMessage(`Unable to submit reviewer.`, 'error', error.message);
             }
         });
     }
@@ -141,7 +142,8 @@
             if (response.ok) {
                 document.querySelectorAll('filtered-table')[0].updateContent();
             } else {
-                console.error('Failed to assign documents');
+                document.querySelector('message-box')?.showMessage(`Unable to submit status update.`, 'error', error.message);
+
             }
         });
     }
