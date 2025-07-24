@@ -21,6 +21,21 @@ router = fastapi.APIRouter(prefix="/document", tags=[schemas.Tags.document])
 # ---------------------------------------------------------------------------- #
 
 
+@router.get("/list-statuses", summary="List Statuses")
+async def list_statuses(
+    session: database.DatabaseDependency
+) -> List[schemas.StatusListSchema]:
+    """
+    List possible document statuses.
+    """
+    return [
+        schemas.StatusListSchema(name=status.name, value=status.value)
+        for status in models.DocumentStatusPublic
+    ]
+
+# ---------------------------------------------------------------------------- #
+
+
 @router.get("/{document_id}",
             summary="Get Document")
 async def get_document(

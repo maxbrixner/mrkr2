@@ -45,6 +45,7 @@ class TesseractOcrProvider(BaseOcrProvider):
     """
 
     _type_map: dict[int, schemas.OcrItemType]
+    _config: schemas.OcrProviderTesseractConfigSchema
 
     def __init__(
         self,
@@ -114,7 +115,8 @@ class TesseractOcrProvider(BaseOcrProvider):
                 pytesseract.image_to_data,
                 image=self._images[page-1],
                 output_type=pytesseract.Output.DICT,
-                config="--psm 1"
+                config="--psm 1",
+                lang=self._config.language
             )
         )
 

@@ -70,12 +70,12 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
         newValue: string | null) {
         if (propertyName === 'content-url') {
             this.contentUrl = newValue || undefined;
-            this._updateContent();
+            this.updateContent();
         }
         if (propertyName === 'table-config') {
             this.config = newValue || undefined;
             this._parseConfig();
-            this._updateContent();
+            this.updateContent();
         }
     }
 
@@ -95,7 +95,7 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
                     (this as any)._filterTimeout = setTimeout(() => {
                         const target = event.target as HTMLInputElement;
                         this.filter = target.value;
-                        this._updateContent();
+                        this.updateContent();
                     }, this.delay);
                 });
             }
@@ -232,9 +232,17 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
     private _clearContent() {
         this._table.innerHTML = '';
         this._table.classList.add('loading');
+
+        this.dispatchEvent(new CustomEvent<SelectionChangedEvent>('selection-changed', {
+            detail: {
+                atLeastOneSelected: false
+            },
+            bubbles: true,
+            composed: true
+        }));
     }
 
-    private _updateContent() {
+    public updateContent() {
         if (!this._configParsed || !this.contentUrl)
             return;
 
@@ -247,7 +255,6 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
             this._table.classList.remove('loading');
             this._addHeaders(content);
             this._addData(content);
-
         }).catch(error => {
             console.error("Error fetching content:", error);
             this._table.classList.remove('loading');
@@ -290,12 +297,12 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
             const tr = document.createElement('tr');
             tr.ariaLabel = `Row for ${item.id}`; // Assuming each item has an 'id' property
             tr.tabIndex = 0; // Make the row focusable
-            tr.role = 'button'; // Set the role for accessibility
+            (tr as any).role = 'button'; // Set the role for accessibility
 
             if (this._configParsed && this._configParsed.idColumn) {
-                tr.id = item[this._configParsed.idColumn] || crypto.randomUUID();
+                tr.id = item[this._configParsed.idColumn] || (crypto as any).randomUUID();
             } else {
-                tr.id = item.id || crypto.randomUUID();
+                tr.id = item.id || (crypto as any).randomUUID();
             }
 
             tr.addEventListener('keydown', (event: KeyboardEvent) => {
@@ -385,7 +392,7 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
             url.searchParams.set('filter', this.filter);
         }
 
-        const response = await fetch(url);
+        const response = await fetch(url.toString());
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }

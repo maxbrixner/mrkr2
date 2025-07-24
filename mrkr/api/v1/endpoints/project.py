@@ -90,7 +90,7 @@ async def list_projects(
 
         project_schema.done = status[models.DocumentStatus.done]
         project_schema.open = status[models.DocumentStatus.open]
-        project_schema.in_review = status[models.DocumentStatus.in_review]
+        project_schema.review = status[models.DocumentStatus.review]
 
         result.append(project_schema)
 

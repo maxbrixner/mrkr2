@@ -672,7 +672,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             const labelItem = labelItemContainer[0];
             const deleteButton = labelItemContainer[1];
 
-            const labelId = label.id || crypto.randomUUID(); // Ensure label has an ID
+            const labelId = label.id || (crypto as any).randomUUID(); // Ensure label has an ID
             label.id = labelId; // Assign ID to the label for internal use
 
             deleteButton.addEventListener("click", this._onTextLabelDeleteButtonClick(block, labelDefinitions, labeler, labelItem, block.labels, labelId))
@@ -766,7 +766,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
             // todo: avoid duplicates! This would lead to the delete button not work anymore
 
-            const labelId = crypto.randomUUID();
+            const labelId = (crypto as any).randomUUID();
 
             associatedLabelList.push({
                 id: labelId,
