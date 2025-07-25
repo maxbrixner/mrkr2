@@ -32,6 +32,13 @@ class StaticFilesWithHeaders(StaticFiles):
 
         logger.info("Static file serving initialized.")
 
+    import os
+
+    def lookup_path(self, path: str) -> tuple[str, os.stat_result | None]:
+        result = super().lookup_path(path=path)
+        logger.warning(result)
+        return result
+
     async def get_response(self, path: str, scope: Scope) -> Response:
         """
         Override the get_response method to add custom headers. Please note
