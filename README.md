@@ -118,9 +118,83 @@ To use it, simply import `mrkr.sdk`:
 ```python
 import mrkr.sdk as sdk
 
-with sdk.MrkrClient(log_level="DEBUG") as client:
+with sdk.MrkrClient(url="http://localhost:8000") as client:
+    # ...
+```
 
-    # create demo project
+You may pass further arguments to the client:
+
+|Argument|Description|
+|-|-|
+|api_version|The version of the API, e.g. ``"v1"``|
+|cert|A certificate to connect to the API, e.g. ``"cert.pem"`` or ``("cert.crt", "cert.key")``|
+|proxies|A dictionary of proxies to connect to the API, e.g. ``{"http": "url.com", "https": "url.com"}``|
+|timeout|The timeout after a failed request in seconds|
+|retry_attempts|The number of retries after a failed request|
+|log_level|The logging level of the client, e.g. ``"DEBUG"``|
+
+
+#### 2.2.1. List Users
+
+List all users:
+
+```python
+import mrkr.sdk as sdk
+
+with sdk.MrkrClient(url="http://localhost:8000") as client:
+    users = client.list_users()
+    print("users:", users)
+```
+
+#### 2.2.2. List Projects
+
+List all projects:
+
+```python
+import mrkr.sdk as sdk
+
+with sdk.MrkrClient(url="http://localhost:8000") as client:
+    projects = client.list_projects()
+    print("projects:", projects)
+```
+
+#### 2.2.3 List Documents
+
+List the documents of a project:
+
+```python
+import mrkr.sdk as sdk
+
+with sdk.MrkrClient(url="http://localhost:8000") as client:
+    documents = client.list_documents(project_id=1)
+    print("documents:", documents)
+```
+
+#### 2.2.4. Create a User
+
+Create a new user:
+
+```python
+import mrkr.sdk as sdk
+
+with sdk.MrkrClient(url="http://localhost:8000") as client:
+    spongebob = client.create_user(
+        user={
+            "username": "Spongebob",
+            "email": "spongebob@example.com",
+            "password": "demo_password"
+        }
+    )
+```
+
+#### 2.2.5. Create a Project
+
+Create a new project:
+
+```python
+import mrkr.sdk as sdk
+
+with sdk.MrkrClient(url="http://localhost:8000") as client:
     project_id = client.create_project(
         name="Demo Project",
         config={
@@ -130,12 +204,6 @@ with sdk.MrkrClient(log_level="DEBUG") as client:
                     "target": "document",
                     "name": "Letter",
                     "color": "#4CAF50"
-                },
-                {
-                    "type": "classification_single",
-                    "target": "document",
-                    "name": "Email",
-                    "color": "#2196F3"
                 },
                 {
                     "type": "classification_multiple",
@@ -160,12 +228,6 @@ with sdk.MrkrClient(log_level="DEBUG") as client:
                     "target": "block",
                     "name": "IBAN",
                     "color": "#8BC34A"
-                },
-                {
-                    "type": "text",
-                    "target": "block",
-                    "name": "Street",
-                    "color": "#3F51B5"
                 }
             ],
             "file_provider": {
@@ -183,79 +245,38 @@ with sdk.MrkrClient(log_level="DEBUG") as client:
                 }
             }
         }
-    )
-
-    print(f"Created project with ID: {project_id}")
-
-    # create demo users
-    spongebob = client.create_user(
-        user={
-            "username": "Spongebob",
-            "email": "spongebob@example.com",
-            "password": "demo_password"
-        }
-    )
-
-    patrick = client.create_user(
-        user={
-            "username": "Patrick",
-            "email": "patrick@example.com",
-            "password": "demo_password"
-        }
-    )
-
-    squidward = client.create_user(
-        user={
-            "username": "Squidward",
-            "email": "squidward@example.com",
-            "password": "demo_password"
-        }
-    )
-
-    mrkrabs = client.create_user(
-        user={
-            "username": "Mr. Krabs",
-            "email": "mrkrabs@example.com",
-            "password": "demo_password"
-        }
-    )
-
-    sandy = client.create_user(
-        user={
-            "username": "Sandy",
-            "email": "sandy@example.com",
-            "password": "demo_password"
-        }
-    )
-
-    gary = client.create_user(
-        user={
-            "username": "Gary",
-            "email": "gary@example.com",
-            "password": "demo_password"
-        }
-    )
-
-    plankton = client.create_user(
-        user={
-            "username": "Plankton",
-            "email": "plankton@example.com",
-            "password": "demo_password"
-        }
-    )
-
-    # list projects
-    projects = client.list_projects()
-    print("projects:", projects)
-
-    # list documents
-    for project in projects:
-        documents = client.list_project_documents(
-            project_id=project.id
-        )
-        print(f"Documents for project {project.name}: {documents}")
-
-    # list users
-    users = client.list_users()
-    print("users:", users)
 ```
+
+Instead of passing a dictionary, you can also use ``sdk.ProjectCreateSchema`` to get type hints.
+
+A label can have the following **targets**:
+
+|Target|Description|
+|-|-|
+|document|The label targets the whole document|
+|page|The label targets a single page within the document|
+|block|The label targets a block or text within the block|
+
+A label can have the following **types**:
+
+|Type|Description|
+|-|-|
+|classification_single|A classification label that unselects all other labels for its target once it is selected|
+|classification_multiple|A classification label that allows other classification labels for the same target|
+|text|A label that targets a substring within a block|
+
+Text labels can only target blocks!
+
+The following file providers are available:
+
+|Type|Description|Configuration|
+|-|-|-|
+|local|Serves local files from a folder, e.g. within the Docker container|Expects a ``path`` config variable|
+
+All file providers expect a ``pdf_dpi`` (defaults to 200) and an ``image_format`` (defaults to JPEG).
+
+The following OCR providers are available:
+
+|Type|Description|Configuration|
+|-|-|-|
+|tesseract|Uses Google's tesseract for OCR.|Expects a ``language`` config variable, e.g. ``eng``or ``deu``|

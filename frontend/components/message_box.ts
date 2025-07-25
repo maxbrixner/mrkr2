@@ -70,7 +70,7 @@ export class MessageBox extends HTMLElement implements MessageBoxAttributes {
             }
 
             .message {
-                padding: 10px;
+                padding: 1rem;
                 border-radius: 5px;
                 border: 1px solid transparent;
                 font-size: 1rem;
