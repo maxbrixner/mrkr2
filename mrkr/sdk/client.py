@@ -228,6 +228,23 @@ class MrkrClient():
             json=name.model_dump()
         )
 
+    def update_project_configuration(
+        self,
+        project_id: int,
+        config: schemas.ProjectConfigSchema | Dict
+    ) -> None:
+        """
+        Update the configuration of a project.
+        """
+        if isinstance(config, dict):
+            config = schemas.ProjectConfigSchema(**config)
+
+        self._call_api(
+            method="PUT",
+            endpoint=f"/project/{project_id}/config",
+            json=config.model_dump()
+        )
+
     def list_projects(
         self
     ) -> List[schemas.ProjectListSchema]:

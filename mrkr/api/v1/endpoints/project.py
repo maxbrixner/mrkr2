@@ -127,7 +127,7 @@ async def get_project(
 # ---------------------------------------------------------------------------- #
 
 
-@router.put("{project_id}/config",
+@router.put("/{project_id}/config",
             summary="Update Project Configuration")
 async def update_project_configuration(
     session: database.DatabaseDependency,
