@@ -384,6 +384,7 @@ The following file providers are available:
 |Type|Description|Configuration|
 |-|-|-|
 |local|Serves local files from a folder, e.g. within the Docker container|Expects a ``path`` config variable|
+|s3|Serves files from an AWS S3 bucket|Expects a ``path``, ``aws_access_key_id``, ``aws_secret_access_key``, ``aws_region_name``, ``aws_account_id``, ``aws_role_name``, ``aws_bucket_name`` variable|
 
 All file providers expect a ``pdf_dpi`` (defaults to 200) and an ``image_format`` (defaults to JPEG).
 
