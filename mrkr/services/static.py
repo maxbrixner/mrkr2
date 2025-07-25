@@ -36,6 +36,7 @@ class StaticFilesWithHeaders(StaticFiles):
 
     def lookup_path(self, path: str) -> tuple[str, os.stat_result | None]:
         logger.warning(path)
+        logger.warning(self.all_directories)
         result = super().lookup_path(path=path)
         logger.warning(result)
         return result
