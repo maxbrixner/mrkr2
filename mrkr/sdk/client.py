@@ -144,6 +144,15 @@ class MrkrClient():
                     proxies=self.proxies,
                     timeout=self.timeout
                 )
+            case "put":
+                response = requests.put(
+                    url=url,
+                    params=params,
+                    json=json,
+                    cert=self.cert,
+                    proxies=self.proxies,
+                    timeout=self.timeout
+                )
             case _:
                 raise ValueError(f"Unsupported HTTP method: {method}")
 
@@ -200,6 +209,23 @@ class MrkrClient():
         self._call_api(
             method="POST",
             endpoint=f"/project/{project_id}/scan"
+        )
+
+    def update_project_name(
+        self,
+        project_id: int,
+        name: schemas.UpdateProjectNameSchema | str
+    ) -> None:
+        """
+        Update the name of a project.
+        """
+        if isinstance(name, str):
+            name = schemas.UpdateProjectNameSchema(name=name)
+
+        self._call_api(
+            method="PUT",
+            endpoint=f"/project/{project_id}/name",
+            json=name.model_dump()
         )
 
     def list_projects(

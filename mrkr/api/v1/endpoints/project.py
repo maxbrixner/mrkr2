@@ -129,7 +129,7 @@ async def get_project(
 
 @router.put("{project_id}/config",
             summary="Update Project Configuration")
-async def update_label_data(
+async def update_project_configuration(
     session: database.DatabaseDependency,
     config: schemas.ProjectConfigSchema,
     project_id: int = fastapi.Path(
@@ -157,6 +157,41 @@ async def update_label_data(
 
     return {
         "message": "Project configuration updated successfully.",
+    }
+
+# ---------------------------------------------------------------------------- #
+
+
+@router.put("/{project_id}/name",
+            summary="Update Project Name")
+async def update_project_name(
+    session: database.DatabaseDependency,
+    update: schemas.UpdateProjectNameSchema,
+    project_id: int = fastapi.Path(
+        ...,
+        description="The unique identifier for the project (as an integer).",
+        examples=[1]
+    )
+) -> Dict:
+    """
+    Update the name of the project.
+    """
+    project = crud.get_project(session=session, id=project_id)
+
+    if not project:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
+
+    crud.update_project_name(
+        session=session,
+        project=project,
+        name=update.name
+    )
+
+    return {
+        "message": "Project name updated successfully.",
     }
 
 # ---------------------------------------------------------------------------- #

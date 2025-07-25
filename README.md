@@ -200,7 +200,16 @@ with sdk.MrkrClient(url="http://localhost:8000") as client:
     print(f"Project config: {project.config}")
 ```
 
-#### 2.2.6. Export a Document (with labels)
+#### 2.2.6. Update a Project's Name
+
+Update the name of a project:
+
+```python
+with sdk.MrkrClient(url="http://localhost:8000") as client:
+    client.update_project_name(project_id=1, name="New Name")
+```
+
+#### 2.2.7. Export a Document (with labels)
 
 Export a document including its labels:
 
@@ -219,7 +228,7 @@ with sdk.MrkrClient(url="http://localhost:8000") as client:
             print(f"Block labels: {block.labels}")
 ```
 
-#### 2.2.7. Create a Project
+#### 2.2.8. Create a Project
 
 Create a new project:
 

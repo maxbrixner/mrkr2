@@ -134,3 +134,21 @@ def update_project_configuration(
     return project
 
 # ---------------------------------------------------------------------------- #
+
+
+def update_project_name(
+    session: sqlmodel.Session,
+    project: models.Project,
+    name: str
+) -> models.Project:
+    """
+    Update a project's name.
+    """
+    project.name = name
+
+    session.add(project)
+    session.commit()
+    session.refresh(project)
+    return project
+
+# ---------------------------------------------------------------------------- #
