@@ -229,6 +229,28 @@ class MrkrClient():
         return [schemas.DocumentListSchema.model_validate(item)
                 for item in response.json()]
 
+    def get_project(
+        self,
+        project_id: int
+    ) -> schemas.ProjectSchema:
+        response = self._call_api(
+            method="GET",
+            endpoint=f"/project/{project_id}"
+        )
+
+        return schemas.ProjectSchema(**response.json())
+
+    def get_document(
+        self,
+        document_id: int
+    ) -> schemas.DocumentSchema:
+        response = self._call_api(
+            method="GET",
+            endpoint=f"/document/{document_id}"
+        )
+
+        return schemas.DocumentSchema(**response.json())
+
     def create_user(
         self,
         user: Dict | schemas.UserCreateSchema
@@ -260,5 +282,6 @@ class MrkrClient():
 
         return [schemas.UserListSchema.model_validate(item)
                 for item in response.json()]
+
 
 # ---------------------------------------------------------------------------- #

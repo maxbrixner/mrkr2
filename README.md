@@ -146,31 +146,7 @@ with sdk.MrkrClient(url="http://localhost:8000") as client:
     print("users:", users)
 ```
 
-#### 2.2.2. List Projects
-
-List all projects:
-
-```python
-import mrkr.sdk as sdk
-
-with sdk.MrkrClient(url="http://localhost:8000") as client:
-    projects = client.list_projects()
-    print("projects:", projects)
-```
-
-#### 2.2.3 List Documents
-
-List the documents of a project:
-
-```python
-import mrkr.sdk as sdk
-
-with sdk.MrkrClient(url="http://localhost:8000") as client:
-    documents = client.list_documents(project_id=1)
-    print("documents:", documents)
-```
-
-#### 2.2.4. Create a User
+#### 2.2.2. Create a User
 
 Create a new user:
 
@@ -187,7 +163,63 @@ with sdk.MrkrClient(url="http://localhost:8000") as client:
     )
 ```
 
-#### 2.2.5. Create a Project
+#### 2.2.3. List Projects
+
+List all projects:
+
+```python
+import mrkr.sdk as sdk
+
+with sdk.MrkrClient(url="http://localhost:8000") as client:
+    projects = client.list_projects()
+    print("projects:", projects)
+```
+
+#### 2.2.4. List Documents
+
+List the documents of a project:
+
+```python
+import mrkr.sdk as sdk
+
+with sdk.MrkrClient(url="http://localhost:8000") as client:
+    documents = client.list_documents(project_id=1)
+    print("documents:", documents)
+```
+
+#### 2.2.5. Export a Project (with configurations)
+
+Export a project including its configuration:
+
+```python
+import mrkr.sdk as sdk
+
+with sdk.MrkrClient(url="http://localhost:8000") as client:
+    project = client.get_project(project_id=1)
+    print(f"Project name: {project.name}")
+    print(f"Project config: {project.config}")
+```
+
+#### 2.2.6. Export a Document (with labels)
+
+Export a document including its labels:
+
+```python
+import mrkr.sdk as sdk
+
+with sdk.MrkrClient(url="http://localhost:8000") as client:
+    document = client.get_document(document_id=1)
+    print(f"Document Labels: {document.data.labels}")
+
+    for page in document.data.pages:
+        print(f"Page {page.page} labels: {page.labels}")
+
+        for block in page.blocks:
+            print(f"Block contents: {block.content}")
+            print(f"Block labels: {block.labels}")
+```
+
+#### 2.2.7. Create a Project
 
 Create a new project:
 
