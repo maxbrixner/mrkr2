@@ -3,7 +3,7 @@
   "locale": "en_US.UTF-8",
   "metadata": {
     "appmode": "python-fastapi",
-    "entrypoint": "mrkr:create_app"
+    "entrypoint": "entrypoint.py"
   },
   "python": {
     "version": "3.11.0",
@@ -20,7 +20,7 @@
   },
   "files": {
     "requirements.txt": {
-      "checksum": "c704f5ed8a49d091410f295f07e43b86"
+      "checksum": "2b7df816007da6c7f29942a1ef97eddb"
     },
     ".deploy/docker.app.yaml": {
       "checksum": "74d1ffa289b9877da45f62568ecbc115"
@@ -41,7 +41,7 @@
       "checksum": "b2da385b7ec3de6b4cd25e22a5b3b3e3"
     },
     ".gitignore": {
-      "checksum": "9568a3d5989a4be4c6fc8f238b0acb42"
+      "checksum": "76b3110091b398d8e7ce3d2843a837d6"
     },
     ".mypy_cache/.gitignore": {
       "checksum": "443828a59157868f0b38d74c6dbd48b2"
@@ -7433,10 +7433,10 @@
       "checksum": "913f1f29f11fac5932ba9310ce627858"
     },
     ".mypy_cache/3.11/mrkr/api/v1/endpoints/document.data.json": {
-      "checksum": "b38f66ba18af6fa8acb3f33e940879a2"
+      "checksum": "8738b58d51028e05dd63627bd5b41ffb"
     },
     ".mypy_cache/3.11/mrkr/api/v1/endpoints/document.meta.json": {
-      "checksum": "6189ee1b74cccf91c609970b6cccef5a"
+      "checksum": "b5d9fb8c52ce23672e87590921ddbd61"
     },
     ".mypy_cache/3.11/mrkr/api/v1/endpoints/ocr.data.json": {
       "checksum": "3f600ba0cfbafac7af119ed4eb82f804"
@@ -7448,13 +7448,13 @@
       "checksum": "2067c358e8c55f45c6a5a392b32b4605"
     },
     ".mypy_cache/3.11/mrkr/api/v1/endpoints/project.meta.json": {
-      "checksum": "c5d0d27a7ff8e8c6911ebc2227b5715a"
+      "checksum": "714909873201d2a13dcbf561d3435862"
     },
     ".mypy_cache/3.11/mrkr/api/v1/endpoints/user.data.json": {
-      "checksum": "08e0e1e92f6536b02e0b38b7a71d2c6b"
+      "checksum": "97f9713dbc2048f9af65e07f7d14d69a"
     },
     ".mypy_cache/3.11/mrkr/api/v1/endpoints/user.meta.json": {
-      "checksum": "f78434f8d8fe21e849febc3fd7105952"
+      "checksum": "6a4173f666e13b2bcaee6c8fbd745477"
     },
     ".mypy_cache/3.11/mrkr/api/v1/endpoints/utils.data.json": {
       "checksum": "c5536f5f01a7b3ee64ee31564096439b"
@@ -7499,10 +7499,10 @@
       "checksum": "cc39af71c4259a0c5505672b1b7c9990"
     },
     ".mypy_cache/3.11/mrkr/crud/document.data.json": {
-      "checksum": "925c04c73686738f202d7d746ee5f0f2"
+      "checksum": "f518268350fa10f959676604e5c55ee8"
     },
     ".mypy_cache/3.11/mrkr/crud/document.meta.json": {
-      "checksum": "ce021657643c14b13b54bc69a561abae"
+      "checksum": "589a0ae7af39d10686557cba8ea33bfd"
     },
     ".mypy_cache/3.11/mrkr/crud/ocr.data.json": {
       "checksum": "e005a194b16c13f743d6a9e2064a9aba"
@@ -7517,10 +7517,10 @@
       "checksum": "ac97297a6896acbc42d1467639b6da55"
     },
     ".mypy_cache/3.11/mrkr/crud/user.data.json": {
-      "checksum": "f53843e69aa7842d4ab1bdc00652536e"
+      "checksum": "48fef280691e07d7d84cfd3622433379"
     },
     ".mypy_cache/3.11/mrkr/crud/user.meta.json": {
-      "checksum": "31ea0472ba80ea0a2dbbb71c23b210a9"
+      "checksum": "b9f9ad8026918937875e793d0925ab4d"
     },
     ".mypy_cache/3.11/mrkr/database/__init__.data.json": {
       "checksum": "a5c37535bb056e36a68f8a36fdc8e7b0"
@@ -7577,16 +7577,16 @@
       "checksum": "cb6321883781c7d1965795c25ebd34f7"
     },
     ".mypy_cache/3.11/mrkr/models/__init__.data.json": {
-      "checksum": "db39b43dec31239b9df0b8bdd352fbaa"
+      "checksum": "528e1419192b9231d51579befbd60c2b"
     },
     ".mypy_cache/3.11/mrkr/models/__init__.meta.json": {
-      "checksum": "d440ca6df46abbdcebf91261cabc2511"
+      "checksum": "a8a4f814ccf2884b832d17f7a1fa59f1"
     },
     ".mypy_cache/3.11/mrkr/models/document.data.json": {
-      "checksum": "25cd470d004e3774e4d24708da742ba4"
+      "checksum": "816f7f5719276a6315d76eaca356be75"
     },
     ".mypy_cache/3.11/mrkr/models/document.meta.json": {
-      "checksum": "88fd9751305a20d56556ea00daf93b6b"
+      "checksum": "4152780cad0f928e352bd69d5214d18b"
     },
     ".mypy_cache/3.11/mrkr/models/ocr.data.json": {
       "checksum": "cea752bd84a0c8776f066e4aefed26b6"
@@ -7649,10 +7649,10 @@
       "checksum": "9c23142fb6220aea14fc443f645d3daf"
     },
     ".mypy_cache/3.11/mrkr/providers/ocr/tesseract.data.json": {
-      "checksum": "bb029ff7fc1668d936814fe3520ea5fb"
+      "checksum": "2e121fd7d7461e7fd6029f0640fbd97d"
     },
     ".mypy_cache/3.11/mrkr/providers/ocr/tesseract.meta.json": {
-      "checksum": "e2e6f5aa5477e121f63c6d9d199f6bbd"
+      "checksum": "12fbb620ad3f827fb4d505d8f241a1cb"
     },
     ".mypy_cache/3.11/mrkr/providers/setup/__init__.data.json": {
       "checksum": "afe8a887649dd3242439295404ca2600"
@@ -7673,16 +7673,16 @@
       "checksum": "1c8f03c28d62302b065bad76f4779ed6"
     },
     ".mypy_cache/3.11/mrkr/schemas/__init__.data.json": {
-      "checksum": "691f7e0c5a6b5d8b18817d7c1ebb23ae"
+      "checksum": "f94b493ee95fa3344b13adacebba2217"
     },
     ".mypy_cache/3.11/mrkr/schemas/__init__.meta.json": {
-      "checksum": "9c629fb72e87ab336a7a7778f4dce144"
+      "checksum": "4da0316daf88f33d724765746c83c6ac"
     },
     ".mypy_cache/3.11/mrkr/schemas/document.data.json": {
-      "checksum": "c180a791430ff84cc9e5a06271bc31b9"
+      "checksum": "67016bd4cc12f4205de546f60c14ebf7"
     },
     ".mypy_cache/3.11/mrkr/schemas/document.meta.json": {
-      "checksum": "6e35dbff76e296d7f3d26a0afa366fd6"
+      "checksum": "6cac996c443c7e6606970bf262ec2e14"
     },
     ".mypy_cache/3.11/mrkr/schemas/label.data.json": {
       "checksum": "08e77054b19c93003f11d6e10c289977"
@@ -7697,10 +7697,10 @@
       "checksum": "8cdb3781aadd2403f128579be2e35318"
     },
     ".mypy_cache/3.11/mrkr/schemas/project.data.json": {
-      "checksum": "5665baab10ce0be173adfbddd341b1a9"
+      "checksum": "fa5bcbf3d83f52aef92abfe780a3b3b1"
     },
     ".mypy_cache/3.11/mrkr/schemas/project.meta.json": {
-      "checksum": "0c1c66477c9c2de563c8d2b9f3a23fc7"
+      "checksum": "831c9325fea94175792a158bc6839ddc"
     },
     ".mypy_cache/3.11/mrkr/schemas/tags.data.json": {
       "checksum": "1f6ff48a945cd6644c3aa39992101c67"
@@ -10250,10 +10250,10 @@
       "checksum": "916f4dd256e625539885e0d6f3c5c155"
     },
     "README.md": {
-      "checksum": "6c6196253222b328a4f51ca5aabe27f2"
+      "checksum": "943bf33443ddc288bbb4b82b376e957b"
     },
     "demo.py": {
-      "checksum": "241bf6e5086535f8399655edfb932d1e"
+      "checksum": "f711c0032aeb910aa8d014df32d3eaa0"
     },
     "demo/2024-03-19_4027394689_DM1 (1).pdf": {
       "checksum": "07f40776e12a345374ca35728a6fb0cb"
@@ -10267,17 +10267,32 @@
     "demo/broker_demo2.pdf": {
       "checksum": "893da1e6d0d4ba1e35ca4a9f411daccf"
     },
+    "demo/documen4EN.pdf": {
+      "checksum": "29545570ffb36dc1b0e7f3cc30456901"
+    },
+    "demo/document1EN.pdf": {
+      "checksum": "29545570ffb36dc1b0e7f3cc30456901"
+    },
+    "demo/document2EN.pdf": {
+      "checksum": "29545570ffb36dc1b0e7f3cc30456901"
+    },
+    "demo/document3EN.pdf": {
+      "checksum": "29545570ffb36dc1b0e7f3cc30456901"
+    },
+    "entrypoint.py": {
+      "checksum": "e7e4a124f8da34e5125afca14303c752"
+    },
     "frontend/components/classification_labeler.ts": {
       "checksum": "13f3d9e3a875d4850be9851a003907d1"
     },
     "frontend/components/color_helpers.ts": {
-      "checksum": "0503cf4fa9a91f2ff2993c9bd338519c"
+      "checksum": "4de8b9cacc029e2dc3702daafd66bde4"
     },
     "frontend/components/document_viewer.ts": {
-      "checksum": "b7faf22ae8279bfaa47f13773d49584d"
+      "checksum": "815f43c314f1c6c3987549e3b66e1cec"
     },
     "frontend/components/filtered_table.ts": {
-      "checksum": "647679fe550598a166616df204506931"
+      "checksum": "151034792065112d6a1ed9c630db76c0"
     },
     "frontend/components/icon_button.ts": {
       "checksum": "b5d5d8fe6bce633ef60ced4a05a46186"
@@ -10286,10 +10301,13 @@
       "checksum": "4d25cd31b6363d846957638ca7b54be5"
     },
     "frontend/components/label_maker.ts": {
-      "checksum": "251d7c1b5713492412bb4601e9996f28"
+      "checksum": "9dc077968e39ef2387a52c718bd5379c"
+    },
+    "frontend/components/message_box.ts": {
+      "checksum": "0f503022e82d8aa018ad7017783d946c"
     },
     "frontend/components/remote_list_popup.ts": {
-      "checksum": "f160c02f985982afbafabf8eec9d8db0"
+      "checksum": "ea7add3b5a87cff23439631d0ff49fb5"
     },
     "frontend/components/resizable_panes.ts": {
       "checksum": "786d5c4d9c085cd7e844ab15ed3b29aa"
@@ -10418,16 +10436,16 @@
       "checksum": "6742934a0623cb2ad959d1057c3f886f"
     },
     "frontend/templates/base.html": {
-      "checksum": "4d0fc80671bf8f53f850406fa70bf7b4"
+      "checksum": "8bc4920ee852fedb1c938ed514c4b6af"
     },
     "frontend/templates/labeling.html": {
       "checksum": "09fbbe9da521cd72f9cfb5d8f1e4aaa6"
     },
     "frontend/templates/project.html": {
-      "checksum": "31a2979769767789b136570a70e4dd29"
+      "checksum": "19ac8dec6bcd1853d0f28ec2c9de8ec4"
     },
     "frontend/templates/projects.html": {
-      "checksum": "cfe48a3144cce1ceef8b476c9a6f83c8"
+      "checksum": "3969ffc2435d0d2db8a416808e1e59ab"
     },
     "frontend/tsconfig.json": {
       "checksum": "bdda9321be321756dafb4abc62959c35"
@@ -10541,7 +10559,7 @@
       "checksum": "a2149437ebe8f7805e4a5cb47f4b7f22"
     },
     "mrkr/core/__pycache__/app.cpython-311.pyc": {
-      "checksum": "d4f3423209558aff3e387e947d0faa71"
+      "checksum": "e36df6b6787253792841201732cf9741"
     },
     "mrkr/core/__pycache__/exceptions.cpython-310.pyc": {
       "checksum": "326646d2b9625a260bebf43d62c76b7e"
