@@ -288,6 +288,77 @@ with sdk.MrkrClient(url="http://localhost:8000") as client:
         }
 ```
 
+#### 2.9. Update a Project's Configuration
+
+Update the configuration of a project:
+
+```python
+with sdk.MrkrClient(url="http://localhost:8000") as client:
+    client.update_project_configuration(
+        project_id=1,
+        config={
+            "label_definitions": [
+                {
+                    "type": "classification_single",
+                    "target": "document",
+                    "name": "Letter",
+                    "color": "#4CAF50"
+                },
+                {
+                    "type": "classification_single",
+                    "target": "document",
+                    "name": "Email",
+                    "color": "#2196F3"
+                },
+                {
+                    "type": "classification_multiple",
+                    "target": "page",
+                    "name": "Cover Page",
+                    "color": "#FF9800"
+                },
+                {
+                    "type": "classification_multiple",
+                    "target": "page",
+                    "name": "Attachment",
+                    "color": "#F44336"
+                },
+                {
+                    "type": "text",
+                    "target": "block",
+                    "name": "Name",
+                    "color": "#607D8B"
+                },
+                {
+                    "type": "text",
+                    "target": "block",
+                    "name": "IBAN",
+                    "color": "#8BC34A"
+                },
+                {
+                    "type": "text",
+                    "target": "block",
+                    "name": "Street",
+                    "color": "#3F51B5"
+                }
+            ],
+            "file_provider": {
+                "type": "local",
+                "config": {
+                    "path": "demo",
+                    "pdf_dpi": 200,
+                    "image_format": "WebP"
+                }
+            },
+            "ocr_provider": {
+                "type": "tesseract",
+                "config": {
+                    "language": "eng"
+                }
+            }
+        }
+    )
+```
+
 Instead of passing a dictionary, you can also use ``sdk.ProjectCreateSchema`` to get type hints.
 
 A label can have the following **targets**:
