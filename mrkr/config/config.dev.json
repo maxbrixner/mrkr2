@@ -23,7 +23,7 @@
         "max_age": 600
     },
     "database": {
-        "url": "postgresql+psycopg2://{{POSTGRES_USER}}:{{POSTGRES_PASSWORD}}@{{POSTGRES_HOST}}/{{POSTGRES_DATABASE}}",
+        "url": "postgresql://{{POSTGRES_USER}}:{{POSTGRES_PASSWORD}}@{{POSTGRES_HOST}}/{{POSTGRES_DATABASE}}",
         "echo": false,
         "pool_size": 5,
         "max_overflow": 10
