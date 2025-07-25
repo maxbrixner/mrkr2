@@ -13,7 +13,7 @@ __pycache__
 *.sqlite3
 
 # Compiled JavaScript files
-frontend/static/js/*.js
+#frontend/static/js/*.js
 
 # Demo project creation
 #demo.py
