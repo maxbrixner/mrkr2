@@ -43,6 +43,7 @@ class Database():
         placeholders in the format {{VAR_NAME}} where VAR_NAME is the name
         of the environment variable to be replaced with its value.
         """
+        logger.warning(self._resolve_url(self._config.database.url))
         self._engine = sqlmodel.create_engine(
             url=self._resolve_url(url=self._config.database.url),
             echo=self._config.database.echo,
