@@ -101,7 +101,7 @@ class AwsSession(boto3.session.Session):
         client = super().client(service_name="sts")
 
         role_arn = f"arn:aws:iam::{self._config_aws_account_id}" \
-                   f":role/{self._config_aws_role_name}"
+            f":role/{self._config_aws_role_name}"
 
         response = client.assume_role(
             RoleSessionName='MrkrSession',
@@ -150,11 +150,18 @@ class AwsSession(boto3.session.Session):
         )
 
     def get_bucket(self, bucket_name: str) -> Any:
-        logger.debug(f"Creating AWS S3 bucket using temporary credentials.")
-
+        """
+        Return an AWS S3 bucket resource.
+        """
         bucket_name = self.resolve_config(bucket_name)
 
         resource = self.get_resource(service_name="s3")
         return resource.Bucket(name=bucket_name)
+
+    def get_textract_client(self) -> Any:
+        """
+        Return an AWS Textract client.
+        """
+        return self.get_client(service_name="textract")
 
 # ---------------------------------------------------------------------------- #

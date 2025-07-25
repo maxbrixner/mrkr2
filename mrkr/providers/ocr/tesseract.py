@@ -6,8 +6,7 @@ import pydantic
 import uuid
 import asyncio
 import functools
-from typing import Any, List, Optional, Self
-from PIL import Image
+from typing import Any, List, Self
 
 # ---------------------------------------------------------------------------- #
 
@@ -82,7 +81,7 @@ class TesseractOcrProvider(BaseOcrProvider):
 
     async def ocr(self) -> schemas.OcrResultSchema:
         """
-        Implement this method to perform OCR on the file and return the result.
+        Perform OCR on the file and return the result.
         """
         items = []
         for page, image in enumerate(self._images):

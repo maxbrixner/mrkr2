@@ -1,0 +1,65 @@
+# ---------------------------------------------------------------------------- #
+
+import logging
+from typing import Any, Self
+
+# ---------------------------------------------------------------------------- #
+
+import mrkr.schemas as schemas
+from .base import BaseOcrProvider
+from ..aws import AwsSession
+
+# ---------------------------------------------------------------------------- #
+
+logger = logging.getLogger("mrkr.providers.ocr")
+
+# ---------------------------------------------------------------------------- #
+
+
+class TextractOcrProvider(BaseOcrProvider):
+    """
+    A provider that uses Textract OCR to perform optical character recognition
+    on images.
+    """
+
+    _config: schemas.OcrProviderTesseractConfigSchema
+    _client: Any
+
+    def __init__(
+        self,
+        config: schemas.OcrProviderTextractConfigSchema
+    ) -> None:
+        """
+        Initializes the TextractOcrProvider with a configuration.
+        """
+        super().__init__(config=config)
+
+        aws_config = schemas.AwsConfigSchema(**self._config.model_dump())
+
+        session = AwsSession(config=aws_config)
+        self._client = session.get_textract_client()
+
+    async def __aenter__(self) -> Self:
+        """
+        Implement this method to initialize the OCR provider.
+        """
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: Any,
+        exc_value: Any,
+        traceback: Any
+    ) -> None:
+        """
+        Implement this method to clean up resources used by the OCR provider.
+        """
+        pass
+
+    async def ocr(self) -> schemas.OcrResultSchema:
+        """
+        Perform OCR on the file and return the result.
+        """
+        raise NotImplementedError
+
+# ---------------------------------------------------------------------------- #

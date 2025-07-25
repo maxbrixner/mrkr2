@@ -3,8 +3,7 @@
 import pathlib
 import logging
 import asyncio
-import boto3
-from typing import Any, AsyncGenerator, Self, Optional
+from typing import Any, AsyncGenerator, Optional
 
 # ---------------------------------------------------------------------------- #
 

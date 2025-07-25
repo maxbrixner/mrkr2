@@ -160,35 +160,11 @@ class OcrProviderTesseractConfigSchema(OcrProviderConfigSchema):
 # ---------------------------------------------------------------------------- #
 
 
-class OcrProviderTextractConfigSchema(OcrProviderConfigSchema):
+class OcrProviderTextractConfigSchema(OcrProviderConfigSchema, AwsConfigSchema):
     """
     Configuration for the AWS Textract OCR provider.
     """
-    access_key: str = pydantic.Field(
-        ...,
-        description="The AWS access key for S3.",
-        examples=["AKIAIOSFODNN7EXAMPLE"]
-    )
-    account_id: str = pydantic.Field(
-        ...,
-        description="The AWS account ID for the S3 bucket.",
-        examples=["123456789012"]
-    )
-    region: str = pydantic.Field(
-        ...,
-        description="The AWS region where the S3 bucket is located.",
-        examples=["us-west-2"]
-    )
-    role_name: str = pydantic.Field(
-        ...,
-        description="The AWS IAM role name for accessing the S3 bucket.",
-        examples=["TextractRole"]
-    )
-    secret_access_key: str = pydantic.Field(
-        ...,
-        description="The AWS secret access key for S3.",
-        examples=["wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"]
-    )
+    pass
 
 # ---------------------------------------------------------------------------- #
 

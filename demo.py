@@ -9,7 +9,7 @@ with sdk.MrkrClient(log_level="DEBUG") as client:
 
     # create demo project
     project_id = client.create_project(
-        name="Demo Project 4",
+        name="Demo Project 6",
         config={
             "label_definitions": [
                 {
@@ -56,9 +56,9 @@ with sdk.MrkrClient(log_level="DEBUG") as client:
                 }
             ],
             "file_provider": {
-                "type": "s3",
+                "type": "local",
                 "config": {
-                    "path": "demos",
+                    "path": "demo",
                     "pdf_dpi": 200,
                     "image_format": "WebP",
                     "aws_access_key_id": "{{AWS_ACCESS_KEY_ID}}",
@@ -70,9 +70,14 @@ with sdk.MrkrClient(log_level="DEBUG") as client:
                 },
             },
             "ocr_provider": {
-                "type": "tesseract",
+                "type": "textract",
                 "config": {
-                        "language": "eng"
+                    "aws_access_key_id": "{{AWS_ACCESS_KEY_ID}}",
+                    "aws_secret_access_key": "{{AWS_SECRET_ACCESS_KEY}}",
+                    "aws_region_name": "{{AWS_REGION_NAME}}",
+                    "aws_account_id": "{{AWS_ACCOUNT_ID}}",
+                    "aws_role_name": "{{AWS_ROLE_NAME}}",
+                    "aws_bucket_name": "{{AWS_BUCKET_NAME}}"
                 }
             }
         }

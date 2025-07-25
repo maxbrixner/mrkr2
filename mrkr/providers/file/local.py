@@ -3,7 +3,7 @@
 import pathlib
 import logging
 import asyncio
-from typing import Any, AsyncGenerator, Self, Optional
+from typing import AsyncGenerator, Optional
 
 # ---------------------------------------------------------------------------- #
 
