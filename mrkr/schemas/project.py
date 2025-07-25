@@ -298,6 +298,19 @@ class ProjectSchema(pydantic.BaseModel):
 # ---------------------------------------------------------------------------- #
 
 
+class UpdateProjectNameSchema(pydantic.BaseModel):
+    """
+    API-Schema for updating a project's name.
+    """
+    name: str = pydantic.Field(
+        ...,
+        description="The new name for the project.",
+        examples=["My Project"]
+    )
+
+# ---------------------------------------------------------------------------- #
+
+
 class ProjectListSchema(pydantic.BaseModel):
     """
     API-Schema for a list of projects, stripped of the configuration.
