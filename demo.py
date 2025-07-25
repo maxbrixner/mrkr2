@@ -4,7 +4,7 @@ import mrkr.sdk as sdk
 
 # ---------------------------------------------------------------------------- #
 
-with sdk.MrkrClient(log_level="DEBUG") as client:
+with sdk.MrkrClient(url="https://posit-dev.srv.allianz/mrkr2", log_level="DEBUG") as client:
 
     # create demo project
     project_id = client.create_project(
