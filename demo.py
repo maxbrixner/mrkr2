@@ -4,11 +4,12 @@ import mrkr.sdk as sdk
 
 # ---------------------------------------------------------------------------- #
 
+
 with sdk.MrkrClient(log_level="DEBUG") as client:
 
     # create demo project
     project_id = client.create_project(
-        name="Demo Project",
+        name="Demo Project 4",
         config={
             "label_definitions": [
                 {
@@ -55,21 +56,29 @@ with sdk.MrkrClient(log_level="DEBUG") as client:
                 }
             ],
             "file_provider": {
-                "type": "local",
+                "type": "s3",
                 "config": {
-                    "path": "demo",
+                    "path": "demos",
                     "pdf_dpi": 200,
-                    "image_format": "WebP"
-                }
+                    "image_format": "WebP",
+                    "aws_access_key_id": "{{AWS_ACCESS_KEY_ID}}",
+                    "aws_secret_access_key": "{{AWS_SECRET_ACCESS_KEY}}",
+                    "aws_region_name": "{{AWS_REGION_NAME}}",
+                    "aws_account_id": "{{AWS_ACCOUNT_ID}}",
+                    "aws_role_name": "{{AWS_ROLE_NAME}}",
+                    "aws_bucket_name": "{{AWS_BUCKET_NAME}}"
+                },
             },
             "ocr_provider": {
                 "type": "tesseract",
                 "config": {
-                    "language": "eng"
+                        "language": "eng"
                 }
             }
         }
     )
+
+    exit(0)
 
     print(f"Created project with ID: {project_id}")
 
@@ -129,20 +138,5 @@ with sdk.MrkrClient(log_level="DEBUG") as client:
             "password": "demo_password"
         }
     )
-
-    # list projects
-    projects = client.list_projects()
-    print("projects:", projects)
-
-    # list documents
-    for project in projects:
-        documents = client.list_project_documents(
-            project_id=project.id
-        )
-        print(f"Documents for project {project.name}: {documents}")
-
-    # list users
-    users = client.list_users()
-    print("users:", users)
 
 # ---------------------------------------------------------------------------- #
