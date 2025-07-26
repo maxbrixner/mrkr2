@@ -163,6 +163,8 @@ with sdk.MrkrClient(url="http://localhost:8000") as client:
     )
 ```
 
+Instead of passing a dictionary, you can also use ``sdk.schemas.UserCreateSchema`` to get type hints.
+
 #### 2.2.3. List Projects
 
 List all projects:
@@ -288,6 +290,8 @@ with sdk.MrkrClient(url="http://localhost:8000") as client:
         }
 ```
 
+Instead of passing a dictionary, you can also use ``sdk.schemas.ProjectCreateSchema`` to get type hints.
+
 #### 2.9. Update a Project's Configuration
 
 Update the configuration of a project:
@@ -359,7 +363,7 @@ with sdk.MrkrClient(url="http://localhost:8000") as client:
     )
 ```
 
-Instead of passing a dictionary, you can also use ``sdk.ProjectCreateSchema`` to get type hints.
+Instead of passing a dictionary, you can also use ``sdk.schemas.ProjectConfigSchema`` to get type hints.
 
 A label can have the following **targets**:
 
@@ -384,7 +388,7 @@ The following file providers are available:
 |Type|Description|Configuration|
 |-|-|-|
 |local|Serves local files from a folder, e.g. within the Docker container|Expects a ``path`` config variable|
-|s3|Serves files from an AWS S3 bucket|Expects a ``path``, ``aws_access_key_id``, ``aws_secret_access_key``, ``aws_region_name``, ``aws_account_id``, ``aws_role_name``, ``aws_bucket_name`` variable|
+|s3|Serves files from an AWS S3 bucket|Expects ``path``, ``aws_access_key_id``, ``aws_secret_access_key``, ``aws_region_name``, ``aws_account_id``, ``aws_role_name``, ``aws_bucket_name`` config variables|
 
 All file providers expect a ``pdf_dpi`` (defaults to 200) and an ``image_format`` (defaults to JPEG).
 
@@ -393,3 +397,4 @@ The following OCR providers are available:
 |Type|Description|Configuration|
 |-|-|-|
 |tesseract|Uses Google's tesseract for OCR.|Expects a ``language`` config variable, e.g. ``eng``or ``deu``|
+|textract|Uses AWS's textract for OCR|Expects ``aws_access_key_id``, ``aws_secret_access_key``, ``aws_region_name``, ``aws_account_id``, ``aws_role_name``, ``aws_bucket_name`` config variables|
