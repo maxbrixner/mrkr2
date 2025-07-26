@@ -8,7 +8,7 @@ import pydantic
 import datetime
 import asyncio
 import functools
-from typing import Any
+from typing import Any, AsyncGenerator
 
 # ---------------------------------------------------------------------------- #
 
@@ -94,11 +94,11 @@ class AwsSession(boto3.session.Session):
         string = re.sub(r"{{(\w+)}}", replace_env_var, string)
         return string
 
-    async def refresh_temp_credentials(self) -> None:
+    async def refresh_temp_credentials(self, force: bool = False) -> None:
         """
         Fetch and update temporary credentials.
         """
-        if self._temp_credentials is not None:
+        if self._temp_credentials is not None and force is False:
             if self._temp_credentials.Expiration <= \
                     datetime.datetime.now(tz=datetime.timezone.utc):
                 logger.debug("Temporary credentials sill valid.")
@@ -189,19 +189,79 @@ class AwsSession(boto3.session.Session):
             )
         )
 
-    async def get_bucket(self, bucket_name: str) -> Any:
+    async def get_async_bucket(self, bucket_name: str) -> Any:
         """
-        Return an AWS S3 bucket resource.
+        Return an AWS S3 bucket resource wrapper for asynchronous operations.
         """
         bucket_name = self.resolve_config(bucket_name)
 
         resource = await self.get_resource(service_name="s3")
-        return resource.Bucket(name=bucket_name)
 
-    async def get_textract_client(self) -> Any:
+        loop = asyncio.get_running_loop()
+
+        bucket = await loop.run_in_executor(
+            None,
+            functools.partial(
+                resource.Bucket,
+                name=bucket_name
+            )
+        )
+
+        return AsyncBucketWrapper(bucket=bucket)
+
+    async def get_async_textract_client(self) -> Any:
         """
         Return an AWS Textract client.
         """
-        return await self.get_client(service_name="textract")
+        client = await self.get_client(service_name="textract")
+        return AsyncTextractWrapper(textract_client=client)
+
+# ---------------------------------------------------------------------------- #
+
+
+class AsyncBucketWrapper():
+    """
+    A wrapper for an AWS S3 bucket to provide an asynchronous interface
+    for file operations.
+    """
+    _bucket: Any
+
+    def __init__(self, bucket: Any) -> None:
+        """
+        Initialize the bucket wrapper with the AWS configuration.
+        """
+        self._bucket = bucket
+
+    async def list_objects(self, prefix: str) -> AsyncGenerator[str, None]:
+        """
+        List objects in the bucket with the specified prefix.
+        """
+        loop = asyncio.get_running_loop()
+
+        response = await loop.run_in_executor(
+            None,
+            functools.partial(
+                self._bucket.objects.filter,
+                Prefix=prefix
+            )
+        )
+
+        for object in response:
+            yield object.key
+
+# ---------------------------------------------------------------------------- #
+
+
+class AsyncTextractWrapper():
+    """
+    A wrapper for AWS Textract to provide an asynchronous interface.
+    """
+    _client: Any
+
+    def __init__(self, textract_client: Any) -> None:
+        """
+        Initialize the Textract wrapper with the AWS Textract client.
+        """
+        self._client = textract_client
 
 # ---------------------------------------------------------------------------- #

@@ -7,7 +7,7 @@ from typing import Any, Self
 
 import mrkr.schemas as schemas
 from .base import BaseOcrProvider
-from ..aws import AwsSession
+from ..aws import AwsSession, AsyncTextractWrapper
 
 # ---------------------------------------------------------------------------- #
 
@@ -23,7 +23,7 @@ class TextractOcrProvider(BaseOcrProvider):
     """
 
     _config: schemas.OcrProviderTesseractConfigSchema
-    _client: Any | None
+    _client: AsyncTextractWrapper | None
 
     def __init__(
         self,
@@ -53,6 +53,13 @@ class TextractOcrProvider(BaseOcrProvider):
         """
         pass
 
+    async def ocr(self) -> schemas.OcrResultSchema:
+        """
+        Perform OCR on the file and return the result.
+        """
+        await self.refresh_client()
+        raise NotImplementedError("Textract is not implemented yet.")
+
     async def refresh_client(self) -> None:
         """
         Refresh the Textract client if needed.
@@ -60,13 +67,6 @@ class TextractOcrProvider(BaseOcrProvider):
         if self._client is None:
             aws_config = schemas.AwsConfigSchema(**self._config.model_dump())
             session = AwsSession(config=aws_config)
-            self._client = await session.get_textract_client()
-
-    async def ocr(self) -> schemas.OcrResultSchema:
-        """
-        Perform OCR on the file and return the result.
-        """
-        await self.refresh_client()
-        raise NotImplementedError("Textract is not implemented yet.")
+            self._client = await session.get_async_textract_client()
 
 # ---------------------------------------------------------------------------- #

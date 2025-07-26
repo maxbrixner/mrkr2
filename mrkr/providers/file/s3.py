@@ -9,7 +9,7 @@ from typing import Any, AsyncGenerator, Optional
 
 import mrkr.schemas as schemas
 from .base import BaseFileProvider
-from ..aws import AwsSession
+from ..aws import AwsSession, AsyncBucketWrapper
 
 # ---------------------------------------------------------------------------- #
 
@@ -23,7 +23,7 @@ class S3FileProvider(BaseFileProvider):
     A provider that handles AWS S3 file operations.
     """
     _config: schemas.FileProviderS3ConfigSchema
-    _bucket: Any
+    _bucket: AsyncBucketWrapper | None
 
     def __init__(self, config: schemas.FileProviderS3ConfigSchema):
         super().__init__(config=config)
@@ -98,15 +98,17 @@ class S3FileProvider(BaseFileProvider):
         logger.debug(f"Listing files for path: '{self.filename}'")
 
         await self.refresh_bucket()
+        if self._bucket is None:
+            raise Exception("Bucket not initialized.")
 
         if not await self.is_folder:
             raise Exception(f"Object '{self.filename}' is not a folder.")
 
-        for object in self._bucket.objects.filter(Prefix=str(self.filename)):
-            if object.key.endswith("/"):
+        async for key in self._bucket.list_objects(prefix=str(self.filename)):
+            if key.endswith("/"):
                 continue
 
-            filename = pathlib.Path(object.key).name
+            filename = pathlib.Path(key).name
             yield filename
 
     async def refresh_bucket(self) -> None:
@@ -116,7 +118,7 @@ class S3FileProvider(BaseFileProvider):
         if self._bucket is None:
             aws_config = schemas.AwsConfigSchema(**self._config.model_dump())
             session = AwsSession(config=aws_config)
-            self._bucket = await session.get_bucket(
+            self._bucket = await session.get_async_bucket(
                 bucket_name=self._config.aws_bucket_name)
 
 
