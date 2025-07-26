@@ -30,9 +30,7 @@ class S3FileProvider(BaseFileProvider):
 
         aws_config = schemas.AwsConfigSchema(**self._config.model_dump())
 
-        session = AwsSession(config=aws_config)
-        self._bucket = session.get_bucket(
-            bucket_name=self._config.aws_bucket_name)
+        self._bucket = None
 
     @property
     def filename(self) -> pathlib.Path:
@@ -48,10 +46,11 @@ class S3FileProvider(BaseFileProvider):
         """
         Returns True if the path is a file, False otherwise.
         """
-        loop = asyncio.get_running_loop()
-        is_file = await loop.run_in_executor(
-            None, self.filename.is_file)
-        return is_file
+        return False
+        # loop = asyncio.get_running_loop()
+        # is_file = await loop.run_in_executor(
+        #    None, self.filename.is_file)
+        # return is_file
 
     @property
     async def is_folder(self) -> bool:
@@ -98,6 +97,8 @@ class S3FileProvider(BaseFileProvider):
         """
         logger.debug(f"Listing files for path: '{self.filename}'")
 
+        await self.refresh_bucket()
+
         if not await self.is_folder:
             raise Exception(f"Object '{self.filename}' is not a folder.")
 
@@ -107,5 +108,16 @@ class S3FileProvider(BaseFileProvider):
 
             filename = pathlib.Path(object.key).name
             yield filename
+
+    async def refresh_bucket(self) -> None:
+        """
+        Refresh the S3 bucket if needed.
+        """
+        if self._bucket is None:
+            aws_config = schemas.AwsConfigSchema(**self._config.model_dump())
+            session = AwsSession(config=aws_config)
+            self._bucket = await session.get_bucket(
+                bucket_name=self._config.aws_bucket_name)
+
 
 # ---------------------------------------------------------------------------- #

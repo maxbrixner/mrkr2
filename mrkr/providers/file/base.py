@@ -133,7 +133,7 @@ class BaseFileProvider:
                 None,
                 functools.partial(
                     image.save,
-                    bytes,
+                    fp=bytes,
                     format=self._config.image_format
                 )
             )

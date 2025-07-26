@@ -23,7 +23,7 @@ class TextractOcrProvider(BaseOcrProvider):
     """
 
     _config: schemas.OcrProviderTesseractConfigSchema
-    _client: Any
+    _client: Any | None
 
     def __init__(
         self,
@@ -34,10 +34,7 @@ class TextractOcrProvider(BaseOcrProvider):
         """
         super().__init__(config=config)
 
-        aws_config = schemas.AwsConfigSchema(**self._config.model_dump())
-
-        session = AwsSession(config=aws_config)
-        self._client = session.get_textract_client()
+        self._client = None
 
     async def __aenter__(self) -> Self:
         """
@@ -56,10 +53,20 @@ class TextractOcrProvider(BaseOcrProvider):
         """
         pass
 
+    async def refresh_client(self) -> None:
+        """
+        Refresh the Textract client if needed.
+        """
+        if self._client is None:
+            aws_config = schemas.AwsConfigSchema(**self._config.model_dump())
+            session = AwsSession(config=aws_config)
+            self._client = await session.get_textract_client()
+
     async def ocr(self) -> schemas.OcrResultSchema:
         """
         Perform OCR on the file and return the result.
         """
-        raise NotImplementedError
+        await self.refresh_client()
+        raise NotImplementedError("Textract is not implemented yet.")
 
 # ---------------------------------------------------------------------------- #

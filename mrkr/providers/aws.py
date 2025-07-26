@@ -6,6 +6,8 @@ import os
 import logging
 import pydantic
 import datetime
+import asyncio
+import functools
 from typing import Any
 
 # ---------------------------------------------------------------------------- #
@@ -34,7 +36,7 @@ class AwsSession(boto3.session.Session):
     temporary credentials.
     """
     _config: schemas.AwsConfigSchema
-    _temporary_credentials: _AwsTemporaryCredentials
+    _temp_credentials: _AwsTemporaryCredentials | None
 
     def __init__(self, config: schemas.AwsConfigSchema) -> None:
         """
@@ -48,7 +50,7 @@ class AwsSession(boto3.session.Session):
             region_name=self._config_aws_region_name
         )
 
-        self.refresh_temporary_credentials()
+        self._temp_credentials = None
 
         logger.debug(f"AWS session initialized")
 
@@ -92,76 +94,114 @@ class AwsSession(boto3.session.Session):
         string = re.sub(r"{{(\w+)}}", replace_env_var, string)
         return string
 
-    def refresh_temporary_credentials(self) -> None:
+    async def refresh_temp_credentials(self) -> None:
         """
         Fetch and update temporary credentials.
         """
+        if self._temp_credentials is not None:
+            if self._temp_credentials.Expiration <= \
+                    datetime.datetime.now(tz=datetime.timezone.utc):
+                logger.debug("Temporary credentials sill valid.")
+                return
+
         logger.debug("Fetching temporary AWS credentials...")
 
-        client = super().client(service_name="sts")
+        loop = asyncio.get_running_loop()
+
+        client = await loop.run_in_executor(
+            None,
+            functools.partial(
+                super().client,
+                service_name="sts"
+            )
+        )
 
         role_arn = f"arn:aws:iam::{self._config_aws_account_id}" \
             f":role/{self._config_aws_role_name}"
 
-        response = client.assume_role(
-            RoleSessionName='MrkrSession',
-            RoleArn=role_arn
+        response = await loop.run_in_executor(
+            None,
+            functools.partial(
+                client.assume_role,
+                RoleSessionName='MrkrSession',
+                RoleArn=role_arn
+            )
         )
 
-        schema = _AwsTemporaryCredentials(**response['Credentials'])
+        self._temp_credentials = \
+            _AwsTemporaryCredentials(**response['Credentials'])
 
         logger.debug(
             f"Temporary AWS credentials received (expires "
-            f"{schema.Expiration.strftime('%Y-%m-%d %H:%M:%S%Z')})."
+            f"{self._temp_credentials .Expiration.strftime(
+                '%Y-%m-%d %H:%M:%S%Z')})."
         )
 
-        self._temporary_credentials = schema
-
-    def get_client(self, service_name: str) -> Any:
+    async def get_client(self, service_name: str) -> Any:
         """
         Return an AWS client for a specific service (e.g. s3, ec2) using
         the temporary credentials.
         """
-        logger.debug(f"Creating AWS {service_name} client using temporary "
-                     f"credentials.")
+        logger.debug(f"Creating AWS client using temporary "
+                     f"credentials: {service_name}.")
 
-        return super().client(
-            service_name=service_name,
-            region_name=self._config_aws_region_name,
-            aws_access_key_id=self._temporary_credentials.AccessKeyId,
-            aws_secret_access_key=self._temporary_credentials.SecretAccessKey,
-            aws_session_token=self._temporary_credentials.SessionToken
+        await self.refresh_temp_credentials()
+        if not self._temp_credentials:
+            raise Exception("Temporary credentials not available.")
+
+        loop = asyncio.get_running_loop()
+
+        return await loop.run_in_executor(
+            None,
+            functools.partial(
+                super().client,
+                service_name=service_name,
+                region_name=self._config_aws_region_name,
+                aws_access_key_id=self._temp_credentials.AccessKeyId,
+                aws_secret_access_key=self._temp_credentials.SecretAccessKey,
+                aws_session_token=self._temp_credentials.SessionToken
+            )
         )
 
-    def get_resource(self, service_name: str) -> Any:
+    async def get_resource(self, service_name: str) -> Any:
         """
-        Return an AWS resource for a specific service (e.g. s3, ec2) using
+        Return an AWS resource for a specific service (e.g. "s3", "ec2") using
         the temporary credentials.
         """
-        logger.debug(f"Creating AWS {service_name} resource using temporary "
-                     f"credentials.")
+        logger.debug(f"Creating AWS resource using temporary "
+                     f"credentials: {service_name}.")
 
-        return super().resource(
-            service_name=service_name,
-            region_name=self._config_aws_region_name,
-            aws_access_key_id=self._temporary_credentials.AccessKeyId,
-            aws_secret_access_key=self._temporary_credentials.SecretAccessKey,
-            aws_session_token=self._temporary_credentials.SessionToken
+        await self.refresh_temp_credentials()
+        if not self._temp_credentials:
+            raise Exception("Temporary credentials not available.")
+
+        loop = asyncio.get_running_loop()
+
+        return await loop.run_in_executor(
+            None,
+            functools.partial(
+                super().resource,
+                service_name=service_name,
+                region_name=self._config_aws_region_name,
+                aws_access_key_id=self._temp_credentials.AccessKeyId,
+                aws_secret_access_key=self._temp_credentials.SecretAccessKey,
+                aws_session_token=self._temp_credentials.SessionToken
+            )
         )
 
-    def get_bucket(self, bucket_name: str) -> Any:
+    async def get_bucket(self, bucket_name: str) -> Any:
         """
         Return an AWS S3 bucket resource.
         """
         bucket_name = self.resolve_config(bucket_name)
 
-        resource = self.get_resource(service_name="s3")
+        resource = await self.get_resource(service_name="s3")
         return resource.Bucket(name=bucket_name)
 
-    def get_textract_client(self) -> Any:
+    async def get_textract_client(self) -> Any:
         """
         Return an AWS Textract client.
         """
-        return self.get_client(service_name="textract")
+        return await self.get_client(service_name="textract")
 
 # ---------------------------------------------------------------------------- #
