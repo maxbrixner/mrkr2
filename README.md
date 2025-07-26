@@ -1,6 +1,6 @@
 # Mrkr
 
-A tool to label pages, blocks and text within images and PDF files.
+A tool to label pages, blocks, and text within images and PDF files.
 
 The backend is built with FastAPI, and the frontend uses WebComponents written in TypeScript.
 
@@ -29,7 +29,7 @@ Create an environment file:
 cp .env.example .env
 ```
 
-Install Poppler, Tesseract and any required language packs. A an example, for Arch Linux use:
+Install Poppler, Tesseract and any required language packs. As an example, for Arch Linux use:
 
 ```bash
 sudo pacman -S poppler tesseract tesseract-data-eng tesseract-data-deu
@@ -47,7 +47,7 @@ Alternatively, in Visual Studio Code, press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kb
 
 ### 1.3. Start the Test Database
 
-Add a database password to the `.env` file.  
+Set a database password in the ``.env`` file.
 Use Docker Compose to start the test database. The configuration is located in the `.deploy` folder.
 
 Alternatively, in Visual Studio Code, you can use `Terminal > Run Task` to execute the `build dev database` and `run dev database` tasks.
@@ -122,7 +122,7 @@ with sdk.MrkrClient(url="http://localhost:8000") as client:
     # ...
 ```
 
-You may pass further arguments to the client:
+You may pass additional arguments to the client:
 
 |Argument|Description|
 |-|-|
@@ -288,11 +288,12 @@ with sdk.MrkrClient(url="http://localhost:8000") as client:
                 }
             }
         }
+    )
 ```
 
 Instead of passing a dictionary, you can also use ``sdk.schemas.ProjectCreateSchema`` to get type hints.
 
-#### 2.9. Update a Project's Configuration
+#### 2.3. Update a Project's Configuration
 
 Update the configuration of a project:
 
@@ -365,7 +366,7 @@ with sdk.MrkrClient(url="http://localhost:8000") as client:
 
 Instead of passing a dictionary, you can also use ``sdk.schemas.ProjectConfigSchema`` to get type hints.
 
-A label can have the following **targets**:
+A label can **target** the following:
 
 |Target|Description|
 |-|-|
@@ -377,24 +378,24 @@ A label can have the following **types**:
 
 |Type|Description|
 |-|-|
-|classification_single|A classification label that unselects all other labels for its target once it is selected|
+|classification_single|A classification label that deselects all other labels for its target when selected.|
 |classification_multiple|A classification label that allows other classification labels for the same target|
 |text|A label that targets a substring within a block|
 
-Text labels can only target blocks!
+Note: text labels can only target blocks.
 
 The following file providers are available:
 
 |Type|Description|Configuration|
 |-|-|-|
-|local|Serves local files from a folder, e.g. within the Docker container|Expects a ``path`` config variable|
-|s3|Serves files from an AWS S3 bucket|Expects ``path``, ``aws_access_key_id``, ``aws_secret_access_key``, ``aws_region_name``, ``aws_account_id``, ``aws_role_name``, ``aws_bucket_name`` config variables|
+|local|Serves local files from a folder, e.g. within the Docker container|Requires a ``path`` configuration variable|
+|s3|Serves files from an AWS S3 bucket|Requires ``path``, ``aws_access_key_id``, ``aws_secret_access_key``, ``aws_region_name``, ``aws_account_id``, ``aws_role_name``, ``aws_bucket_name`` configuration variables|
 
-All file providers expect a ``pdf_dpi`` (defaults to 200) and an ``image_format`` (defaults to JPEG).
+All file providers require a ``pdf_dpi`` (default: 200) and an ``image_format`` (default: JPEG).
 
 The following OCR providers are available:
 
 |Type|Description|Configuration|
 |-|-|-|
-|tesseract|Uses Google's tesseract for OCR.|Expects a ``language`` config variable, e.g. ``eng``or ``deu``|
-|textract|Uses AWS's textract for OCR|Expects ``aws_access_key_id``, ``aws_secret_access_key``, ``aws_region_name``, ``aws_account_id``, ``aws_role_name``, ``aws_bucket_name`` config variables|
+|tesseract|Uses Google's tesseract for OCR.|Requires a ``language`` configuration variable, e.g., ``eng`` or ``deu``|
+|textract|Uses AWS's textract for OCR|Requires ``aws_access_key_id``, ``aws_secret_access_key``, ``aws_region_name``, ``aws_account_id``, ``aws_role_name``, ``aws_bucket_name`` configuration variables|
