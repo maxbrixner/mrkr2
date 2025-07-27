@@ -146,7 +146,7 @@ export class ProjectsContent extends HTMLElement implements ProjectsContentAttri
 
         this._table.style.gridArea = 'table';
         this._table.ariaLabel = "Projects Table";
-        this._table.config = '{"idColumn": "id", "headers": {"id": "ID", "name": "Name", "done": "Done", "open": "Open", "review": "Review", "created": "Created at", "updated": "Updated at", "path": "Path"}, "filterElement": "filter"}';
+        this._table.config = '{"idColumn": "id", "headers": {"id": "ID", "name": "Name", "done": "Done", "open": "Open", "review": "Review", "created": "Created at", "updated": "Updated at"}, "filterElement": "filter"}';
 
         this.shadowRoot.appendChild(toolbar)
         this.shadowRoot.appendChild(this._table);
