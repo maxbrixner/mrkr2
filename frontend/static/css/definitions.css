@@ -20,6 +20,7 @@
 
     --scrollbar-thumb: #8b8b8b;
     --scrollbar-track: #f0efeb;
+    --scrollbar-width: thin;
 
     --success-color: #4caf50;
     --on-success-color: #ffffff;
@@ -33,11 +34,11 @@
     --error-color: #f44336;
     --on-error-color: #ffffff;
 
-
+    --table-even-color: #fdfdfc;
+    --table-odd-color: #f9f8f6;
 
     --border-color: #e1ded5;
-    --hover-color: #e0e0e0;
-    --active-color: #c8c8c8;
+    --hover-color: #f0f3fe;
 
     --disabled-color: #f0f0f0;
     --disabled-text-color: #888888;
@@ -66,15 +67,19 @@
     --spacing-xxlarge: 2rem;
 
     /* Border radius */
-    --border-radius-small: 2px;
-    --border-radius-medium: 4px;
-    --border-radius-large: 8px;
+    --border-radius-small: 0.125rem;
+    --border-radius-medium: 0.25rem;
+    --border-radius-large: 0.5rem;
+    --border-radius-xlarge: 1rem;
+    --border-radius-xxlarge: 2rem;
 
     /* Scrollbar */
     --scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 
     /* Shadows */
     --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --box-shadow-inset: inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+
 
     /* Spinner */
     --spinner-color: var(--primary-color);
@@ -132,6 +137,7 @@
     --message-box-success-background-color: var(--success-color);
     --message-box-success-color: var(--on-success-color);
     --message-box-success-border-color: var(--border-color);
+    --message-box-success-icon-filter: invert(1);
 
     --message-box-info-background-color: var(--info-color);
     --message-box-info-color: var(--on-info-color);
@@ -145,7 +151,40 @@
     --message-box-error-color: var(--on-error-color);
     --message-box-error-border-color: var(--border-color);
 
+    /* Filtered Table Variables */
+    --filtered-table-empty-color: var(--disabled-text-color);
+    --filtered-table-empty-font-size: var(--font-size-medium);
+    --filtered-table-tr-even-background-color: var(--table-even-color);
+    --filtered-table-tr-odd-background-color: var(--table-odd-color);
+    --filtered-table-tr-focus-outline-color: var(--primary-color);
+    --filtered-table-tr-hover-background-color: var(--hover-color);
+    --filtered-table-font-size: var(--font-size-small);
+    --filtered-table-header-box-shadow: var(--box-shadow-inset);
+    --filtered-table-header-background-color: var(--table-odd-color);
+    --filtered-table-font-color: var(--text-color);
+    --filtered-table-th-padding: var(--spacing-medium) var(--spacing-small);
+    --filtered-table-td-padding: var(--spacing-xlarge) var(--spacing-small);
+    --filtered-table-chip-border-radius: var(--border-radius-xlarge);
+    --filtered-table-chip-padding: var(--spacing-small) var(--spacing-medium);
 
+    --filtered-table-chip-processing-background-color: #90A4AE;
+    --filtered-table-chip-processing-color: #000000;
+
+    --filtered-table-chip-open-background-color: #80DEEA;
+    --filtered-table-chip-open-color: #000000;
+
+    --filtered-table-chip-done-background-color: #4CAF50;
+    --filtered-table-chip-done-color: #000000;
+
+    --filtered-table-chip-review-background-color: #FFC107;
+    --filtered-table-chip-review-color: #000000;
+
+
+    --filtered-table-header-background-color: var(--surface-color);
+    --filtered-table-header-color: var(--text-color);
+    --filtered-table-header-border-color: var(--border-color);
+    --filtered-table-header-font-size: var(--font-size-medium);
+    --filtered-table-header-font-weight: var(--font-weight-semibold);
 
 
 

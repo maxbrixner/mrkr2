@@ -7,18 +7,31 @@ export class IconButton extends StyledButton {
     set img(value) {
         this.setAttribute('img', value);
     }
+    get filter() {
+        return this.getAttribute('filter') || 'none';
+    }
+    set filter(value) {
+        this.setAttribute('filter', value);
+    }
     constructor() {
         super();
         this._childPopulateShadowRoot();
     }
     static get observedAttributes() {
-        return [...super.observedAttributes, 'img'];
+        return [...super.observedAttributes, 'img', 'filter'];
     }
     attributeChangedCallback(propertyName, oldValue, newValue) {
+        if (oldValue === newValue)
+            return;
         super.attributeChangedCallback(propertyName, oldValue, newValue);
         if (propertyName === 'img') {
             if (this._imgElement) {
                 this._imgElement.src = newValue || '';
+            }
+        }
+        else if (propertyName === 'filter') {
+            if (this._imgElement) {
+                this._imgElement.style.filter = newValue || 'none';
             }
         }
     }
@@ -36,14 +49,17 @@ export class IconButton extends StyledButton {
             }
 
             img {
-                width: 16px;
                 height: 16px;
+                margin: 0;
+                padding: 0;
+                width: 16px;
             }
         `;
         this.shadowRoot?.appendChild(style);
         this._imgElement = document.createElement('img');
         this._imgElement.src = this.img;
         this._imgElement.alt = 'Icon';
+        this._imgElement.style.filter = this.filter;
         this._slotElement?.appendChild(this._imgElement);
     }
 }

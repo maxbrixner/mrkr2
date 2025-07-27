@@ -98,7 +98,9 @@ export class MessageBox extends HTMLElement {
         if (this._closeIcon) {
             const closeButton = new IconButton();
             closeButton.ariaLabel = 'Close message';
+            closeButton.mode = 'inherit';
             closeButton.img = this._closeIcon || '';
+            closeButton.filter = `var(--message-box-${type}-icon-filter, none)`;
             closeButton.addEventListener('click', () => {
                 this.shadowRoot?.removeChild(messageElement);
                 this._messages = this._messages.filter(msg => msg !== messageElement);

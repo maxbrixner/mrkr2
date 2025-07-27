@@ -2,7 +2,7 @@
 
 export interface StyledButtonAttributes {
     disabled?: boolean;
-    mode?: 'default' | 'primary';
+    mode?: 'default' | 'primary' | 'inherit';
 }
 
 /* -------------------------------------------------------------------------- */
@@ -26,10 +26,10 @@ export class StyledButton extends HTMLElement implements StyledButtonAttributes 
 
     get mode() {
         const mode = this.getAttribute('mode');
-        return (mode === 'default' || mode === 'primary') ? mode : 'default';
+        return (mode === 'default' || mode === 'primary' || mode === 'inherit') ? mode : 'default';
     }
 
-    set mode(value: 'default' | 'primary') {
+    set mode(value: 'default' | 'primary' | 'inherit') {
         this.setAttribute('mode', value);
     }
 
@@ -126,6 +126,20 @@ export class StyledButton extends HTMLElement implements StyledButtonAttributes 
                 button:not(:disabled):hover,
                 button:not(:disabled):focus {
                     border-color: var(--styled-button-border-color-hover-primary, #000000);
+                }
+            `;
+                break;
+            case 'inherit':
+                this._style.textContent = `
+                button {
+                    background-color: inherit;
+                    border-color: transparent;
+                    color: inherit;
+                }
+
+                button:not(:disabled):hover,
+                button:not(:disabled):focus {
+                    border-color: inherit;
                 }
             `;
                 break;

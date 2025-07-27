@@ -1,6 +1,6 @@
 /* -------------------------------------------------------------------------- */
 
-import { getRelativeLuminance, hexToRgbA } from './color_helpers.js';
+import { getRelativeLuminance, hexToRgbA } from './utils/color_helpers.js';
 
 /* -------------------------------------------------------------------------- */
 

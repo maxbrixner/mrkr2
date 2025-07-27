@@ -29,7 +29,7 @@
             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Filter projects">
     </div>
     <filtered-table id="filtered-table" content-url="{{ url_for('list_projects') }}"
-        table-config='{"idColumn": "id", "headers": {"id": "ID", "name": "Name", "done": "Done", "open": "Open", "review": "Review", "created": "Created at", "updated": "Updated at", "path": "Path"}, "filterElement": "filter"}'></filtered-table>
+        config='{"idColumn": "id", "headers": {"id": "ID", "name": "Name", "done": "Done", "open": "Open", "review": "Review", "created": "Created at", "updated": "Updated at", "path": "Path"}, "filterElement": "filter"}'></filtered-table>
 </main>
 
 <script>
@@ -41,11 +41,12 @@
 
     document.addEventListener('selection-changed', (event) => {
         const detail = event.detail;
-        document.getElementById('schedule-scan-button')?.setAttribute('disabled', !detail.atLeastOneSelected);
+        document.getElementById('schedule-scan-button')?.setAttribute('disabled', detail.none);
     });
 
     document.getElementById('schedule-scan-button')?.addEventListener('click', (event) => {
-        document.getElementById('filtered-table')?.getSelectedRows().forEach((rowId) => {
+        document.getElementById('filtered-table')?.getSelectedRows().forEach((rowElement) => {
+            const rowId = rowElement.id;
             const url = "{{ url_for('scan_project', project_id='[ID]') }}";
             const scanUrl = url.replace("[ID]", rowId);
             fetch(scanUrl, {

@@ -3,7 +3,7 @@
 {% block scripts %}
 <script type="module" src="{{ url_for('static', path='/js/base/styled_link.js') }}"></script>
 <script type="module" src="{{ url_for('static', path='/js/base/styled_button.js') }}"></script>
-<script type="module" src="{{ url_for('static', path='/js/filtered_table.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/base/filtered_table.js') }}"></script>
 <script type="module" src="{{ url_for('static', path='/js/remote_list_popup.js') }}"></script>
 {% endblock %}
 
@@ -32,7 +32,7 @@
             autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Filter documents">
     </div>
     <filtered-table content-url="{{ url_for('list_project_documents', project_id=project.id) }}"
-        table-config='{"idColumn": "id", "headers": {"id": "ID", "status": "Status", "assignee_name": "Assignee", "reviewer_name": "Reviewer", "created": "Created at", "updated": "Updated at", "path": "Path"}, "filterElement": "filter", "display": {"status": "chip"}, "chips": {"processing": "#90A4AE", "open": "#80DEEA", "done": "#4CAF50", "review": "#FFC107"}}'></filtered-table>
+        table-config='{"idColumn": "id", "headers": {"id": "ID", "status": "Status", "assignee_name": "Assignee", "reviewer_name": "Reviewer", "created": "Created at", "updated": "Updated at", "path": "Path"}, "filterElement": "filter", "display": {"status": "chip"}}'></filtered-table>
 
     <remote-list-popup id="assign-to-popup" content-url="{{ url_for('list_users') }}" id-field="id"
         display-field="username"></remote-list-popup>

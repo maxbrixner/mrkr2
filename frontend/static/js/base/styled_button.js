@@ -16,7 +16,7 @@ export class StyledButton extends HTMLElement {
     }
     get mode() {
         const mode = this.getAttribute('mode');
-        return (mode === 'default' || mode === 'primary') ? mode : 'default';
+        return (mode === 'default' || mode === 'primary' || mode === 'inherit') ? mode : 'default';
     }
     set mode(value) {
         this.setAttribute('mode', value);
@@ -103,6 +103,20 @@ export class StyledButton extends HTMLElement {
                 button:not(:disabled):hover,
                 button:not(:disabled):focus {
                     border-color: var(--styled-button-border-color-hover-primary, #000000);
+                }
+            `;
+                break;
+            case 'inherit':
+                this._style.textContent = `
+                button {
+                    background-color: inherit;
+                    border-color: transparent;
+                    color: inherit;
+                }
+
+                button:not(:disabled):hover,
+                button:not(:disabled):focus {
+                    border-color: inherit;
                 }
             `;
                 break;
