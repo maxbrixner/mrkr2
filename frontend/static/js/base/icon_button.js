@@ -55,7 +55,7 @@ export class IconButton extends StyledButton {
                 width: 16px;
             }
         `;
-        this.shadowRoot?.appendChild(style);
+        this.shadowRoot.appendChild(style);
         this._imgElement = document.createElement('img');
         this._imgElement.src = this.img;
         this._imgElement.alt = 'Icon';

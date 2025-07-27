@@ -3,10 +3,12 @@
 export interface StyledInputAttributes {
     autocapitalize?: 'none' | 'off' | 'on' | 'sentences' | 'words';
     autocorrect?: 'on' | 'off';
+    autocomplete?: 'on' | 'off';
     disabled?: boolean;
     type?: 'text' | 'password' | 'email' | 'number' | 'search';
     placeholder?: string;
     spellcheck?: boolean;
+    value?: string;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -30,6 +32,15 @@ export class StyledInput extends HTMLElement implements StyledInputAttributes {
 
     set autocorrect(value: 'on' | 'off') {
         this.setAttribute('autocorrect', value);
+    }
+
+    get autocomplete() {
+        const value = this.getAttribute('autocomplete');
+        return value === 'on' || value === 'off' ? value : 'off';
+    }
+
+    set autocomplete(value: 'on' | 'off') {
+        this.setAttribute('autocomplete', value);
     }
 
     get disabled() {
@@ -70,6 +81,14 @@ export class StyledInput extends HTMLElement implements StyledInputAttributes {
         this.setAttribute('spellcheck', String(value));
     }
 
+    get value() {
+        return this._InputElement.value;
+    }
+
+    set value(value: string) {
+        this._InputElement.value = value;
+    }
+
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -78,7 +97,7 @@ export class StyledInput extends HTMLElement implements StyledInputAttributes {
     }
 
     static get observedAttributes() {
-        return ['autocapitalize', 'autocorrect', 'disabled', 'name', 'type', 'placeholder', 'spellcheck'];
+        return ['autocapitalize', 'autocorrect', 'autocomplete', 'disabled', 'name', 'type', 'placeholder', 'spellcheck', 'value'];
     }
 
     attributeChangedCallback(propertyName: string, oldValue: string | null, newValue: string | null) {
@@ -88,6 +107,8 @@ export class StyledInput extends HTMLElement implements StyledInputAttributes {
             this._InputElement.autocapitalize = newValue as 'none' | 'off' | 'on' | 'sentences' | 'words';
         } else if (propertyName === 'autocorrect') {
             this._InputElement.setAttribute('autocorrect', newValue || 'off');
+        } else if (propertyName === 'autocomplete') {
+            this._InputElement.setAttribute('autocomplete', newValue || 'off');
         } else if (propertyName === 'disabled') {
             if (newValue !== null && newValue !== "false") {
                 this.setAttribute('aria-disabled', 'true');
@@ -104,6 +125,8 @@ export class StyledInput extends HTMLElement implements StyledInputAttributes {
             this._InputElement.placeholder = newValue || '';
         } else if (propertyName === 'spellcheck') {
             this._InputElement.spellcheck = newValue === 'true';
+        } else if (propertyName === 'value') {
+            this._InputElement.value = newValue || '';
         }
     }
 
@@ -156,9 +179,9 @@ export class StyledInput extends HTMLElement implements StyledInputAttributes {
             }
         `;
 
-        this.shadowRoot?.appendChild(style);
+        this.shadowRoot.appendChild(style);
 
-        this.shadowRoot?.appendChild(this._InputElement);
+        this.shadowRoot.appendChild(this._InputElement);
     }
 }
 

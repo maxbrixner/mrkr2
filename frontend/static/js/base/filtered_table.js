@@ -9,7 +9,6 @@ export class FilteredTable extends HTMLElement {
     _orderBy = undefined;
     _configParsed = undefined;
     _tableElement = document.createElement('table');
-    _filterTimeout = null;
     get config() {
         return this._config || '{}';
     }
@@ -83,6 +82,7 @@ export class FilteredTable extends HTMLElement {
         }
         else if (propertyName === 'filter') {
             this._filter = newValue || '';
+            this.updateContent();
         }
         else if (propertyName === 'limit') {
             this._limit = newValue ? parseInt(newValue, 10) : 0;
@@ -210,6 +210,7 @@ export class FilteredTable extends HTMLElement {
         `;
         this.shadowRoot.appendChild(style);
         this._tableElement.classList.add('loading');
+        this._tableElement.classList.remove('empty');
         this.shadowRoot.appendChild(this._tableElement);
     }
     _parseConfig() {
@@ -220,9 +221,10 @@ export class FilteredTable extends HTMLElement {
             throw new Error(`Failed to parse table config: ${error}`);
         }
     }
-    _clearContent() {
+    clearContent() {
         this._tableElement.innerHTML = '';
         this._tableElement.classList.add('loading');
+        this._tableElement.classList.remove('empty');
         this.dispatchEvent(new CustomEvent('selection-changed', {
             detail: {
                 selectedRows: [],
@@ -236,7 +238,7 @@ export class FilteredTable extends HTMLElement {
     updateContent() {
         if (!this._configParsed || !this._contentUrl)
             return;
-        this._clearContent();
+        this.clearContent();
         this._queryContent().then(content => {
             this._tableElement.classList.remove('loading');
             if (!content || content.length === 0) {
@@ -247,11 +249,10 @@ export class FilteredTable extends HTMLElement {
                 this._addData(content);
             }
         }).catch(error => {
-            this._clearContent();
+            this.clearContent();
             this._tableElement.classList.remove('loading');
             this._tableElement.classList.add('empty');
             this._dispatchError(`Unable to load table content.`, error);
-            console.error(`Error loading table content:`, error);
         });
     }
     _addHeaders() {
@@ -372,7 +373,7 @@ export class FilteredTable extends HTMLElement {
         this.dispatchEvent(new CustomEvent('table-render-error', {
             detail: {
                 message: message,
-                error: error
+                error: error.message
             },
             bubbles: true,
             composed: true

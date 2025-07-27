@@ -1,6 +1,5 @@
 import { IconButton } from './icon_button.js';
 export class MessageBox extends HTMLElement {
-    _messages = [];
     _closeIcon = undefined;
     _hideAfter = undefined;
     _maxMessages = undefined;
@@ -67,7 +66,7 @@ export class MessageBox extends HTMLElement {
                 left: 10%;
                 position: fixed;
                 right: 10%;
-                top: 1rem;
+                bottom: 1rem;
                 z-index: 10;
             }
 
@@ -88,9 +87,15 @@ export class MessageBox extends HTMLElement {
         if (!this.shadowRoot) {
             throw new Error("Shadow Root is not initialized.");
         }
-        if (this._messages.length >= (this._maxMessages || 5)) {
-            this.shadowRoot.removeChild(this._messages[0]);
-            this._messages.shift();
+        if (this.shadowRoot.children.length >= (this._maxMessages || 5)) {
+            try {
+                const messages = Array.from(this.shadowRoot.querySelectorAll('.message'));
+                if (messages.length > 0) {
+                    this.shadowRoot.removeChild(messages[0]);
+                }
+            }
+            catch (error) {
+            }
         }
         const messageElement = document.createElement('div');
         messageElement.innerHTML = message;
@@ -103,14 +108,12 @@ export class MessageBox extends HTMLElement {
             closeButton.filter = `var(--message-box-${type}-icon-filter, none)`;
             closeButton.addEventListener('click', () => {
                 this.shadowRoot?.removeChild(messageElement);
-                this._messages = this._messages.filter(msg => msg !== messageElement);
             }, { once: true });
             messageElement.appendChild(closeButton);
         }
         messageElement.style.backgroundColor = `var(--message-box-${type}-background-color, #ffffff)`;
         messageElement.style.color = `var(--message-box-${type}-color, #000000)`;
         messageElement.style.borderColor = `var(--message-box-${type}-border-color, #000000)`;
-        this._messages.push(messageElement);
         this.shadowRoot.appendChild(messageElement);
         switch (type) {
             case 'success':

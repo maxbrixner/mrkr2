@@ -200,7 +200,7 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
             }
         `
 
-        this.shadowRoot?.appendChild(style);
+        this.shadowRoot.appendChild(style);
 
         this.classList.add('loading');
     }

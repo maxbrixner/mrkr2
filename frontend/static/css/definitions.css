@@ -142,14 +142,17 @@
     --message-box-info-background-color: var(--info-color);
     --message-box-info-color: var(--on-info-color);
     --message-box-info-border-color: var(--border-color);
+    --message-box-info-icon-filter: invert(1);
 
     --message-box-warning-background-color: var(--warning-color);
     --message-box-warning-color: var(--on-warning-color);
     --message-box-warning-border-color: var(--border-color);
+    --message-box-warning-icon-filter: invert(1);
 
     --message-box-error-background-color: var(--error-color);
     --message-box-error-color: var(--on-error-color);
     --message-box-error-border-color: var(--border-color);
+    --message-box-error-icon-filter: invert(1);
 
     /* Filtered Table Variables */
     --filtered-table-empty-color: var(--disabled-text-color);

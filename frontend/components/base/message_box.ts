@@ -13,7 +13,6 @@ export interface MessageBoxAttributes {
 /* -------------------------------------------------------------------------- */
 
 export class MessageBox extends HTMLElement implements MessageBoxAttributes {
-    private _messages: HTMLDivElement[] = [];
     private _closeIcon?: string = undefined;
     private _hideAfter?: number = undefined;
     private _maxMessages?: number = undefined;
@@ -93,7 +92,7 @@ export class MessageBox extends HTMLElement implements MessageBoxAttributes {
                 left: 10%;
                 position: fixed;
                 right: 10%;
-                top: 1rem;
+                bottom: 1rem;
                 z-index: 10;
             }
 
@@ -117,9 +116,15 @@ export class MessageBox extends HTMLElement implements MessageBoxAttributes {
             throw new Error("Shadow Root is not initialized.");
         }
 
-        if (this._messages.length >= (this._maxMessages || 5)) {
-            this.shadowRoot.removeChild(this._messages[0]);
-            this._messages.shift();
+        if (this.shadowRoot.children.length >= (this._maxMessages || 5)) {
+            try {
+                const messages = Array.from(this.shadowRoot.querySelectorAll('.message'));
+                if (messages.length > 0) {
+                    this.shadowRoot.removeChild(messages[0]);
+                }
+            } catch (error) {
+                // ...
+            }
         }
 
         const messageElement = document.createElement('div');
@@ -136,7 +141,6 @@ export class MessageBox extends HTMLElement implements MessageBoxAttributes {
 
             closeButton.addEventListener('click', () => {
                 this.shadowRoot?.removeChild(messageElement);
-                this._messages = this._messages.filter(msg => msg !== messageElement);
             }, { once: true });
             messageElement.appendChild(closeButton);
         }
@@ -145,7 +149,6 @@ export class MessageBox extends HTMLElement implements MessageBoxAttributes {
         messageElement.style.color = `var(--message-box-${type}-color, #000000)`;
         messageElement.style.borderColor = `var(--message-box-${type}-border-color, #000000)`;
 
-        this._messages.push(messageElement);
         this.shadowRoot.appendChild(messageElement);
 
         switch (type) {

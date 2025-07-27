@@ -78,10 +78,10 @@ export class StyledLink extends HTMLElement implements StyledLinkAttributes {
             }
         `;
 
-        this.shadowRoot?.appendChild(style);
+        this.shadowRoot.appendChild(style);
 
         this._LinkElement.appendChild(document.createElement('slot'));
-        this.shadowRoot?.appendChild(this._LinkElement);
+        this.shadowRoot.appendChild(this._LinkElement);
     }
 }
 

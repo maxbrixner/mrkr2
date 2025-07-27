@@ -1,9 +1,7 @@
 {% extends "base.html" %}
 
 {% block scripts %}
-<script type="module" src="{{ url_for('static', path='/js/base/styled_button.js') }}"></script>
-<script type="module" src="{{ url_for('static', path='/js/base/styled_input.js') }}"></script>
-<script type="module" src="{{ url_for('static', path='/js/base/filtered_table.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/projects_content.js') }}"></script>
 {% endblock %}
 
 {% block header %}
@@ -19,53 +17,8 @@
 
 {% block main %}
 <main class="project-main">
-    <div class="toolbar">
-        <div class="buttons">
-            <styled-button id="schedule-scan-button" aria-label="Schedule Scan">
-                Schedule Scan
-            </styled-button>
-        </div>
-        <styled-input type="search" name="filter-projects" id="filter" placeholder="Filter projects..."
-            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Filter projects">
-    </div>
-    <filtered-table id="filtered-table" content-url="{{ url_for('list_projects') }}"
-        config='{"idColumn": "id", "headers": {"id": "ID", "name": "Name", "done": "Done", "open": "Open", "review": "Review", "created": "Created at", "updated": "Updated at", "path": "Path"}, "filterElement": "filter"}'></filtered-table>
+    <projects-content content-url="{{ url_for('list_projects') }}"
+        project-gui-url="{{ url_for('project_documents_page', project_id='[ID]') }}"
+        scan-url="{{ url_for('scan_project', project_id='[ID]') }}"></projects-content>
 </main>
-
-<script>
-    document.addEventListener('row-clicked', (event) => {
-        const detail = event.detail;
-        const url = "{{ url_for('project_documents_page', project_id='[ID]') }}";
-        window.location.href = url.replace("[ID]", detail.rowId);
-    });
-
-    document.addEventListener('selection-changed', (event) => {
-        const detail = event.detail;
-        document.getElementById('schedule-scan-button')?.setAttribute('disabled', detail.none);
-    });
-
-    document.getElementById('schedule-scan-button')?.addEventListener('click', (event) => {
-        document.getElementById('filtered-table')?.getSelectedRows().forEach((rowElement) => {
-            const rowId = rowElement.id;
-            const url = "{{ url_for('scan_project', project_id='[ID]') }}";
-            const scanUrl = url.replace("[ID]", rowId);
-            fetch(scanUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ project_id: rowId })
-            }).then(response => {
-                if (response.ok) {
-                    document.querySelector('message-box')?.showMessage(`The scan was scheduled successfully.<br>It may take a while until all documents are processed.`, 'success');
-                } else {
-                    document.querySelector('message-box')?.showMessage(`Unable to schedule scan.`, 'error', 'Server Error');
-                }
-            }).catch(error => {
-                document.querySelector('message-box')?.showMessage(`Unable to schedule scan.`, 'error', error.message);
-            });
-        });
-    });
-</script>
-
 {% endblock %}

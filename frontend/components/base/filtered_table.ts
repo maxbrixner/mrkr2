@@ -30,7 +30,7 @@ export interface SelectionChangedEvent {
 
 export interface TableRenderErrorEvent {
     message: string;
-    error: Error;
+    error: string;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -47,7 +47,6 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
 
     private _configParsed: any = undefined;
     private _tableElement = document.createElement('table');
-    private _filterTimeout: any = null;
 
     get config() {
         return this._config || '{}';
@@ -138,6 +137,7 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
             this._delay = newValue ? parseInt(newValue, 10) : 500;
         } else if (propertyName === 'filter') {
             this._filter = newValue || '';
+            this.updateContent();
         } else if (propertyName === 'limit') {
             this._limit = newValue ? parseInt(newValue, 10) : 0;
         } else if (propertyName === 'offset') {
@@ -150,21 +150,7 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
     }
 
     connectedCallback() {
-        /*if (this._configParsed && this._configParsed.filterElement) {
-            const filterElement = document.getElementById(this._configParsed.filterElement);
-            if (filterElement) {
-                filterElement.addEventListener('input', (event: Event) => {
-                    //only do this after a delay of 500ms
-                    this._clearContent();
-                    clearTimeout((this as any)._filterTimeout);
-                    (this as any)._filterTimeout = setTimeout(() => {
-                        const target = event.target as HTMLInputElement;
-                        this.filter = target.value;
-                        this.updateContent();
-                    }, this.delay);
-                });
-            }
-        }*/
+        // ...
     }
 
     disconnectedCallback() {
@@ -282,6 +268,7 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
         this.shadowRoot.appendChild(style);
 
         this._tableElement.classList.add('loading');
+        this._tableElement.classList.remove('empty');
 
         this.shadowRoot.appendChild(this._tableElement);
     }
@@ -294,9 +281,10 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
         }
     }
 
-    private _clearContent() {
+    public clearContent() {
         this._tableElement.innerHTML = '';
         this._tableElement.classList.add('loading');
+        this._tableElement.classList.remove('empty');
 
         this.dispatchEvent(new CustomEvent<SelectionChangedEvent>('selection-changed', {
             detail: {
@@ -313,7 +301,7 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
         if (!this._configParsed || !this._contentUrl)
             return;
 
-        this._clearContent();
+        this.clearContent();
 
         this._queryContent().then(content => {
             this._tableElement.classList.remove('loading');
@@ -325,11 +313,10 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
                 this._addData(content);
             }
         }).catch(error => {
-            this._clearContent();
+            this.clearContent();
             this._tableElement.classList.remove('loading');
             this._tableElement.classList.add('empty');
             this._dispatchError(`Unable to load table content.`, error);
-            console.error(`Error loading table content:`, error);
         });
     }
 
@@ -470,7 +457,7 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
         this.dispatchEvent(new CustomEvent<TableRenderErrorEvent>('table-render-error', {
             detail: {
                 message: message,
-                error: error
+                error: error.message
             },
             bubbles: true,
             composed: true

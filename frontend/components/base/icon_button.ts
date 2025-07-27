@@ -76,7 +76,7 @@ export class IconButton extends StyledButton implements IconButtonAttributes {
             }
         `;
 
-        this.shadowRoot?.appendChild(style);
+        this.shadowRoot.appendChild(style);
 
         this._imgElement = document.createElement('img');
         this._imgElement.src = this.img;

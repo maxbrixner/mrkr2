@@ -14,6 +14,13 @@ export class StyledInput extends HTMLElement {
     set autocorrect(value) {
         this.setAttribute('autocorrect', value);
     }
+    get autocomplete() {
+        const value = this.getAttribute('autocomplete');
+        return value === 'on' || value === 'off' ? value : 'off';
+    }
+    set autocomplete(value) {
+        this.setAttribute('autocomplete', value);
+    }
     get disabled() {
         return this.hasAttribute('disabled');
     }
@@ -45,13 +52,19 @@ export class StyledInput extends HTMLElement {
     set spellcheck(value) {
         this.setAttribute('spellcheck', String(value));
     }
+    get value() {
+        return this._InputElement.value;
+    }
+    set value(value) {
+        this._InputElement.value = value;
+    }
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
         this._populateShadowRoot();
     }
     static get observedAttributes() {
-        return ['autocapitalize', 'autocorrect', 'disabled', 'name', 'type', 'placeholder', 'spellcheck'];
+        return ['autocapitalize', 'autocorrect', 'autocomplete', 'disabled', 'name', 'type', 'placeholder', 'spellcheck', 'value'];
     }
     attributeChangedCallback(propertyName, oldValue, newValue) {
         if (oldValue === newValue)
@@ -61,6 +74,9 @@ export class StyledInput extends HTMLElement {
         }
         else if (propertyName === 'autocorrect') {
             this._InputElement.setAttribute('autocorrect', newValue || 'off');
+        }
+        else if (propertyName === 'autocomplete') {
+            this._InputElement.setAttribute('autocomplete', newValue || 'off');
         }
         else if (propertyName === 'disabled') {
             if (newValue !== null && newValue !== "false") {
@@ -82,6 +98,9 @@ export class StyledInput extends HTMLElement {
         }
         else if (propertyName === 'spellcheck') {
             this._InputElement.spellcheck = newValue === 'true';
+        }
+        else if (propertyName === 'value') {
+            this._InputElement.value = newValue || '';
         }
     }
     connectedCallback() {
@@ -127,8 +146,8 @@ export class StyledInput extends HTMLElement {
                 cursor: not-allowed;
             }
         `;
-        this.shadowRoot?.appendChild(style);
-        this.shadowRoot?.appendChild(this._InputElement);
+        this.shadowRoot.appendChild(style);
+        this.shadowRoot.appendChild(this._InputElement);
     }
 }
 customElements.define('styled-input', StyledInput);

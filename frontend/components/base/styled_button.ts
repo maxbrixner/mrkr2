@@ -103,14 +103,14 @@ export class StyledButton extends HTMLElement implements StyledButtonAttributes 
             }
         `;
 
-        this.shadowRoot?.appendChild(style);
+        this.shadowRoot.appendChild(style);
 
         this._updateStyle();
-        this.shadowRoot?.appendChild(this._style);
+        this.shadowRoot.appendChild(this._style);
 
         this._buttonElement.type = 'button';
         this._buttonElement.appendChild(this._slotElement);
-        this.shadowRoot?.appendChild(this._buttonElement);
+        this.shadowRoot.appendChild(this._buttonElement);
     }
 
     protected _updateStyle() {
