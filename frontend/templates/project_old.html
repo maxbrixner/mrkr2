@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+<script type="module" src="{{ url_for('static', path='/js/base/styled_link.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/base/styled_button.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/base/filtered_table.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/remote_list_popup.js') }}"></script>
+{% endblock %}
+
+{% block header %}
+<header class="project-header">
+    <h1>mrkr</h1>
+    <span class="path">
+        <styled-link href="{{ url_for('projects_page') }}">Projects</styled-link>
+        &nbsp;&nbsp;/&nbsp;&nbsp;
+        <b>{{project.name}}</b>
+    </span>
+    <span class="buttons">
+    </span>
+</header>
+{% endblock %}
+
+{% block main %}
+<main class="project-main">
+    <div class="toolbar">
+        <div class="buttons">
+            <styled-button id="assign-to-button" disabled>Assign to...</styled-button>
+            <styled-button id="review-by-button" disabled>Review by...</styled-button>
+            <styled-button id="mark-as-button" disabled>Mark as...</styled-button>
+        </div>
+        <input type="text" name="filter-documents" id="filter" placeholder="Filter documents..." autocomplete="off"
+            autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Filter documents">
+    </div>
+    <filtered-table content-url="{{ url_for('list_project_documents', project_id=project.id) }}"
+        table-config='{"idColumn": "id", "headers": {"id": "ID", "status": "Status", "assignee_name": "Assignee", "reviewer_name": "Reviewer", "created": "Created at", "updated": "Updated at", "path": "Path"}, "filterElement": "filter", "display": {"status": "chip"}}'></filtered-table>
+
+    <remote-list-popup id="assign-to-popup" content-url="{{ url_for('list_users') }}" id-field="id"
+        display-field="username"></remote-list-popup>
+    <remote-list-popup id="review-by-popup" content-url="{{ url_for('list_users') }}" id-field="id"
+        display-field="username"></remote-list-popup>
+    <remote-list-popup id="mark-as-popup" content-url="{{ url_for('list_statuses') }}" id-field="name"
+        display-field="value"></remote-list-popup>
+
+</main>
+
+<script>
+    document.addEventListener('row-clicked', (event) => {
+        const detail = event.detail;
+        const url = "{{ url_for('document_page', document_id='[ID]') }}";
+        window.location.href = url.replace("[ID]", detail.rowId);
+    });
+
+    document.addEventListener('selection-changed', (event) => {
+        const detail = event.detail;
+        document.getElementById('assign-to-button')?.setAttribute('disabled', !detail.atLeastOneSelected);
+        document.getElementById('review-by-button')?.setAttribute('disabled', !detail.atLeastOneSelected);
+        document.getElementById('mark-as-button')?.setAttribute('disabled', !detail.atLeastOneSelected);
+    });
+
+    document.getElementById('assign-to-button')?.addEventListener('click', (event) => {
+        const detail = event.detail;
+        document.getElementById('assign-to-popup')?.show(
+            callback = assignToCallback
+        );
+    });
+
+    document.getElementById('review-by-button')?.addEventListener('click', (event) => {
+        const detail = event.detail;
+        document.getElementById('review-by-popup')?.show(
+            callback = reviewByCallback
+        );
+    });
+
+    document.getElementById('mark-as-button')?.addEventListener('click', (event) => {
+        const detail = event.detail;
+        document.getElementById('mark-as-popup')?.show(
+            callback = markAsCallback
+        );
+    });
+
+    function assignToCallback(selected) {
+
+        const url = "{{ url_for('update_assignee') }}";
+
+        const selectedDocuments = document.querySelectorAll('filtered-table')[0].getSelectedRows();
+        const selectedUser = selected;
+        fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ document_ids: selectedDocuments, assignee_id: selectedUser })
+        }).then(response => {
+            if (response.ok) {
+                document.querySelectorAll('filtered-table')[0].updateContent();
+            } else {
+                document.querySelector('message-box')?.showMessage(`Unable to submit assigned user.`, 'error', error.message);
+
+            }
+        });
+    }
+
+
+
+    function reviewByCallback(selected) {
+
+        const url = "{{ url_for('update_reviewer') }}";
+
+        const selectedDocuments = document.querySelectorAll('filtered-table')[0].getSelectedRows();
+        const selectedUser = selected;
+        fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ document_ids: selectedDocuments, reviewer_id: selectedUser })
+        }).then(response => {
+            if (response.ok) {
+                document.querySelectorAll('filtered-table')[0].updateContent();
+            } else {
+                document.querySelector('message-box')?.showMessage(`Unable to submit reviewer.`, 'error', error.message);
+            }
+        });
+    }
+
+    function markAsCallback(selected) {
+
+        const url = "{{ url_for('update_status') }}";
+
+        const selectedDocuments = document.querySelectorAll('filtered-table')[0].getSelectedRows();
+        const selectedStatus = selected;
+        fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ document_ids: selectedDocuments, status: selectedStatus })
+        }).then(response => {
+            if (response.ok) {
+                document.querySelectorAll('filtered-table')[0].updateContent();
+            } else {
+                document.querySelector('message-box')?.showMessage(`Unable to submit status update.`, 'error', error.message);
+
+            }
+        });
+    }
+
+</script>
+
+{% endblock %}

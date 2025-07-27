@@ -169,6 +169,7 @@
     --filtered-table-td-padding: var(--spacing-xlarge) var(--spacing-small);
     --filtered-table-chip-border-radius: var(--border-radius-xlarge);
     --filtered-table-chip-padding: var(--spacing-small) var(--spacing-medium);
+    --filtered-table-sort-icon-opacity: 0.5;
 
     --filtered-table-chip-processing-background-color: #90A4AE;
     --filtered-table-chip-processing-color: #000000;

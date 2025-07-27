@@ -1,14 +1,18 @@
 /* -------------------------------------------------------------------------- */
 
+import { IconButton } from './icon_button.js';
+
+/* -------------------------------------------------------------------------- */
+
 export interface FilteredTableAttributes {
     config?: string;
     contentUrl?: string;
-    delay?: number;
     filter?: string
     limit?: number;
     offset?: number;
     order?: 'asc' | 'desc';
     orderBy?: string;
+    sortImg?: string;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -38,12 +42,12 @@ export interface TableRenderErrorEvent {
 export class FilteredTable extends HTMLElement implements FilteredTableAttributes {
     private _config?: string = undefined;
     private _contentUrl?: string = undefined;
-    private _delay?: number = undefined;
     private _filter?: string = undefined;
     private _limit?: number = undefined;
     private _offset?: number = undefined;
     private _order?: 'asc' | 'desc' = undefined;
     private _orderBy?: string = undefined;
+    private _sortImg?: string = undefined;
 
     private _configParsed: any = undefined;
     private _tableElement = document.createElement('table');
@@ -62,14 +66,6 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
 
     set contentUrl(value: string) {
         this.setAttribute('content-url', value);
-    }
-
-    get delay() {
-        return this._delay || 500;
-    }
-
-    set delay(value: number) {
-        this.setAttribute('delay', value.toString());
     }
 
     get filter() {
@@ -112,6 +108,14 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
         this.setAttribute('order-by', value);
     }
 
+    get sortImg() {
+        return this._sortImg || '';
+    }
+
+    set sortImg(value: string) {
+        this.setAttribute('sort-img', value);
+    }
+
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -120,7 +124,7 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
     }
 
     static get observedAttributes() {
-        return ['config', 'content-url', 'delay', 'filter', 'limit', 'offset', 'order', 'order-by'];
+        return ['config', 'content-url', 'filter', 'limit', 'offset', 'order', 'order-by', 'sort-img'];
     }
 
     attributeChangedCallback(propertyName: string, oldValue: string | null, newValue: string | null) {
@@ -133,8 +137,6 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
         } else if (propertyName === 'content-url') {
             this._contentUrl = newValue || '';
             this.updateContent();
-        } else if (propertyName === 'delay') {
-            this._delay = newValue ? parseInt(newValue, 10) : 500;
         } else if (propertyName === 'filter') {
             this._filter = newValue || '';
             this.updateContent();
@@ -146,6 +148,8 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
             this._order = newValue as 'asc' | 'desc' || 'asc';
         } else if (propertyName === 'order-by') {
             this._orderBy = newValue || '';
+        } else if (propertyName === 'sort-img') {
+            this._sortImg = newValue || '';
         }
     }
 
@@ -242,13 +246,25 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
                 position: sticky;
                 top: 0;
                 z-index: 1;
+                border-right: 1px solid var(--filtered-table-header-border-color, #000000);
             }
 
             td {
                 cursor: pointer;
                 padding: var(--filtered-table-td-padding, 1.5rem 0.5rem);
             }
-            
+
+            th > div {
+                display: grid;
+                grid-template-areas: "header sort";
+                grid-template-columns: 1fr min-content;
+                align-items: center;
+            }
+
+            th > div > icon-button {
+                opacity: var(--filtered-table-sort-icon-opacity, 0.5);
+            }
+
             .chip {
                 border-radius: var(--filtered-table-chip-border-radius, 1rem);
                 display: inline-block;
@@ -339,7 +355,28 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
 
         for (const key of Object.keys(this._configParsed.headers)) {
             const th = document.createElement('th');
-            th.textContent = this._configParsed.headers[key];
+
+            const div = document.createElement('div');
+
+            const span = document.createElement('span');
+            span.textContent = this._configParsed.headers[key];
+            th.style.gridArea = 'header';
+            div.appendChild(span);
+
+            const sortButton = new IconButton();
+            sortButton.img = this._sortImg || '';
+            sortButton.mode = "inherit";
+            sortButton.ariaLabel = `Sort by ${this._configParsed.headers[key]}`;
+            sortButton.addEventListener('click', () => {
+                this._order = this._order === 'asc' ? 'desc' : 'asc';
+                this._orderBy = key;
+                this.updateContent();
+            });
+            sortButton.style.gridArea = 'sort';
+            sortButton.display = 'inline-block';
+            div.appendChild(sortButton);
+
+            th.appendChild(div);
             tr.appendChild(th);
         }
 
@@ -477,6 +514,18 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
         var url = new URL(this._contentUrl);
         if (this._filter) {
             url.searchParams.set('filter', this._filter);
+        }
+        if (this._offset) {
+            url.searchParams.set('offset', this._offset.toString());
+        }
+        if (this._limit) {
+            url.searchParams.set('limit', this._limit.toString());
+        }
+        if (this._order) {
+            url.searchParams.set('order', this._order);
+        }
+        if (this._orderBy) {
+            url.searchParams.set('order-by', this._orderBy);
         }
 
         const response = await fetch(url.toString());

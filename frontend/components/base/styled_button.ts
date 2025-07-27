@@ -3,6 +3,7 @@
 export interface StyledButtonAttributes {
     disabled?: boolean;
     mode?: 'default' | 'primary' | 'inherit';
+    display?: 'inline-block' | 'block';
 }
 
 /* -------------------------------------------------------------------------- */
@@ -33,6 +34,15 @@ export class StyledButton extends HTMLElement implements StyledButtonAttributes 
         this.setAttribute('mode', value);
     }
 
+    get display() {
+        const display = this.getAttribute('display');
+        return (display === 'inline-block' || display === 'block') ? display : 'inline-block';
+    }
+
+    set display(value: 'inline-block' | 'block') {
+        this.setAttribute('display', value);
+    }
+
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -41,7 +51,7 @@ export class StyledButton extends HTMLElement implements StyledButtonAttributes 
     }
 
     static get observedAttributes() {
-        return ['disabled', 'mode'];
+        return ['disabled', 'mode', 'display'];
     }
 
     attributeChangedCallback(propertyName: string, oldValue: string | null, newValue: string | null) {
@@ -59,6 +69,8 @@ export class StyledButton extends HTMLElement implements StyledButtonAttributes 
             }
         } else if (propertyName === 'mode') {
             this._updateStyle();
+        } else if (propertyName === 'display') {
+            this.style.display = newValue || 'inline-block';
         }
     }
 
@@ -78,7 +90,7 @@ export class StyledButton extends HTMLElement implements StyledButtonAttributes 
         const style = document.createElement('style');
         style.textContent = `
             :host {
-                display: block;
+                /* ... */
             }
 
             button {

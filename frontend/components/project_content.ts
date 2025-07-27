@@ -7,7 +7,7 @@ import { FilteredTable, RowClickedEvent, SelectionChangedEvent, TableRenderError
 
 /* -------------------------------------------------------------------------- */
 
-interface ProjectsContentAttributes {
+interface ProjectContentAttributes {
     contentUrl?: string;
     projectGuiUrl?: string;
     scanUrl?: string;
@@ -16,7 +16,7 @@ interface ProjectsContentAttributes {
 
 /* -------------------------------------------------------------------------- */
 
-export class ProjectsContent extends HTMLElement implements ProjectsContentAttributes {
+export class ProjectContent extends HTMLElement implements ProjectContentAttributes {
     private _projectGuiUrl: string = '';
     private _scanUrl: string = '';
 
@@ -86,7 +86,6 @@ export class ProjectsContent extends HTMLElement implements ProjectsContentAttri
         this.shadowRoot?.addEventListener('row-clicked', (event: Event) => this._onRowClicked(event as CustomEvent<RowClickedEvent>));
         this.shadowRoot?.addEventListener('selection-changed', (event: Event) => this._onSelectionChanged(event as CustomEvent<SelectionChangedEvent>));
         this.shadowRoot?.addEventListener('table-render-error', (event: Event) => this._onTableRenderError(event as CustomEvent<TableRenderErrorEvent>));
-        this._scanButton.addEventListener('click', (event: Event) => this._onScanButtonClick(event));
         this._searchInput.addEventListener('input', (event: Event) => this._onSearchInputChange(event));
     }
 
@@ -94,7 +93,6 @@ export class ProjectsContent extends HTMLElement implements ProjectsContentAttri
         this.shadowRoot?.removeEventListener('row-clicked', (event: Event) => this._onRowClicked(event as CustomEvent<RowClickedEvent>));
         this.shadowRoot?.removeEventListener('selection-changed', (event: Event) => this._onSelectionChanged(event as CustomEvent<SelectionChangedEvent>));
         this.shadowRoot?.removeEventListener('table-render-error', (event: Event) => this._onTableRenderError(event as CustomEvent<TableRenderErrorEvent>));
-        this._scanButton.removeEventListener('click', (event: Event) => this._onScanButtonClick(event));
         this._searchInput.removeEventListener('input', (event: Event) => this._onSearchInputChange(event));
     }
 
@@ -157,7 +155,7 @@ export class ProjectsContent extends HTMLElement implements ProjectsContentAttri
 
         this._table.style.gridArea = 'table';
         this._table.ariaLabel = "Projects Table";
-        this._table.config = '{"idColumn": "id", "headers": {"id": "ID", "name": "Name", "done": "Done", "open": "Open", "review": "Review", "created": "Created at", "updated": "Updated at"}, "filterElement": "filter"}';
+        this._table.config = '{"idColumn": "id", "headers": {"id": "ID", "path": "Path", "status": "Status", "assignee_name": "Assignee", "reviewer_name": "Reviewer", "created": "Created at", "updated": "Updated at"}, "filterElement": "filter", "display": {"status": "chip"}}';
         this._table.sortImg = 'sort.svg';
 
         this.shadowRoot.appendChild(toolbar)
@@ -189,27 +187,6 @@ export class ProjectsContent extends HTMLElement implements ProjectsContentAttri
         }
     }
 
-    private _onScanButtonClick(event: Event) {
-        this._table.getSelectedRows().forEach((rowElement) => {
-            const messageBox = document.querySelector('message-box') as MessageBox | null;
-            const scanUrl = this._scanUrl.replace("[ID]", rowElement.id);
-            fetch(scanUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }).then(response => {
-                if (response.ok && messageBox) {
-                    messageBox.showMessage(`A scan for project ${rowElement.id} was scheduled successfully. It may take a while until all documents are processed.`, 'success');
-                } else if (messageBox) {
-                    messageBox.showMessage(`Unable to schedule scan.`, 'error', 'Server Error');
-                }
-            }).catch(error => {
-                messageBox?.showMessage(`Unable to schedule scan.`, 'error', error.message);
-            });
-        });
-    }
-
     private _onSearchInputChange(event: Event) {
         this._table.clearContent();
         clearTimeout((this as any)._filterTimeout);
@@ -222,6 +199,6 @@ export class ProjectsContent extends HTMLElement implements ProjectsContentAttri
 
 /* -------------------------------------------------------------------------- */
 
-customElements.define('projects-content', ProjectsContent);
+customElements.define('project-content', ProjectContent);
 
 /* -------------------------------------------------------------------------- */

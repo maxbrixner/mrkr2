@@ -19,6 +19,7 @@
 <main class="project-main">
     <projects-content content-url="{{ url_for('list_projects') }}"
         project-gui-url="{{ url_for('project_documents_page', project_id='[ID]') }}"
-        scan-url="{{ url_for('scan_project', project_id='[ID]') }}"></projects-content>
+        scan-url="{{ url_for('scan_project', project_id='[ID]') }}"
+        sort-img="{{ url_for('static', path='/img/chevron-up-down-outline.svg') }}"></projects-content>
 </main>
 {% endblock %}

@@ -1,12 +1,13 @@
+import { IconButton } from './icon_button.js';
 export class FilteredTable extends HTMLElement {
     _config = undefined;
     _contentUrl = undefined;
-    _delay = undefined;
     _filter = undefined;
     _limit = undefined;
     _offset = undefined;
     _order = undefined;
     _orderBy = undefined;
+    _sortImg = undefined;
     _configParsed = undefined;
     _tableElement = document.createElement('table');
     get config() {
@@ -20,12 +21,6 @@ export class FilteredTable extends HTMLElement {
     }
     set contentUrl(value) {
         this.setAttribute('content-url', value);
-    }
-    get delay() {
-        return this._delay || 500;
-    }
-    set delay(value) {
-        this.setAttribute('delay', value.toString());
     }
     get filter() {
         return this._filter || '';
@@ -57,13 +52,19 @@ export class FilteredTable extends HTMLElement {
     set orderBy(value) {
         this.setAttribute('order-by', value);
     }
+    get sortImg() {
+        return this._sortImg || '';
+    }
+    set sortImg(value) {
+        this.setAttribute('sort-img', value);
+    }
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
         this._populateShadowRoot();
     }
     static get observedAttributes() {
-        return ['config', 'content-url', 'delay', 'filter', 'limit', 'offset', 'order', 'order-by'];
+        return ['config', 'content-url', 'filter', 'limit', 'offset', 'order', 'order-by', 'sort-img'];
     }
     attributeChangedCallback(propertyName, oldValue, newValue) {
         if (oldValue === newValue)
@@ -76,9 +77,6 @@ export class FilteredTable extends HTMLElement {
         else if (propertyName === 'content-url') {
             this._contentUrl = newValue || '';
             this.updateContent();
-        }
-        else if (propertyName === 'delay') {
-            this._delay = newValue ? parseInt(newValue, 10) : 500;
         }
         else if (propertyName === 'filter') {
             this._filter = newValue || '';
@@ -95,6 +93,9 @@ export class FilteredTable extends HTMLElement {
         }
         else if (propertyName === 'order-by') {
             this._orderBy = newValue || '';
+        }
+        else if (propertyName === 'sort-img') {
+            this._sortImg = newValue || '';
         }
     }
     connectedCallback() {
@@ -185,13 +186,25 @@ export class FilteredTable extends HTMLElement {
                 position: sticky;
                 top: 0;
                 z-index: 1;
+                border-right: 1px solid var(--filtered-table-header-border-color, #000000);
             }
 
             td {
                 cursor: pointer;
                 padding: var(--filtered-table-td-padding, 1.5rem 0.5rem);
             }
-            
+
+            th > div {
+                display: grid;
+                grid-template-areas: "header sort";
+                grid-template-columns: 1fr min-content;
+                align-items: center;
+            }
+
+            th > div > icon-button {
+                opacity: var(--filtered-table-sort-icon-opacity, 0.5);
+            }
+
             .chip {
                 border-radius: var(--filtered-table-chip-border-radius, 1rem);
                 display: inline-block;
@@ -271,7 +284,24 @@ export class FilteredTable extends HTMLElement {
         tr.appendChild(th);
         for (const key of Object.keys(this._configParsed.headers)) {
             const th = document.createElement('th');
-            th.textContent = this._configParsed.headers[key];
+            const div = document.createElement('div');
+            const span = document.createElement('span');
+            span.textContent = this._configParsed.headers[key];
+            th.style.gridArea = 'header';
+            div.appendChild(span);
+            const sortButton = new IconButton();
+            sortButton.img = this._sortImg || '';
+            sortButton.mode = "inherit";
+            sortButton.ariaLabel = `Sort by ${this._configParsed.headers[key]}`;
+            sortButton.addEventListener('click', () => {
+                this._order = this._order === 'asc' ? 'desc' : 'asc';
+                this._orderBy = key;
+                this.updateContent();
+            });
+            sortButton.style.gridArea = 'sort';
+            sortButton.display = 'inline-block';
+            div.appendChild(sortButton);
+            th.appendChild(div);
             tr.appendChild(th);
         }
         this._tableElement.appendChild(tr);
@@ -390,6 +420,18 @@ export class FilteredTable extends HTMLElement {
         var url = new URL(this._contentUrl);
         if (this._filter) {
             url.searchParams.set('filter', this._filter);
+        }
+        if (this._offset) {
+            url.searchParams.set('offset', this._offset.toString());
+        }
+        if (this._limit) {
+            url.searchParams.set('limit', this._limit.toString());
+        }
+        if (this._order) {
+            url.searchParams.set('order', this._order);
+        }
+        if (this._orderBy) {
+            url.searchParams.set('order-by', this._orderBy);
         }
         const response = await fetch(url.toString());
         if (!response.ok) {
