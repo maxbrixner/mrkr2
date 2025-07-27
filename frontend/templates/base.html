@@ -19,14 +19,14 @@
     <link rel="stylesheet" href="{{ url_for('static', path='/css/definitions.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='/css/layout.css') }}">
 
-    <script type="module" src="{{ url_for('static', path='/js/message_box.js') }}"></script>
+    <script type="module" src="{{ url_for('static', path='/js/base/message_box.js') }}"></script>
     {% block scripts %}
     {% endblock %}
-
 </head>
 
 <body>
-    <message-box></message-box>
+    <message-box hide-after="3000" max-messages="5"
+        close-icon="{{ url_for('static', path='/img/close-outline.svg') }}"></message-box>
 
     {% block header %}
     <!-- Content will be injected here -->

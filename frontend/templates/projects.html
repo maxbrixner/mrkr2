@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
 {% block scripts %}
-<script type="module" src="{{ url_for('static', path='/js/styled_link.js') }}"></script>
-<script type="module" src="{{ url_for('static', path='/js/styled_button.js') }}"></script>
-<script type="module" src="{{ url_for('static', path='/js/filtered_table.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/base/styled_button.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/base/styled_input.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/base/filtered_table.js') }}"></script>
 {% endblock %}
 
 {% block header %}
@@ -21,10 +21,12 @@
 <main class="project-main">
     <div class="toolbar">
         <div class="buttons">
-            <styled-button id="schedule-scan-button" disabled>Schedule Scan</styled-button>
+            <styled-button id="schedule-scan-button" aria-label="Schedule Scan">
+                Schedule Scan
+            </styled-button>
         </div>
-        <input type="text" name="filter-projects" id="filter" placeholder="Filter projects..." autocomplete="off"
-            autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Filter projects">
+        <styled-input type="search" name="filter-projects" id="filter" placeholder="Filter projects..."
+            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Filter projects">
     </div>
     <filtered-table id="filtered-table" content-url="{{ url_for('list_projects') }}"
         table-config='{"idColumn": "id", "headers": {"id": "ID", "name": "Name", "done": "Done", "open": "Open", "review": "Review", "created": "Created at", "updated": "Updated at", "path": "Path"}, "filterElement": "filter"}'></filtered-table>
@@ -54,7 +56,7 @@
                 body: JSON.stringify({ project_id: rowId })
             }).then(response => {
                 if (response.ok) {
-                    document.querySelector('message-box')?.showMessage(`The scan was scheduled successfully. It may take a while until all documents are processed.`, 'info');
+                    document.querySelector('message-box')?.showMessage(`The scan was scheduled successfully.<br>It may take a while until all documents are processed.`, 'success');
                 } else {
                     document.querySelector('message-box')?.showMessage(`Unable to schedule scan.`, 'error', 'Server Error');
                 }

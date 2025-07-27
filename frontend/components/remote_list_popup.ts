@@ -1,7 +1,7 @@
 /* -------------------------------------------------------------------------- */
 
-import { MessageBox } from './message_box.js';
-import { StyledButton } from './styled_button.js';
+import { MessageBox } from './base/message_box.js';
+import { StyledButton } from './base/styled_button.js';
 
 /* -------------------------------------------------------------------------- */
 

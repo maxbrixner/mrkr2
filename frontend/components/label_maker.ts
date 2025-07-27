@@ -7,7 +7,7 @@ import { ClassificationLabeler } from './classification_labeler.js';
 import { TextLabeler } from './text_labeler.js';
 import { LabelButton } from './label_button.js';
 import { combineHexColors, getRelativeLuminance, hexToRgbA, hexToRgb } from './color_helpers.js';
-import { MessageBox } from './message_box.js';
+import { MessageBox } from './base/message_box.js';
 
 /* -------------------------------------------------------------------------- */
 

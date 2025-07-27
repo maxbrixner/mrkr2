@@ -4,23 +4,27 @@ import { StyledButton, StyledButtonAttributes } from './styled_button.js';
 
 /* -------------------------------------------------------------------------- */
 
-interface IconButtonAttributes extends StyledButtonAttributes {
+export interface IconButtonAttributes extends StyledButtonAttributes {
     img: string;
 }
 
 /* -------------------------------------------------------------------------- */
 
 export class IconButton extends StyledButton implements IconButtonAttributes {
-    public img: string = '';
+    private _imgElement?: HTMLImageElement;
 
-    private _imgElement: HTMLImageElement = document.createElement('img');
+    get img() {
+        return this.getAttribute('img') || '';
+    }
+
+    set img(value: string) {
+        this.setAttribute('img', value);
+    }
 
     constructor() {
         super();
 
-        this._imgElement.alt = 'Icon';
-        this._ButtonElement.classList.add('icon-button');
-        this._ButtonElement.appendChild(this._imgElement);
+        this._childPopulateShadowRoot();
     }
 
     static get observedAttributes() {
@@ -33,15 +37,20 @@ export class IconButton extends StyledButton implements IconButtonAttributes {
         newValue: string | null) {
         super.attributeChangedCallback(propertyName, oldValue, newValue);
         if (propertyName === 'img') {
-            this._imgElement.src = newValue || '';
-            this._updateStyle();
+            if (this._imgElement) {
+                this._imgElement.src = newValue || '';
+            }
         }
     }
 
-    protected _updateStyle() {
-        super._updateStyle();
-        this._style.textContent += `
-            .icon-button {
+    protected _childPopulateShadowRoot() {
+        if (!this.shadowRoot) {
+            throw new Error("Shadow Root is not initialized.");
+        }
+
+        const style = document.createElement('style');
+        style.textContent += `
+            button {
                 display: grid;
                 grid-template-columns: min-content 1fr;
                 grid-template-rows: 1fr;
@@ -52,7 +61,14 @@ export class IconButton extends StyledButton implements IconButtonAttributes {
                 width: 16px;
                 height: 16px;
             }
-        `
+        `;
+
+        this.shadowRoot?.appendChild(style);
+
+        this._imgElement = document.createElement('img');
+        this._imgElement.src = this.img;
+        this._imgElement.alt = 'Icon';
+        this._slotElement?.appendChild(this._imgElement);
     }
 }
 

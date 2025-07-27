@@ -1,7 +1,7 @@
 /* -------------------------------------------------------------------------- */
 
 import { LabelButton } from './label_button.js';
-import { IconButton } from './icon_button.js';
+import { IconButton } from './base/icon_button.js';
 
 /* -------------------------------------------------------------------------- */
 

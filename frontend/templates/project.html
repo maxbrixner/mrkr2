@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
 {% block scripts %}
-<script type="module" src="{{ url_for('static', path='/js/styled_link.js') }}"></script>
-<script type="module" src="{{ url_for('static', path='/js/styled_button.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/base/styled_link.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/base/styled_button.js') }}"></script>
 <script type="module" src="{{ url_for('static', path='/js/filtered_table.js') }}"></script>
 <script type="module" src="{{ url_for('static', path='/js/remote_list_popup.js') }}"></script>
 {% endblock %}
@@ -79,7 +79,6 @@
     });
 
     function assignToCallback(selected) {
-        console.log(selected);
 
         const url = "{{ url_for('update_assignee') }}";
 
@@ -104,7 +103,6 @@
 
 
     function reviewByCallback(selected) {
-        console.log(selected);
 
         const url = "{{ url_for('update_reviewer') }}";
 
@@ -126,7 +124,6 @@
     }
 
     function markAsCallback(selected) {
-        console.log(selected);
 
         const url = "{{ url_for('update_status') }}";
 
