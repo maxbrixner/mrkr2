@@ -272,6 +272,12 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
                 align-items: center;
             }
 
+            th > div > span {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
             th > div > icon-button {
                 opacity: var(--filtered-table-sort-icon-opacity, 0.5);
             }
