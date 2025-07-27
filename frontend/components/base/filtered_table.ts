@@ -13,6 +13,7 @@ export interface FilteredTableAttributes {
     order?: 'asc' | 'desc';
     orderBy?: string;
     sortImg?: string;
+    emptyMessage?: string;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -116,6 +117,14 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
         this.setAttribute('sort-img', value);
     }
 
+    get emptyMessage() {
+        return this._tableElement.style.getPropertyValue('--filtered-table-empty-message') || 'No items found';
+    }
+
+    set emptyMessage(value: string) {
+        this.setAttribute('empty-message', value);
+    }
+
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -124,7 +133,7 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
     }
 
     static get observedAttributes() {
-        return ['config', 'content-url', 'filter', 'limit', 'offset', 'order', 'order-by', 'sort-img'];
+        return ['config', 'content-url', 'filter', 'limit', 'offset', 'order', 'order-by', 'sort-img', 'empty-message'];
     }
 
     attributeChangedCallback(propertyName: string, oldValue: string | null, newValue: string | null) {
@@ -150,6 +159,8 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
             this._orderBy = newValue || '';
         } else if (propertyName === 'sort-img') {
             this._sortImg = newValue || '';
+        } else if (propertyName === 'empty-message') {
+            this._tableElement.style.setProperty('--filtered-table-empty-message', `'${newValue || 'No items found'}'`);
         }
     }
 
@@ -202,7 +213,7 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
 
             table.empty::before {
                 color: var(--filtered-table-empty-color, #000000);
-                content: "No projects found";
+                content: var(--filtered-table-empty-message, 'No items found');
                 display: block;
                 font-size: var(--filtered-table-empty-font-size, 1rem);
                 margin: 4rem auto;

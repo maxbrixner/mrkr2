@@ -58,13 +58,19 @@ export class FilteredTable extends HTMLElement {
     set sortImg(value) {
         this.setAttribute('sort-img', value);
     }
+    get emptyMessage() {
+        return this._tableElement.style.getPropertyValue('--filtered-table-empty-message') || 'No items found';
+    }
+    set emptyMessage(value) {
+        this.setAttribute('empty-message', value);
+    }
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
         this._populateShadowRoot();
     }
     static get observedAttributes() {
-        return ['config', 'content-url', 'filter', 'limit', 'offset', 'order', 'order-by', 'sort-img'];
+        return ['config', 'content-url', 'filter', 'limit', 'offset', 'order', 'order-by', 'sort-img', 'empty-message'];
     }
     attributeChangedCallback(propertyName, oldValue, newValue) {
         if (oldValue === newValue)
@@ -96,6 +102,9 @@ export class FilteredTable extends HTMLElement {
         }
         else if (propertyName === 'sort-img') {
             this._sortImg = newValue || '';
+        }
+        else if (propertyName === 'empty-message') {
+            this._tableElement.style.setProperty('--filtered-table-empty-message', `'${newValue || 'No items found'}'`);
         }
     }
     connectedCallback() {
@@ -142,7 +151,7 @@ export class FilteredTable extends HTMLElement {
 
             table.empty::before {
                 color: var(--filtered-table-empty-color, #000000);
-                content: "No projects found";
+                content: var(--filtered-table-empty-message, 'No items found');
                 display: block;
                 font-size: var(--filtered-table-empty-font-size, 1rem);
                 margin: 4rem auto;

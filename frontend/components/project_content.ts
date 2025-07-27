@@ -156,7 +156,7 @@ export class ProjectContent extends HTMLElement implements ProjectContentAttribu
         this._table.style.gridArea = 'table';
         this._table.ariaLabel = "Projects Table";
         this._table.config = '{"idColumn": "id", "headers": {"id": "ID", "path": "Path", "status": "Status", "assignee_name": "Assignee", "reviewer_name": "Reviewer", "created": "Created at", "updated": "Updated at"}, "filterElement": "filter", "display": {"status": "chip"}}';
-        this._table.sortImg = 'sort.svg';
+        this._table.emptyMessage = 'No documents found';
 
         this.shadowRoot.appendChild(toolbar)
         this.shadowRoot.appendChild(this._table);
