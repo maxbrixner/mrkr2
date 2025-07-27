@@ -2,6 +2,7 @@
 import { ListBasedContent, ListBasedContentAttributes } from './list_based_content.js';
 import { MessageBox } from './base/message_box.js';
 import { StyledButton } from './base/styled_button.js';
+import { RowClickedEvent, SelectionChangedEvent } from './base/filtered_table.js';
 
 /* -------------------------------------------------------------------------- */
 

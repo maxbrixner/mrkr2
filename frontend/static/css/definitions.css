@@ -171,6 +171,7 @@
     --filtered-table-chip-padding: var(--spacing-small) var(--spacing-medium);
     --filtered-table-sort-icon-opacity: 0.5;
     --filtered-table-empty-message: 'No items found';
+    --filtered-table-header-border-color: var(--border-color);
 
     --filtered-table-chip-processing-background-color: #90A4AE;
     --filtered-table-chip-processing-color: #000000;
@@ -184,12 +185,18 @@
     --filtered-table-chip-review-background-color: #FFC107;
     --filtered-table-chip-review-color: #000000;
 
-
-    --filtered-table-header-background-color: var(--surface-color);
-    --filtered-table-header-color: var(--text-color);
-    --filtered-table-header-border-color: var(--border-color);
-    --filtered-table-header-font-size: var(--font-size-medium);
-    --filtered-table-header-font-weight: var(--font-weight-semibold);
+    /* Styled Modal Variables */
+    --styled-dialog-header-background-color: var(--surface-color);
+    --styled-dialog-header-color: var(--text-color);
+    --styled-dialog-header-font-size: var(--font-size-medium);
+    --styled-dialog-header-font-weight: var(--font-weight-semibold);
+    --styled-dialog-header-padding: var(--spacing-medium) var(--spacing-large);
+    --styled-dialog-border-color: var(--border-color);
+    --styled-dialog-content-padding: var(--spacing-medium) var(--spacing-large);
+    --styled-dialog-buttons-padding: var(--spacing-medium) var(--spacing-large);
+    --styled-dialog-error-color: var(--disabled-text-color);
+    --styled-dialog-error-message: 'Error loading content';
+    --styled-dialog-error-font-size: var(--font-size-medium);
 
 
 

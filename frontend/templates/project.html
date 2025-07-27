@@ -2,6 +2,7 @@
 
 {% block scripts %}
 <script type="module" src="{{ url_for('static', path='/js/base/styled_link.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/base/styled_dialog.js') }}"></script>
 <script type="module" src="{{ url_for('static', path='/js/project_content.js') }}"></script>
 {% endblock %}
 
@@ -11,7 +12,7 @@
     <span class="path">
         <styled-link href="{{ url_for('projects_page') }}">Projects</styled-link>
         &nbsp;&nbsp;/&nbsp;&nbsp;
-        <b>{{project.name}}</b>
+        <b id="test2">{{project.name}}</b>
     </span>
     <span class="buttons">
     </span>
@@ -24,5 +25,26 @@
         project-gui-url="{{ url_for('document_page', document_id='[ID]') }}" assign-to-url="{{ url_for('list_users') }}"
         review-by-url="{{ url_for('list_users') }}" mark-as-url="{{ url_for('list_statuses') }}"
         sort-img="{{ url_for('static', path='/img/chevron-up-down-outline.svg') }}"></project-content>
+    <styled-dialog id="test" heading="hallo">
+        <span slot="buttons">sasddsdj</span>
+    </styled-dialog>
 </main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const buttons = document.getElementById('test2');
+        if (buttons) {
+            buttons.addEventListener('click', () => {
+                console.log('Button clicked');
+                const modal = document.getElementById('test');
+                if (modal) {
+                    modal.showModal();
+                    modal.heading = 'Assign to...';
+                } else {
+                    console.error('Modal element not found');
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}

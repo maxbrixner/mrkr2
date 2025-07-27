@@ -99,6 +99,7 @@ export class ListBasedContent extends HTMLElement implements ListBasedContentAtt
                 grid-template-areas: "scan search";
                 grid-template-columns: 1fr auto;
                 padding: 0.5rem 1rem;
+                user-select: none;
             }
         
             .toolbar > .buttons {

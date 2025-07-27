@@ -251,13 +251,13 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
             th {
                 background-color: var(--filtered-table-header-background-color, #ffffff);
                 border-bottom: 1px solid transparent; /* make outline for rows visible */
+                border-right: 1px solid var(--filtered-table-header-border-color, #000000);
                 box-shadow: var(--filtered-table-header-box-shadow);
                 font-weight: 500;
                 padding: var(--filtered-table-th-padding, 0.5rem 0.5rem);
                 position: sticky;
                 top: 0;
                 z-index: 1;
-                border-right: 1px solid var(--filtered-table-header-border-color, #000000);
             }
 
             td {
