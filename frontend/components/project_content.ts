@@ -4,6 +4,7 @@ import { ListBasedContent, ListBasedContentAttributes } from './list_based_conte
 import { MessageBox } from './base/message_box.js';
 import { StyledButton } from './base/styled_button.js';
 import { RowClickedEvent, SelectionChangedEvent } from './base/filtered_table.js';
+import { CheckboxDialog } from './base/checkbox_dialog.js';
 
 /* -------------------------------------------------------------------------- */
 
@@ -21,6 +22,10 @@ export class ProjectContent extends ListBasedContent implements ProjectContentAt
     private _assignToButton: StyledButton = new StyledButton();
     private _reviewByButton: StyledButton = new StyledButton();
     private _markAsButton: StyledButton = new StyledButton();
+
+    private _assignToDialog: CheckboxDialog = new CheckboxDialog();
+    private _reviewByDialog: CheckboxDialog = new CheckboxDialog();
+    private _markAsDialog: CheckboxDialog = new CheckboxDialog();
 
     get projectGuiUrl() {
         return this._projectGuiUrl;
@@ -95,6 +100,20 @@ export class ProjectContent extends ListBasedContent implements ProjectContentAt
         this._markAsButton.textContent = "Mark as...";
         this._markAsButton.disabled = true;
         this._buttonsDiv.appendChild(this._markAsButton);
+
+        this._assignToDialog.heading = "Assign to...";
+        this._assignToDialog.contentUrl = this._scanUrl;
+        this.shadowRoot.appendChild(this._assignToDialog);
+
+        this._reviewByDialog.heading = "Review by...";
+        this._reviewByDialog.contentUrl = this._scanUrl;
+        this.shadowRoot.appendChild(this._reviewByDialog);
+
+        this._markAsDialog.heading = "Mark as...";
+        this._markAsDialog.contentUrl = this._scanUrl;
+        this.shadowRoot.appendChild(this._markAsDialog);
+
+        this._table.emptyMessage = 'No documents found';
     }
 
     protected _onRowClicked(event: CustomEvent<RowClickedEvent>) {
@@ -114,15 +133,15 @@ export class ProjectContent extends ListBasedContent implements ProjectContentAt
     }
 
     private _onAssignToButtonClick(event: Event) {
-        console.log("Assign to button clicked");
+        this._assignToDialog.showModal();
     }
 
     private _onReviewByButtonClick(event: Event) {
-        console.log("Review by button clicked");
+        this._reviewByDialog.showModal();
     }
 
     private _onMarkAsButtonClick(event: Event) {
-        console.log("Mark as button clicked");
+        this._markAsDialog.showModal();
     }
 
 }

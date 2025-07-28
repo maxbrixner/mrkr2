@@ -1,5 +1,9 @@
 /* -------------------------------------------------------------------------- */
 
+import { StyledButton } from './styled_button.js';
+
+/* -------------------------------------------------------------------------- */
+
 export interface StyledDialogAttributes {
     heading?: string;
 }
@@ -11,6 +15,7 @@ export class StyledDialog extends HTMLElement implements StyledDialogAttributes 
     protected _header = document.createElement('div');
     protected _content = document.createElement('div');
     protected _buttons = document.createElement('div');
+    protected _cancelButton = new StyledButton();
 
     protected _contentSlot = document.createElement('slot');
     protected _buttonsSlot = document.createElement('slot');
@@ -58,7 +63,12 @@ export class StyledDialog extends HTMLElement implements StyledDialogAttributes 
         const style = document.createElement('style');
         style.textContent = `
             :host {
-                /* ... */
+                height: 0;
+                left: 0;    
+                position: fixed;
+                top: 0;
+                visibility: hidden;
+                width: 0;
             }
 
             dialog:open {
@@ -180,6 +190,10 @@ export class StyledDialog extends HTMLElement implements StyledDialogAttributes 
 
         this._content.classList.add('error');
 
+        this._cancelButton.textContent = 'Cancel';
+        this._cancelButton.addEventListener('click', this._onCancelButtonClick.bind(this));
+        this._buttons.appendChild(this._cancelButton);
+
         this._buttonsSlot.name = 'buttons';
         this._buttons.appendChild(this._buttonsSlot);
 
@@ -196,6 +210,10 @@ export class StyledDialog extends HTMLElement implements StyledDialogAttributes 
 
     public close() {
         (this._dialog as any).close();
+    }
+
+    protected _onCancelButtonClick(event: Event) {
+        this.close();
     }
 }
 

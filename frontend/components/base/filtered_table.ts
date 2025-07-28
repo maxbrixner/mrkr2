@@ -441,21 +441,17 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
             tr.appendChild(td);
 
             for (const key of Object.keys(this._configParsed.headers)) {
-                if (!(key in item)) {
-                    continue;
-                }
-
                 const td = document.createElement('td');
                 td.addEventListener('click', this._onRowClickedEvent(tr.id));
 
                 const display: 'text' | 'chip' = this._configParsed?.display?.[key] || 'text';
 
                 if (display === 'text') {
-                    td.textContent = item[key];
+                    td.textContent = item[key] || '';
                 } else {
                     const divElement = document.createElement('div');
                     divElement.classList.add('chip');
-                    divElement.textContent = item[key];
+                    divElement.textContent = item[key] || '';
                     divElement.style.backgroundColor = `var(--filtered-table-chip-${item[key]}-background-color, #000000)`;
                     divElement.style.color = `var(--filtered-table-chip-${item[key]}-color, #ffffff)`;
                     td.appendChild(divElement);

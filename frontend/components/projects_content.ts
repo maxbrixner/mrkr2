@@ -1,4 +1,5 @@
 /* -------------------------------------------------------------------------- */
+
 import { ListBasedContent, ListBasedContentAttributes } from './list_based_content.js';
 import { MessageBox } from './base/message_box.js';
 import { StyledButton } from './base/styled_button.js';
@@ -81,6 +82,8 @@ export class ProjectsContent extends ListBasedContent implements ProjectsContent
         this._scanButton.textContent = "Schedule Scan";
         this._scanButton.disabled = true;
         this._buttonsDiv.appendChild(this._scanButton);
+
+        this._table.emptyMessage = 'No projects found';
     }
 
     protected _onRowClicked(event: CustomEvent<RowClickedEvent>) {

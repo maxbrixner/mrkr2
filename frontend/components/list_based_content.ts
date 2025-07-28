@@ -135,7 +135,7 @@ export class ListBasedContent extends HTMLElement implements ListBasedContentAtt
         this._table.style.gridArea = 'table';
         this._table.ariaLabel = "Projects Table";
         this._table.config = this._getTableConfig();
-        this._table.emptyMessage = 'No projects found';
+        this._table.emptyMessage = 'No items found';
 
         this.shadowRoot.appendChild(toolbar)
         this.shadowRoot.appendChild(this._table);
