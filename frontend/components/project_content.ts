@@ -9,15 +9,23 @@ import { CheckboxDialog } from './base/checkbox_dialog.js';
 /* -------------------------------------------------------------------------- */
 
 interface ProjectContentAttributes extends ListBasedContentAttributes {
-    projectGuiUrl?: string;
-    scanUrl?: string;
+    labelGuiUrl?: string
+    listUsersUrl?: string
+    listStatusesUrl?: string
+    updateAssignToUrl?: string
+    updateReviewByUrl?: string
+    updateMarkAsUrl?: string
 }
 
 /* -------------------------------------------------------------------------- */
 
 export class ProjectContent extends ListBasedContent implements ProjectContentAttributes {
-    private _projectGuiUrl: string = '';
-    private _scanUrl: string = '';
+    private _labelGuiUrl: string = '';
+    private _listUsersUrl: string = '';
+    private _listStatusesUrl: string = '';
+    private _updateAssignToUrl: string = '';
+    private _updateReviewByUrl: string = '';
+    private _updateMarkAsUrl: string = '';
 
     private _assignToButton: StyledButton = new StyledButton();
     private _reviewByButton: StyledButton = new StyledButton();
@@ -27,20 +35,52 @@ export class ProjectContent extends ListBasedContent implements ProjectContentAt
     private _reviewByDialog: CheckboxDialog = new CheckboxDialog();
     private _markAsDialog: CheckboxDialog = new CheckboxDialog();
 
-    get projectGuiUrl() {
-        return this._projectGuiUrl;
+    get labelGuiUrl() {
+        return this._labelGuiUrl;
     }
 
-    set projectGuiUrl(value: string) {
-        this.setAttribute('project-gui-url', value);
+    set labelGuiUrl(value: string) {
+        this.setAttribute('label-gui-url', value);
     }
 
-    get scanUrl() {
-        return this._scanUrl;
+    get listUsersUrl() {
+        return this._listUsersUrl;
     }
 
-    set scanUrl(value: string) {
-        this.setAttribute('scan-url', value);
+    set listUsersUrl(value: string) {
+        this.setAttribute('list-users-url', value);
+    }
+
+    get listStatusesUrl() {
+        return this._listStatusesUrl;
+    }
+
+    set listStatusesUrl(value: string) {
+        this.setAttribute('list-statuses-url', value);
+    }
+
+    get updateAssignToUrl() {
+        return this._updateAssignToUrl;
+    }
+
+    set updateAssignToUrl(value: string) {
+        this.setAttribute('update-assign-to-url', value);
+    }
+
+    get updateReviewByUrl() {
+        return this._updateReviewByUrl;
+    }
+
+    set updateReviewByUrl(value: string) {
+        this.setAttribute('update-review-by-url', value);
+    }
+
+    get updateMarkAsUrl() {
+        return this._updateMarkAsUrl;
+    }
+
+    set updateMarkAsUrl(value: string) {
+        this.setAttribute('update-mark-as-url', value);
     }
 
     constructor() {
@@ -50,17 +90,18 @@ export class ProjectContent extends ListBasedContent implements ProjectContentAt
     }
 
     static get observedAttributes() {
-        return [...super.observedAttributes, 'project-gui-url', 'scan-url'];
+        return [...super.observedAttributes, 'label-gui-url', 'list-users-url', 'list-statuses-url', 'update-assign-to-url', 'update-review-by-url', 'update-mark-as-url'];
     }
 
     attributeChangedCallback(propertyName: string, oldValue: string | null, newValue: string | null) {
         if (oldValue === newValue) return;
         super.attributeChangedCallback(propertyName, oldValue, newValue);
-        if (propertyName === 'project-gui-url') {
-            this._projectGuiUrl = newValue || '';
-        } else if (propertyName === 'scan-url') {
-            this._scanUrl = newValue || '';
-        }
+        if (propertyName === 'label-gui-url') {
+            this._labelGuiUrl = newValue || '';
+        } else if (propertyName === 'list-users-url') {
+            this._listUsersUrl = newValue || '';
+            this._assignToDialog.contentUrl = this._listUsersUrl;
+        } /* todo */
     }
 
     connectedCallback() {
@@ -102,15 +143,17 @@ export class ProjectContent extends ListBasedContent implements ProjectContentAt
         this._buttonsDiv.appendChild(this._markAsButton);
 
         this._assignToDialog.heading = "Assign to...";
-        this._assignToDialog.contentUrl = this._scanUrl;
+        this._assignToDialog.contentUrl = this._listUsersUrl;
+        this._assignToDialog.idField = "id";
+        this._assignToDialog.displayField = "username";
         this.shadowRoot.appendChild(this._assignToDialog);
 
         this._reviewByDialog.heading = "Review by...";
-        this._reviewByDialog.contentUrl = this._scanUrl;
+        this._reviewByDialog.contentUrl = this._listUsersUrl;
         this.shadowRoot.appendChild(this._reviewByDialog);
 
         this._markAsDialog.heading = "Mark as...";
-        this._markAsDialog.contentUrl = this._scanUrl;
+        this._markAsDialog.contentUrl = this._listStatusesUrl;
         this.shadowRoot.appendChild(this._markAsDialog);
 
         this._table.emptyMessage = 'No documents found';
@@ -122,7 +165,7 @@ export class ProjectContent extends ListBasedContent implements ProjectContentAt
         if (!detail.rowId) {
             throw new Error("Row ID is not defined.");
         }
-        window.location.href = this._projectGuiUrl.replace("[ID]", String(detail.rowId));
+        window.location.href = this._labelGuiUrl.replace("[ID]", String(detail.rowId));
     }
 
     protected _onSelectionChanged(event: CustomEvent<SelectionChangedEvent>) {

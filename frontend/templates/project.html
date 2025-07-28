@@ -22,8 +22,8 @@
 {% block main %}
 <main class="project-main">
     <project-content content-url="{{ url_for('list_project_documents', project_id=project.id) }}"
-        project-gui-url="{{ url_for('document_page', document_id='[ID]') }}" assign-to-url="{{ url_for('list_users') }}"
-        review-by-url="{{ url_for('list_users') }}" mark-as-url="{{ url_for('list_statuses') }}"
+        label-gui-url="{{ url_for('document_page', document_id='[ID]') }}" list-users-url="{{ url_for('list_users') }}"
+        list-statuses-url="{{ url_for('list_statuses') }}"
         sort-img="{{ url_for('static', path='/img/chevron-up-down-outline.svg') }}"></project-content>
 </main>
 {% endblock %}

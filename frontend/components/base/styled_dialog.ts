@@ -128,6 +128,8 @@ export class StyledDialog extends HTMLElement implements StyledDialogAttributes 
                 border: none;
                 gap: .5rem;
                 grid-area: content;
+                max-height: 80%;
+                max-width: 80%;
                 min-height: 15rem;
                 min-width: 15rem;
                 outline: none;
@@ -187,8 +189,6 @@ export class StyledDialog extends HTMLElement implements StyledDialogAttributes 
 
         this._contentSlot.name = 'content';
         this._content.appendChild(this._contentSlot);
-
-        this._content.classList.add('error');
 
         this._cancelButton.textContent = 'Cancel';
         this._cancelButton.addEventListener('click', this._onCancelButtonClick.bind(this));
