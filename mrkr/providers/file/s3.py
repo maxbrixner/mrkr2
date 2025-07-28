@@ -84,26 +84,27 @@ class S3FileProvider(BaseFileProvider):
 
         loop = asyncio.get_running_loop()
 
-        stream = io.BytesIO()
+        try:
+            stream = io.BytesIO()
+            await self._bucket.download_fileobj(
+                key=str(self.filename),
+                stream=stream
+            )
 
-        await self._bucket.download_fileobj(
-            key=str(self.filename),
-            stream=stream
-        )
-
-        stream.seek(0)
-        while True:
-            if chunk_size:
-                chunk = await loop.run_in_executor(
-                    None, stream.read, chunk_size)
-            else:
-                chunk = await loop.run_in_executor(
-                    None, stream.read)
-            if not chunk:
-                break
-            yield chunk
-
-        stream.close()
+            while True:
+                if chunk_size:
+                    chunk = await loop.run_in_executor(
+                        None, stream.read, chunk_size)
+                else:
+                    chunk = await loop.run_in_executor(
+                        None, stream.read)
+                if not chunk:
+                    break
+                yield chunk
+        except Exception as exception:
+            raise exception
+        finally:
+            stream.close()
 
     async def list(self) -> AsyncGenerator[str, None]:
         """

@@ -333,6 +333,7 @@ class AsyncBucketWrapper():
                 Fileobj=stream
             )
         )
+        stream.seek(0)
 
 # ---------------------------------------------------------------------------- #
 

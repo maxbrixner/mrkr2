@@ -199,6 +199,8 @@ async def _scan_project_file_system(
     async with file_provider("/") as provider:
         async for file in provider.list():
 
+            # todo: exclude extensions based on config?
+
             if file in db_paths:
                 logger.debug(f"Document already exists: {file}")
                 continue
