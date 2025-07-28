@@ -23,7 +23,8 @@
 <main class="project-main">
     <project-content content-url="{{ url_for('list_project_documents', project_id=project.id) }}"
         label-gui-url="{{ url_for('document_page', document_id='[ID]') }}" list-users-url="{{ url_for('list_users') }}"
-        list-statuses-url="{{ url_for('list_statuses') }}"
+        list-statuses-url="{{ url_for('list_statuses') }}" update-assign-to-url="{{ url_for('update_assignee') }}"
+        update-review-by-url="{{ url_for('update_reviewer') }}" update-mark-as-url="{{ url_for('update_status') }}"
         sort-img="{{ url_for('static', path='/img/chevron-up-down-outline.svg') }}"></project-content>
 </main>
 {% endblock %}

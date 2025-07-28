@@ -84,10 +84,19 @@ export class CheckboxDialog extends StyledDialog implements CheckboxDialogAttrib
         const style = document.createElement('style');
         style.textContent = `
             .content {
+                display: block;
+            }
+
+            fieldset {
+                align-items: center;
+                border: none;
                 display: grid;
-                grid-template-columns: min-content 1fr;
-                grid-auto-rows: min-content;
                 grid-auto-flow: row;
+                grid-auto-rows: min-content;
+                grid-template-columns: min-content 1fr;
+                margin: 0;
+                outline: none;
+                padding: 0;
             }
         `
         this.shadowRoot?.appendChild(style);
@@ -101,6 +110,19 @@ export class CheckboxDialog extends StyledDialog implements CheckboxDialogAttrib
         this._clearContent();
         this._updateContent();
         super.showModal();
+    }
+
+    public showModalWithCallback(confirmCallback: CallableFunction) {
+        this._confirmButton.addEventListener('click', this._onConfirmButtonClick(confirmCallback), { 'once': true })
+        this.showModal();
+    }
+
+    private _onConfirmButtonClick(confirmCallback: CallableFunction) {
+        return (event: Event) => {
+            this.close();
+            this._confirmButton.setAttribute("disabled", "true");
+            confirmCallback(this._currentSelection);
+        }
     }
 
     private _clearContent() {
@@ -120,6 +142,8 @@ export class CheckboxDialog extends StyledDialog implements CheckboxDialogAttrib
                 if (!this.idField || !this.displayField)
                     throw new Error("idField or displayField not defined");
 
+                const fieldset = document.createElement('fieldset');
+
                 for (const item of content) {
                     if (!(this.idField in item) || !(this.displayField in item)) {
                         throw new Error("idField or displayField not present");
@@ -138,13 +162,15 @@ export class CheckboxDialog extends StyledDialog implements CheckboxDialogAttrib
                         this._confirmButton.removeAttribute("disabled");
                     });
 
-                    this._content.appendChild(itemElement);
+                    fieldset.appendChild(itemElement);
 
                     const labelElement = document.createElement('label');
                     labelElement.textContent = item[this.displayField];
                     labelElement.setAttribute('for', `remote-list-${id}`);
-                    this._content.appendChild(labelElement);
+                    fieldset.appendChild(labelElement);
                 }
+
+                this._content.appendChild(fieldset);
 
             })
             .catch(error => {

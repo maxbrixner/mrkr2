@@ -101,7 +101,17 @@ export class ProjectContent extends ListBasedContent implements ProjectContentAt
         } else if (propertyName === 'list-users-url') {
             this._listUsersUrl = newValue || '';
             this._assignToDialog.contentUrl = this._listUsersUrl;
-        } /* todo */
+            this._reviewByDialog.contentUrl = this._listUsersUrl;
+        } else if (propertyName === 'list-statuses-url') {
+            this._listStatusesUrl = newValue || '';
+            this._markAsDialog.contentUrl = this._listStatusesUrl;
+        } else if (propertyName === 'update-assign-to-url') {
+            this._updateAssignToUrl = newValue || '';
+        } else if (propertyName === 'update-review-by-url') {
+            this._updateReviewByUrl = newValue || '';
+        } else if (propertyName === 'update-mark-as-url') {
+            this._updateMarkAsUrl = newValue || '';
+        }
     }
 
     connectedCallback() {
@@ -127,6 +137,11 @@ export class ProjectContent extends ListBasedContent implements ProjectContentAt
             throw new Error("Shadow Root is not initialized.");
         }
 
+        this._markAsButton.ariaLabel = "Mark as...";
+        this._markAsButton.textContent = "Mark as...";
+        this._markAsButton.disabled = true;
+        this._buttonsDiv.appendChild(this._markAsButton);
+
         this._assignToButton.ariaLabel = "Assign to...";
         this._assignToButton.textContent = "Assign to...";
         this._assignToButton.disabled = true;
@@ -137,11 +152,6 @@ export class ProjectContent extends ListBasedContent implements ProjectContentAt
         this._reviewByButton.disabled = true;
         this._buttonsDiv.appendChild(this._reviewByButton);
 
-        this._markAsButton.ariaLabel = "Mark as...";
-        this._markAsButton.textContent = "Mark as...";
-        this._markAsButton.disabled = true;
-        this._buttonsDiv.appendChild(this._markAsButton);
-
         this._assignToDialog.heading = "Assign to...";
         this._assignToDialog.contentUrl = this._listUsersUrl;
         this._assignToDialog.idField = "id";
@@ -150,10 +160,14 @@ export class ProjectContent extends ListBasedContent implements ProjectContentAt
 
         this._reviewByDialog.heading = "Review by...";
         this._reviewByDialog.contentUrl = this._listUsersUrl;
+        this._reviewByDialog.idField = "id";
+        this._reviewByDialog.displayField = "username";
         this.shadowRoot.appendChild(this._reviewByDialog);
 
         this._markAsDialog.heading = "Mark as...";
         this._markAsDialog.contentUrl = this._listStatusesUrl;
+        this._markAsDialog.idField = "name";
+        this._markAsDialog.displayField = "value";
         this.shadowRoot.appendChild(this._markAsDialog);
 
         this._table.emptyMessage = 'No documents found';
@@ -175,16 +189,97 @@ export class ProjectContent extends ListBasedContent implements ProjectContentAt
         this._markAsButton.disabled = detail.none;
     }
 
+    private _onAssignToConfirm(userId: string) {
+        const messageBox = document.querySelector('message-box') as MessageBox | null;
+        const selectedDocuments = this._table.getSelectedRows().map(row => row.id);
+        const selectedUser = userId;
+        fetch(this._updateAssignToUrl, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ document_ids: selectedDocuments, assignee_id: selectedUser })
+
+        }).then(response => {
+            if (response.ok) {
+                this._table.updateContent();
+                if (messageBox) {
+                    messageBox.showMessage(`Documents have been assigned successfully.`, 'success');
+                }
+            } else {
+                if (messageBox) {
+                    messageBox.showMessage(`Unable to assign documents.`, 'error', 'Server Error');
+                }
+            }
+        }).catch(error => {
+            messageBox?.showMessage(`Unable to assign documents.`, 'error', error.message);
+        });
+    }
+
+    private _onReviewByConfirm(userId: string) {
+        const messageBox = document.querySelector('message-box') as MessageBox | null;
+        const selectedDocuments = this._table.getSelectedRows().map(row => row.id);
+        const selectedUser = userId;
+        fetch(this._updateReviewByUrl, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ document_ids: selectedDocuments, reviewer_id: selectedUser })
+
+        }).then(response => {
+            if (response.ok) {
+                this._table.updateContent();
+                if (messageBox) {
+                    messageBox.showMessage(`Documents have been assigned successfully.`, 'success');
+                }
+            } else {
+                if (messageBox) {
+                    messageBox.showMessage(`Unable to assign documents.`, 'error', 'Server Error');
+                }
+            }
+        }).catch(error => {
+            messageBox?.showMessage(`Unable to assign documents.`, 'error', error.message);
+        });
+    }
+
+    private _onMarkAsConfirm(status: string) {
+        const messageBox = document.querySelector('message-box') as MessageBox | null;
+        const selectedDocuments = this._table.getSelectedRows().map(row => row.id);
+        const selectedStatus = status;
+        fetch(this._updateMarkAsUrl, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ document_ids: selectedDocuments, status: selectedStatus })
+
+        }).then(response => {
+            if (response.ok) {
+                this._table.updateContent();
+                if (messageBox) {
+                    messageBox.showMessage(`Status has been changed successfully.`, 'success');
+                }
+            } else {
+                if (messageBox) {
+                    messageBox.showMessage(`Unable to change status.`, 'error', 'Server Error');
+                }
+            }
+        }).catch(error => {
+            messageBox?.showMessage(`Unable to change status.`, 'error', error.message);
+        });
+    }
+
     private _onAssignToButtonClick(event: Event) {
-        this._assignToDialog.showModal();
+        this._assignToDialog.showModalWithCallback(this._onAssignToConfirm.bind(this));
     }
 
     private _onReviewByButtonClick(event: Event) {
-        this._reviewByDialog.showModal();
+        this._reviewByDialog.showModalWithCallback(this._onReviewByConfirm.bind(this));
     }
 
     private _onMarkAsButtonClick(event: Event) {
-        this._markAsDialog.showModal();
+        this._markAsDialog.showModalWithCallback(this._onMarkAsConfirm.bind(this));
     }
 
 }
