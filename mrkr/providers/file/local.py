@@ -66,19 +66,24 @@ class LocalFileProvider(BaseFileProvider):
 
         loop = asyncio.get_running_loop()
 
-        stream = await loop.run_in_executor(
-            None, self.filename.open, 'rb')
+        try:
+            stream = await loop.run_in_executor(
+                None, self.filename.open, 'rb')
 
-        while True:
-            if chunk_size:
-                chunk = await loop.run_in_executor(
-                    None, stream.read, chunk_size)
-            else:
-                chunk = await loop.run_in_executor(
-                    None, stream.read)
-            if not chunk:
-                break
-            yield chunk
+            while True:
+                if chunk_size:
+                    chunk = await loop.run_in_executor(
+                        None, stream.read, chunk_size)
+                else:
+                    chunk = await loop.run_in_executor(
+                        None, stream.read)
+                if not chunk:
+                    break
+                yield chunk
+        except Exception as exception:
+            raise exception
+        finally:
+            stream.close()
 
     async def list(self) -> AsyncGenerator[str, None]:
         """

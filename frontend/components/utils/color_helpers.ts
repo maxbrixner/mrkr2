@@ -108,6 +108,10 @@ export function combineHexColors(hexColors: string[]): string {
  */
 export function getRelativeLuminance(color: string): number {
     //get r,g,b from rgba(r,g,b,a) string
+    if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(color)) {
+        color = hexToRgbA(color);
+    }
+
     const rgba = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)/);
     if (!rgba) {
         throw new Error('Invalid color format. Expected rgba(r,g,b,a) or rgb(r,g,b)');

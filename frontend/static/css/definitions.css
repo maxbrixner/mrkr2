@@ -1,35 +1,85 @@
+@font-face {
+    font-family: 'Geist';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: block;
+    src: local('Geist'),
+        url('/static/font/Geist-VariableFont_wght.ttf') format('woff2'),
+}
+
 :root {
+    /* Color Variables */
     --primary-color: #4a90e2;
-    --secondary-color: #50e3c2;
+    --on-primary-color: #ffffff;
+
     --surface-color: #fdfdfc;
+    --on-surface-color: #333333;
+
     --background-color: #f0efeb;
-    --text-color: #333333;
-    --border-color: #e1ded5;
-    --hover-color: #e0e0e0;
-    --active-color: #c8c8c8;
-    --error-color: #ff4d4d;
-    --success-color: #4caf50;
-    --warning-color: #ff9800;
+    --on-background-color: #333333;
+
     --scrollbar-thumb: #8b8b8b;
+    --scrollbar-track: #f0efeb;
+    --scrollbar-width: thin;
+
+    --success-color: #4caf50;
+    --on-success-color: #ffffff;
+
+    --info-color: #2196f3;
+    --on-info-color: #ffffff;
+
+    --warning-color: #ff9800;
+    --on-warning-color: #ffffff;
+
+    --error-color: #f44336;
+    --on-error-color: #ffffff;
+
+    --table-even-color: #fdfdfc;
+    --table-odd-color: #f9f8f6;
+
+    --border-color: #e1ded5;
+    --hover-color: #f0f3fe;
+
     --disabled-color: #f0f0f0;
     --disabled-text-color: #888888;
 
+    /* Layout Variables */
+    --min-layout-width: 800px;
+
+    /* Font Variables */
+    --font-family: "Geist", sans-serif;
+
     /* Font sizes */
-    --font-size-small: 12px;
-    --font-size-medium: 14px;
-    --font-size-large: 16px;
+    --font-size-small: 0.8rem;
+    --font-size-medium: 1rem;
+    --font-size-large: 1.2rem;
+
+    /* Font weights */
+    --font-weight-normal: 400;
+    --font-weight-semibold: 500;
+    --font-weight-bold: 700;
 
     /* Spacing */
-    --spacing-small: 4px;
-    --spacing-medium: 8px;
-    --spacing-large: 16px;
+    --spacing-small: 0.25rem;
+    --spacing-medium: 0.5rem;
+    --spacing-large: 1rem;
+    --spacing-xlarge: 1.5rem;
+    --spacing-xxlarge: 2rem;
 
-    --border-radius-small: 2px;
-    --border-radius-medium: 4px;
-    --border-radius-large: 8px;
+    /* Border radius */
+    --border-radius-small: 0.125rem;
+    --border-radius-medium: 0.25rem;
+    --border-radius-large: 0.5rem;
+    --border-radius-xlarge: 1rem;
+    --border-radius-xxlarge: 2rem;
+
+    /* Scrollbar */
+    --scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 
     /* Shadows */
     --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --box-shadow-inset: inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+
 
     /* Spinner */
     --spinner-color: var(--primary-color);
@@ -37,17 +87,15 @@
     --spinner-size-large: 30px;
     --spinner-border-large: 4px;
 
-
-    --styled-link-color: var(--text-color);
-    --styled-link-hover-color: var(--primary-color);
-
+    /* Styled Button Variables */
     --styled-button-border-radius: var(--border-radius-medium);
     --styled-button-border-width: 1px;
-    --styled-button-font-weight: 600;
+    --styled-button-font-size: var(--font-size-small);
+    --styled-button-font-weight: var(--font-weight-semibold);
     --styled-button-padding: var(--spacing-medium) var(--spacing-large);
 
+    --styled-button-background-color-disabled: var(--disabled-color);
     --styled-button-border-color-disabled: var(--border-color);
-    --styled-button-background-disabled: var(--disabled-color);
     --styled-button-color-disabled: var(--disabled-text-color);
 
     --styled-button-background-color: var(--surface-color);
@@ -57,8 +105,98 @@
 
     --styled-button-background-color-primary: var(--primary-color);
     --styled-button-border-color-primary: var(--primary-color);
-    --styled-button-border-color-hover-primary: black;
-    --styled-button-color-primary: white;
+    --styled-button-border-color-hover-primary: var(--border-color);
+    --styled-button-color-primary: var(--on-primary-color);
+
+    /* Styled Input Variables */
+    --styled-input-border-radius: var(--border-radius-medium);
+    --styled-input-border-width: 1px;
+    --styled-input-font-size: var(--font-size-small);
+    --styled-input-font-weight: var(--font-weight-normal);
+    --styled-input-padding: var(--spacing-medium) var(--spacing-medium);
+
+    --styled-input-background-color-disabled: var(--disabled-color);
+    --styled-input-border-color-disabled: var(--border-color);
+    --styled-input-color-disabled: var(--disabled-text-color);
+
+    --styled-input-background-color: var(--surface-color);
+    --styled-input-border-color: var(--border-color);
+    --styled-input-border-color-hover: var(--primary-color);
+    --styled-input-color: var(--text-color);
+
+    /* Styled Link Variables */
+    --styled-link-font-size: var(--font-size-medium);
+    --styled-link-color: var(--text-color);
+    --styled-link-hover-color: var(--primary-color);
+
+    /* Message Box Variables */
+    --message-box-box-shadow: var(--box-shadow);
+    --message-box-font-size: var(--font-size-medium);
+    --message-box-padding: var(--spacing-large);
+
+    --message-box-success-background-color: var(--success-color);
+    --message-box-success-color: var(--on-success-color);
+    --message-box-success-border-color: var(--border-color);
+    --message-box-success-icon-filter: invert(1);
+
+    --message-box-info-background-color: var(--info-color);
+    --message-box-info-color: var(--on-info-color);
+    --message-box-info-border-color: var(--border-color);
+    --message-box-info-icon-filter: invert(1);
+
+    --message-box-warning-background-color: var(--warning-color);
+    --message-box-warning-color: var(--on-warning-color);
+    --message-box-warning-border-color: var(--border-color);
+    --message-box-warning-icon-filter: invert(1);
+
+    --message-box-error-background-color: var(--error-color);
+    --message-box-error-color: var(--on-error-color);
+    --message-box-error-border-color: var(--border-color);
+    --message-box-error-icon-filter: invert(1);
+
+    /* Filtered Table Variables */
+    --filtered-table-empty-color: var(--disabled-text-color);
+    --filtered-table-empty-font-size: var(--font-size-medium);
+    --filtered-table-tr-even-background-color: var(--table-even-color);
+    --filtered-table-tr-odd-background-color: var(--table-odd-color);
+    --filtered-table-tr-focus-outline-color: var(--primary-color);
+    --filtered-table-tr-hover-background-color: var(--hover-color);
+    --filtered-table-font-size: var(--font-size-small);
+    --filtered-table-header-box-shadow: var(--box-shadow-inset);
+    --filtered-table-header-background-color: var(--table-odd-color);
+    --filtered-table-font-color: var(--text-color);
+    --filtered-table-th-padding: var(--spacing-medium) var(--spacing-small);
+    --filtered-table-td-padding: var(--spacing-xlarge) var(--spacing-small);
+    --filtered-table-chip-border-radius: var(--border-radius-xlarge);
+    --filtered-table-chip-padding: var(--spacing-small) var(--spacing-medium);
+    --filtered-table-sort-icon-opacity: 0.5;
+    --filtered-table-empty-message: 'No items found';
+    --filtered-table-header-border-color: var(--border-color);
+
+    --filtered-table-chip-processing-background-color: #90A4AE;
+    --filtered-table-chip-processing-color: #000000;
+
+    --filtered-table-chip-open-background-color: #80DEEA;
+    --filtered-table-chip-open-color: #000000;
+
+    --filtered-table-chip-done-background-color: #4CAF50;
+    --filtered-table-chip-done-color: #000000;
+
+    --filtered-table-chip-review-background-color: #FFC107;
+    --filtered-table-chip-review-color: #000000;
+
+    /* Styled Modal Variables */
+    --styled-dialog-header-background-color: var(--surface-color);
+    --styled-dialog-header-color: var(--text-color);
+    --styled-dialog-header-font-size: var(--font-size-medium);
+    --styled-dialog-header-font-weight: var(--font-weight-semibold);
+    --styled-dialog-header-padding: var(--spacing-medium) var(--spacing-large);
+    --styled-dialog-border-color: var(--border-color);
+    --styled-dialog-content-padding: var(--spacing-medium) var(--spacing-large);
+    --styled-dialog-buttons-padding: var(--spacing-medium) var(--spacing-large);
+    --styled-dialog-error-color: var(--disabled-text-color);
+    --styled-dialog-error-message: 'Error loading content';
+    --styled-dialog-error-font-size: var(--font-size-medium);
 
 
 

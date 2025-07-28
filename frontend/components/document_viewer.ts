@@ -1,7 +1,7 @@
 
 /* -------------------------------------------------------------------------- */
 
-import { MessageBox } from './message_box.js';
+import { MessageBox } from './base/message_box.js';
 
 /* -------------------------------------------------------------------------- */
 
@@ -200,7 +200,7 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
             }
         `
 
-        this.shadowRoot?.appendChild(style);
+        this.shadowRoot.appendChild(style);
 
         this.classList.add('loading');
     }

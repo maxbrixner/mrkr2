@@ -23,6 +23,7 @@ class TextractOcrProvider(BaseOcrProvider):
     """
 
     _config: schemas.OcrProviderTesseractConfigSchema
+    _session: AwsSession | None
     _client: AsyncTextractWrapper | None
 
     def __init__(
@@ -34,6 +35,7 @@ class TextractOcrProvider(BaseOcrProvider):
         """
         super().__init__(config=config)
 
+        self._session = None
         self._client = None
 
     async def __aenter__(self) -> Self:
@@ -64,9 +66,11 @@ class TextractOcrProvider(BaseOcrProvider):
         """
         Refresh the Textract client if needed.
         """
-        if self._client is None:
+        if self._session is None:
             aws_config = schemas.AwsConfigSchema(**self._config.model_dump())
-            session = AwsSession(config=aws_config)
-            self._client = await session.get_async_textract_client()
+            self._session = AwsSession(config=aws_config)
+
+        if self._client is None:
+            self._client = await self._session.get_async_textract_client()
 
 # ---------------------------------------------------------------------------- #
