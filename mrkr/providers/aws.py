@@ -3,6 +3,7 @@
 import boto3
 import re
 import os
+import io
 import logging
 import pydantic
 import datetime
@@ -131,10 +132,11 @@ class AwsSession(boto3.session.Session):
         self._temp_credentials = \
             _AwsTemporaryCredentials(**response['Credentials'])
 
+        expiration = self._temp_credentials.Expiration
+
         logger.debug(
             f"Temporary AWS credentials received (expires "
-            f"{self._temp_credentials .Expiration.strftime(
-                '%Y-%m-%d %H:%M:%S%Z')})."
+            f"{expiration.strftime('%Y-%m-%d %H:%M:%S%Z')})."
         )
 
     async def get_client(self, service_name: str) -> Any:
@@ -219,6 +221,11 @@ class AwsSession(boto3.session.Session):
 # ---------------------------------------------------------------------------- #
 
 
+class BucketObjectMetadata(pydantic.BaseModel):
+    content_type: str = pydantic.Field(alias="ContentType")
+    etag: str = pydantic.Field(alias="ETag")
+
+
 class AsyncBucketWrapper():
     """
     A wrapper for an AWS S3 bucket to provide an asynchronous interface
@@ -232,7 +239,11 @@ class AsyncBucketWrapper():
         """
         self._bucket = bucket
 
-    async def list_objects(self, prefix: str) -> AsyncGenerator[str, None]:
+    async def list_objects(
+        self,
+        prefix: str,
+        max_keys: int = 1000
+    ) -> AsyncGenerator[Any, None]:
         """
         List objects in the bucket with the specified prefix.
         """
@@ -242,12 +253,86 @@ class AsyncBucketWrapper():
             None,
             functools.partial(
                 self._bucket.objects.filter,
-                Prefix=prefix
+                Prefix=prefix,
+                MaxKeys=max_keys
             )
         )
 
         for object in response:
-            yield object.key
+            yield object
+
+    async def get_object_metadata(
+        self,
+        key: str
+    ) -> BucketObjectMetadata | None:
+        """
+        Retrieve the matadata for an S3 object.
+        """
+        loop = asyncio.get_running_loop()
+
+        matched_object = None
+        async for object in self.list_objects(prefix=key):
+            if object.key == key:
+                matched_object = object
+
+        if matched_object is None:
+            return None
+
+        response = await loop.run_in_executor(
+            None,
+            matched_object.get
+        )
+
+        return BucketObjectMetadata(**(response))
+
+    async def is_file(self, key: str) -> bool:
+        """
+        Check whether an S3 object is a file
+        """
+        metadata = await self.get_object_metadata(key=key)
+
+        if not metadata:
+            return False
+
+        if not metadata.content_type.lower().startswith(
+                "application/x-directory"):
+            return True
+
+        return False
+
+    async def is_folder(self, key: str) -> bool:
+        """
+        Check whether an S3 object is a folder.
+        """
+        key = key.rstrip("/")
+        key += "/"
+
+        metadata = await self.get_object_metadata(key=key)
+
+        if not metadata:
+            return False
+
+        if metadata.content_type.lower().startswith(
+                "application/x-directory"):
+            return True
+
+        return False
+
+    async def download_fileobj(
+        self,
+        key: str,
+        stream: io.BytesIO
+    ) -> None:
+        loop = asyncio.get_running_loop()
+
+        await loop.run_in_executor(
+            None,
+            functools.partial(
+                self._bucket.download_fileobj,
+                Key=key,
+                Fileobj=stream
+            )
+        )
 
 # ---------------------------------------------------------------------------- #
 

@@ -68,10 +68,23 @@ async def scan_project(
         project = crud.get_project(session=session, id=project_id)
 
         if not project:
+            raise Exception(f"Project with id {project_id} not found.")
+
+        file_provider = providers.get_file_provider(
+            project_config=project.config)
+
+        ocr_provider = providers.get_ocr_provider(
+            project_config=project.config)
+
+        if not project:
             logger.error(f"Project {project_id} not found.")
             return
 
-        await _scan_project_file_system(session=session, project=project)
+        await _scan_project_file_system(
+            session=session,
+            project=project,
+            file_provider=file_provider
+        )
 
         documents = crud.get_project_documents(
             session=session,
@@ -82,10 +95,14 @@ async def scan_project(
             await scan_document(
                 document_id=document.id,
                 force=force,
-                session=session)
+                session=session,
+                file_provider=file_provider,
+                ocr_provider=ocr_provider
+            )
 
         logger.debug(f"Scan of project {project_id} successful.")
     except Exception as exception:
+        logger.exception(exception)
         logger.error(f"Error scanning project {project_id}: {exception}")
 
 
@@ -113,7 +130,9 @@ async def scan_document_sync(
 async def scan_document(
     document_id: int,
     force: bool = False,
-    session: sqlmodel.Session | None = None
+    session: sqlmodel.Session | None = None,
+    file_provider: Optional[providers.BaseFileProvider] = None,
+    ocr_provider: Optional[providers.BaseOcrProvider] = None
 ) -> None:
     """
     Scan a single document.
@@ -132,7 +151,9 @@ async def scan_document(
 
         if document.data is None or force:
             ocr_result = await _run_document_ocr(
-                document=document
+                document=document,
+                file_provider=file_provider,
+                ocr_provider=ocr_provider
             )
 
             await _create_document_data(
@@ -147,6 +168,7 @@ async def scan_document(
 
         logger.debug(f"Scan of document {document_id} successful.")
     except Exception as exception:
+        logger.exception(exception)
         logger.error(f"Error scanning document {document_id}: {exception}")
 
 # ---------------------------------------------------------------------------- #
@@ -154,7 +176,8 @@ async def scan_document(
 
 async def _scan_project_file_system(
     session: sqlmodel.Session,
-    project: models.Project
+    project: models.Project,
+    file_provider: Optional[providers.BaseFileProvider] = None
 ) -> None:
     """
     List the files in a project, compare them with the database,
@@ -169,8 +192,9 @@ async def _scan_project_file_system(
 
     db_paths = [document.path for document in db_documents]
 
-    file_provider = providers.get_file_provider(
-        project_config=project.config)
+    if not file_provider:
+        file_provider = providers.get_file_provider(
+            project_config=project.config)
 
     async with file_provider("/") as provider:
         async for file in provider.list():
@@ -193,18 +217,22 @@ async def _scan_project_file_system(
 
 
 async def _run_document_ocr(
-    document: models.Document
+    document: models.Document,
+    file_provider: Optional[providers.BaseFileProvider] = None,
+    ocr_provider: Optional[providers.BaseOcrProvider] = None
 ) -> schemas.OcrResultSchema:
     """
     Run OCR on a document using the configured OCR provider.
     """
     logger.debug(f"Running OCR for document {document.id}...")
 
-    file_provider = providers.get_file_provider(
-        project_config=document.project.config)
+    if not file_provider:
+        file_provider = providers.get_file_provider(
+            project_config=document.project.config)
 
-    ocr_provider = providers.get_ocr_provider(
-        project_config=document.project.config)
+    if not ocr_provider:
+        ocr_provider = providers.get_ocr_provider(
+            project_config=document.project.config)
 
     async with file_provider(document.path) as provider:
         images = await provider.read_as_images()

@@ -88,6 +88,7 @@ export class ListBasedContent extends HTMLElement implements ListBasedContentAtt
                     "toolbar"
                     "table";
                 grid-template-rows: auto 1fr;
+                overflow: auto;
             }
 
             .toolbar {

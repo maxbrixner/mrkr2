@@ -80,6 +80,8 @@ class LocalFileProvider(BaseFileProvider):
                 break
             yield chunk
 
+        stream.close()
+
     async def list(self) -> AsyncGenerator[str, None]:
         """
         Lists the contents of the directory if the path is a folder.
