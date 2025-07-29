@@ -762,8 +762,8 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
             const selection = associatedLabeler.getSelection();
 
-            if (!selection) {
-                console.warn("No text selection found.");
+            if (!selection || !selection.text || selection.text === '') {
+                (document.querySelector('message-box') as MessageBox)?.showMessage(`Please select text first and then click on the label button`, 'info');
                 return;
             }
 
