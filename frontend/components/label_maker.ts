@@ -618,8 +618,8 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             let color = '#000000';
             if (overlappingLabels.length === 1) {
                 const labelColor = labelDefinitions.find(def => def.name === overlappingLabels[0].name)?.color || "#ffffff"
-                backgroundColor = hexToRgbAString(labelColor, 0.2)
-                const luminance = getRelativeLuminance(labelColor, 0.2);
+                backgroundColor = hexToRgbAString(labelColor, 0.5)
+                const luminance = getRelativeLuminance(labelColor, 0.5);
                 color = luminance < 0.5 ? '#ffffff' : '#000000'
             } else if (overlappingLabels.length > 1) {
                 const colors: { [key: string]: string } = {};
@@ -630,9 +630,8 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                     }
                 });
                 const labelColor = combineHexColors(Object.values(colors));
-                backgroundColor = hexToRgbAString(labelColor, 0.2);
-                console.log("b")
-                const luminance = getRelativeLuminance(labelColor, 0.2);
+                backgroundColor = hexToRgbAString(labelColor, 0.5);
+                const luminance = getRelativeLuminance(labelColor, 0.5);
                 color = luminance < 0.5 ? '#ffffff' : '#000000'
             }
 
