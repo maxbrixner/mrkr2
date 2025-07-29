@@ -1,7 +1,10 @@
 # ---------------------------------------------------------------------------- #
 
 import logging
-from typing import Any, Self
+import asyncio
+import functools
+import io
+from typing import Any
 
 # ---------------------------------------------------------------------------- #
 
@@ -22,7 +25,7 @@ class TextractOcrProvider(BaseOcrProvider):
     on images.
     """
 
-    _config: schemas.OcrProviderTesseractConfigSchema
+    _config: schemas.OcrProviderTextractConfigSchema
     _session: AwsSession | None
     _client: Any | None
 
@@ -38,34 +41,53 @@ class TextractOcrProvider(BaseOcrProvider):
         self._session = None
         self._client = None
 
-    async def __aenter__(self) -> Self:
-        """
-        Implement this method to initialize the OCR provider.
-        """
-        return self
-
-    async def __aexit__(
-        self,
-        exc_type: Any,
-        exc_value: Any,
-        traceback: Any
-    ) -> None:
-        """
-        Implement this method to clean up resources used by the OCR provider.
-        """
-        pass
-
     async def ocr(self) -> schemas.OcrResultSchema:
         """
         Perform OCR on the file and return the result.
         """
         await self.refresh_client()
+        if self._client is None:
+            raise Exception("Client not initialized.")
+
+        loop = asyncio.get_running_loop()
+
+        for page, image in enumerate(self._images):
+            bytes = io.BytesIO()
+            await loop.run_in_executor(
+                None,
+                functools.partial(
+                    image.save,
+                    fp=bytes,
+                    format=self._config.image_format
+                )
+            )
+            bytes.seek(0)
+
+            # todo: make this async and also use start_document_analysis instead?
+            result = self._client.analyze_document(
+                Document={
+                    "Bytes": bytes.getvalue()
+                },
+                FeatureTypes=["LAYOUT"]
+            )
+
+            print(result)
+
         raise NotImplementedError("Textract is not implemented yet.")
 
     async def refresh_client(self) -> None:
         """
         Refresh the Textract client if needed.
         """
-        pass
+        aws_config = schemas.AwsTextractConfigSchema(
+            **self._config.model_dump())
+
+        if self._session is None:
+            self._session = AwsSession(config=aws_config)
+
+        if self._client is None:
+            self._client = await self._session.get_client(
+                service_name="textract"
+            )
 
 # ---------------------------------------------------------------------------- #

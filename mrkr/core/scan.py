@@ -100,6 +100,8 @@ async def scan_project(
                 ocr_provider=ocr_provider
             )
 
+            return
+
         logger.debug(f"Scan of project {project_id} successful.")
     except Exception as exception:
         logger.exception(exception)

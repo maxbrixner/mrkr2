@@ -171,7 +171,6 @@ class S3FileProvider(BaseFileProvider):
         aws_config = schemas.AwsS3ConfigSchema(**self._config.model_dump())
 
         if self._session is None:
-
             self._session = AwsSession(config=aws_config)
 
         if self._bucket is None:

@@ -227,8 +227,8 @@ def batch_update_document_status(
     """
     for document in documents:
         if document.status == models.DocumentStatus.processing:
-            raise Exception("Batch updating the status from processing "
-                            "is not allowed.")
+            raise Exception("Batch updating the status is not allowed "
+                            "while document is being processed.")
         document.status = models.DocumentStatus(status.value)
         session.add(document)
 
