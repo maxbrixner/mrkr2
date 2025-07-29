@@ -212,11 +212,7 @@
     --tab-container-tab-active-border-color: var(--border-color);
     --tab-container-content-background-color: var(--surface-color);
 
-
-
-
-
-
+    /* Document Viewer Variables */
     --document-viewer-background: var(--background-color);
     --document-viewer-page-background: var(--surface-color);
     --document-viewer-scrollbar-color: var(--scrollbar-thumb) var(--background-color);
@@ -229,11 +225,12 @@
     --document-viewer-page-focus-outline-color: var(--primary-color);
     --document-viewer-page-focus-outline-width: 2px;
 
+
+
+
+
+
     --label-maker-scrollbar-color: var(--scrollbar-thumb) var(--surface-color);
-
-
-
-
 
 
     --label-viewer-background-color: var(--surface-color);
