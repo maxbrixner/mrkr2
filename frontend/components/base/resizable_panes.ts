@@ -133,12 +133,12 @@ export class ResizablePanes extends HTMLElement implements ResizablePanesAttribu
     }
 
     private _updatePanes() {
-        if (this.orientation === 'vertical') {
-            this.style.gridTemplateColumns = `${this.startsize} min-content 1fr`;
+        if (this._orientation === 'vertical') {
+            this.style.gridTemplateColumns = `${this._startsize} min-content 1fr`;
             this._handle?.classList.remove('horizontal');
             this._handle?.classList.add('vertical');
         } else {
-            this.style.gridTemplateRows = `${this.startsize} min-content 1fr`;
+            this.style.gridTemplateRows = `${this._startsize} min-content 1fr`;
             this._handle?.classList.remove('vertical');
             this._handle?.classList.add('horizontal');
         }
@@ -153,7 +153,7 @@ export class ResizablePanes extends HTMLElement implements ResizablePanesAttribu
         if (!this._isResizing || !this._handle)
             return;
 
-        if (this.orientation === 'vertical') {
+        if (this._orientation === 'vertical') {
             let newFirstWidth = e.clientX - this.offsetLeft;
             let newSecondWidth = this.offsetWidth - newFirstWidth - this._handle.offsetWidth;
 

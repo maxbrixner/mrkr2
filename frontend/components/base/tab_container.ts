@@ -102,14 +102,14 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
 
            :host(.loading)::before {
                 animation: spin 1s linear infinite;    
-                border: 4px solid var(--spinner-color, #000000);
+                border: var(--spinner-border-large) solid var(--spinner-color, #000000);
                 border-radius: 50%; 
-                border-top: 4px solid var(--spinner-color-top, #ffffff);
+                border-top: var(--spinner-border-large) solid var(--spinner-color-top, #ffffff);
                 content: "";
                 display: block;
-                height: 30px;
+                height: var(--spinner-size-large, 30px);
                 margin: 4rem auto;
-                width: 30px;
+                width: var(--spinner-size-large, 30px);
             }
 
             @keyframes spin {
