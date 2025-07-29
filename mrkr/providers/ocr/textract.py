@@ -7,7 +7,7 @@ from typing import Any, Self
 
 import mrkr.schemas as schemas
 from .base import BaseOcrProvider
-from ..aws import AwsSession, AsyncTextractWrapper
+from ..aws import AwsSession
 
 # ---------------------------------------------------------------------------- #
 
@@ -24,7 +24,7 @@ class TextractOcrProvider(BaseOcrProvider):
 
     _config: schemas.OcrProviderTesseractConfigSchema
     _session: AwsSession | None
-    _client: AsyncTextractWrapper | None
+    _client: Any | None
 
     def __init__(
         self,
@@ -66,11 +66,6 @@ class TextractOcrProvider(BaseOcrProvider):
         """
         Refresh the Textract client if needed.
         """
-        if self._session is None:
-            aws_config = schemas.AwsConfigSchema(**self._config.model_dump())
-            self._session = AwsSession(config=aws_config)
-
-        if self._client is None:
-            self._client = await self._session.get_async_textract_client()
+        pass
 
 # ---------------------------------------------------------------------------- #
