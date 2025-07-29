@@ -1,6 +1,6 @@
 /* -------------------------------------------------------------------------- */
 
-import { ResizablePanes } from './resizable_panes.js';
+import { ResizablePanes } from './base/resizable_panes.js';
 import { DocumentViewer, PagesCreatedEvent, PageClickedEvent, HighlightClickedEvent } from './document_viewer.js';
 import { TabContainer } from './tab_container.js';
 import { ClassificationLabeler } from './classification_labeler.js';
