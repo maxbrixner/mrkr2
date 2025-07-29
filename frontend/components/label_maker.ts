@@ -5,8 +5,8 @@ import { DocumentViewer, PagesCreatedEvent, PageClickedEvent, HighlightClickedEv
 import { TabContainer } from './base/tab_container.js';
 import { ClassificationLabeler } from './classification_labeler.js';
 import { TextLabeler } from './text_labeler.js';
-import { LabelButton } from './label_button.js';
-import { combineHexColors, getRelativeLuminance, hexToRgbA, hexToRgb } from './utils/color_helpers.js';
+import { LabelButton } from './base/label_button.js';
+import { combineHexColors, getRelativeLuminance, hexToRgbAString } from './utils/color_helpers.js';
 import { MessageBox } from './base/message_box.js';
 
 /* -------------------------------------------------------------------------- */
@@ -617,9 +617,10 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             let backgroundColor = 'transparent'; // Default for non-labeled text
             let color = '#000000';
             if (overlappingLabels.length === 1) {
-                backgroundColor = hexToRgbA(labelDefinitions.find(def => def.name === overlappingLabels[0].name)?.color || "#ffffff", 0.2);
-                const luminance = getRelativeLuminance(backgroundColor);
-                color = "#000000"; ///"luminance < 0.5 ? '#ffffff' : '#00000'"
+                const labelColor = labelDefinitions.find(def => def.name === overlappingLabels[0].name)?.color || "#ffffff"
+                backgroundColor = hexToRgbAString(labelColor, 0.2)
+                const luminance = getRelativeLuminance(labelColor, 0.2);
+                color = luminance < 0.5 ? '#ffffff' : '#000000'
             } else if (overlappingLabels.length > 1) {
                 const colors: { [key: string]: string } = {};
                 overlappingLabels.forEach(label => {
@@ -628,9 +629,11 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                         colors[label.name] = definition.color;
                     }
                 });
-                backgroundColor = hexToRgbA(combineHexColors(Object.values(colors)));
-                //const luminance = getRelativeLuminance(hexToRgbA(backgroundColor));
-                color = "#000000";//luminance < 0.5 ? '#ffffff' : '#00000'
+                const labelColor = combineHexColors(Object.values(colors));
+                backgroundColor = hexToRgbAString(labelColor, 0.2);
+                console.log("b")
+                const luminance = getRelativeLuminance(labelColor, 0.2);
+                color = luminance < 0.5 ? '#ffffff' : '#000000'
             }
 
             segments.push({ start, end, backgroundColor, color });

@@ -1,6 +1,6 @@
 /* -------------------------------------------------------------------------- */
 
-import { getRelativeLuminance, hexToRgbA } from './utils/color_helpers.js';
+import { getRelativeLuminance, hexToRgbAString } from '../utils/color_helpers.js';
 
 /* -------------------------------------------------------------------------- */
 
@@ -121,21 +121,21 @@ export class LabelButton extends HTMLElement implements LabelButtonAttributes {
     }
 
     private _updateColor() {
-        const backgroundColor = hexToRgbA(this.color, 0.2);
-        const borderColor = hexToRgbA(this.color, 1);
-        const luminance = getRelativeLuminance(borderColor);
-        // Ensure the font color is readable against the background
-        // If the luminance is low, use a light color, otherwise use a dark color
-        const fontColor = luminance < 0.5 ? '#ffffff' : '#00000'
-        this._ButtonElement.style.borderColor = borderColor;
+        this._ButtonElement.style.borderColor = this.color;
         if (this.active === true) {
+            const color = hexToRgbAString(this.color, 1);
+            const luminance = getRelativeLuminance(this.color, 1);
+            const fontColor = luminance < 0.5 ? '#ffffff' : '#000000'
             this._ButtonElement.classList.add('active');
-            this._ButtonElement.style.backgroundColor = borderColor;
+            this._ButtonElement.style.backgroundColor = color;
             this._ButtonElement.style.color = fontColor;
         } else {
+            const color = hexToRgbAString(this.color, 0.2);
+            const luminance = getRelativeLuminance(this.color, 0.2);
+            const fontColor = luminance < 0.5 ? '#ffffff' : '#000000'
             this._ButtonElement.classList.remove('active');
-            this._ButtonElement.style.backgroundColor = backgroundColor;
-            this._ButtonElement.style.color = "#000000";
+            this._ButtonElement.style.backgroundColor = color;
+            this._ButtonElement.style.color = fontColor;
         }
     }
 
