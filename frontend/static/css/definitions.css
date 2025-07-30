@@ -80,6 +80,9 @@
     --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     --box-shadow-inset: inset 0 -1px 0 rgba(0, 0, 0, 0.1);
 
+    /* Outlines */
+    --focus-outline: 2px solid #000000;
+
 
     /* Spinner */
     --spinner-color: var(--primary-color);
@@ -93,6 +96,7 @@
     --styled-button-font-size: var(--font-size-small);
     --styled-button-font-weight: var(--font-weight-semibold);
     --styled-button-padding: var(--spacing-medium) var(--spacing-large);
+    --styled-button-focus-outline: var(--focus-outline);
 
     --styled-button-background-color-disabled: var(--disabled-color);
     --styled-button-border-color-disabled: var(--border-color);
@@ -114,6 +118,7 @@
     --styled-input-font-size: var(--font-size-small);
     --styled-input-font-weight: var(--font-weight-normal);
     --styled-input-padding: var(--spacing-medium) var(--spacing-medium);
+    --styled-input-focus-outline: var(--focus-outline);
 
     --styled-input-background-color-disabled: var(--disabled-color);
     --styled-input-border-color-disabled: var(--border-color);
@@ -230,6 +235,7 @@
     --label-button-background-color-disabled: var(--disabled-color);
     --label-button-border-color-disabled: var(--border-color);
     --label-button-color-disabled: var(--disabled-text-color);
+    --label-button-focus-outline: var(--focus-outline);
 
 
 

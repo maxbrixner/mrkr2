@@ -105,7 +105,7 @@ export class LabelButton extends HTMLElement implements LabelButtonAttributes {
                 color: #ffffff;
             }
             button:focus {
-                outline: 2px solid #000000;
+                outline: var(--label-button-focus-outline, 2px solid #000000);
             }
             button:disabled {
                 cursor: not-allowed;
