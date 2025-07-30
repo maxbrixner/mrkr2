@@ -856,6 +856,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             event.stopPropagation();
 
             // todo: deactivate the label buttons
+            associatedLabeler.disableButtons();
 
             // clear the label list in place
             associatedBlock.labels.length = 0; // todo: only remove text labels, not classification? Otherwise also unactivate the classification buttons!
@@ -864,6 +865,8 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             associatedLabeler.makeTextEditable(this._onBlockTextBlur(associatedBlock, associatedLabeler, labelDefinitions));
 
             associatedLabeler.clearLabelList();
+
+
 
         }
     }
@@ -877,6 +880,8 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
             // for good measure
             associatedLabeler.addText(this._formatBlockText(associatedBlock, labelDefinitions));
+
+            associatedLabeler.enableButtons();
         }
     }
 

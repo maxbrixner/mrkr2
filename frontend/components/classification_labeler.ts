@@ -243,6 +243,35 @@ export class ClassificationLabeler extends HTMLElement implements Classification
         }
     }
 
+    public disableButtons(): void {
+        // disable all buttons in the classification container
+        const buttons = this._classificationContainer.querySelectorAll('label-button');
+        buttons.forEach((button) => {
+            if (button instanceof LabelButton) {
+                button.setAttribute("disabled", "true");
+            }
+        });
+    }
+
+    public enableButtons(): void {
+        // enable all buttons in the classification container
+        const buttons = this._classificationContainer.querySelectorAll('label-button');
+        buttons.forEach((button) => {
+            if (button instanceof LabelButton) {
+                button.removeAttribute("disabled");
+            }
+        });
+    }
+
+    public clearLabelList(): void {
+        const buttons = this._classificationContainer.querySelectorAll('label-button');
+        buttons.forEach((button) => {
+            if (button instanceof LabelButton) {
+                button.setAttribute("active", 'false');
+            }
+        });
+    }
+
 }
 
 /* -------------------------------------------------------------------------- */

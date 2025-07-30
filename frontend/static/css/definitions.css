@@ -226,7 +226,10 @@
     --document-viewer-page-focus-outline-width: 2px;
 
 
-
+    /* Label Button Variables */
+    --label-button-background-color-disabled: var(--disabled-color);
+    --label-button-border-color-disabled: var(--border-color);
+    --label-button-color-disabled: var(--disabled-text-color);
 
 
 

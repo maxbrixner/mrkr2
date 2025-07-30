@@ -1,3 +1,5 @@
+/* -------------------------------------------------------------------------- */
+
 export function hexToRgb(hex: string): { r: number; g: number; b: number } {
     let cleanHex = hex.startsWith('#') ? hex.slice(1) : hex;
 
@@ -15,6 +17,8 @@ export function hexToRgb(hex: string): { r: number; g: number; b: number } {
     return { r, g, b };
 }
 
+/* -------------------------------------------------------------------------- */
+
 export function rgbToHex(r: number, g: number, b: number): string {
     r = Math.max(0, Math.min(255, Math.round(r)));
     g = Math.max(0, Math.min(255, Math.round(g)));
@@ -28,10 +32,14 @@ export function rgbToHex(r: number, g: number, b: number): string {
     return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
 
+/* -------------------------------------------------------------------------- */
+
 export function hexToRgbAString(hex: string, alpha: number = 1): string {
     const rgb = hexToRgb(hex);
     return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
 }
+
+/* -------------------------------------------------------------------------- */
 
 export function getRelativeLuminance(hex: string, alpha: number): number {
     alpha = Math.max(0, Math.min(1, alpha));
@@ -47,6 +55,8 @@ export function getRelativeLuminance(hex: string, alpha: number): number {
     });
     return 0.2126 * sRGB[0] + 0.7152 * sRGB[1] + 0.0722 * sRGB[2];
 }
+
+/* -------------------------------------------------------------------------- */
 
 export function combineHexColors(hexColors: string[]): string {
     if (hexColors.length === 0) {
@@ -81,3 +91,4 @@ export function combineHexColors(hexColors: string[]): string {
     return rgbToHex(avgR, avgG, avgB);
 }
 
+/* -------------------------------------------------------------------------- */

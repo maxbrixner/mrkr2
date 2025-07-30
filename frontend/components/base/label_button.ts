@@ -17,14 +17,68 @@ interface LabelButtonAttributes {
 /* -------------------------------------------------------------------------- */
 
 export class LabelButton extends HTMLElement implements LabelButtonAttributes {
-    public color: string = '#000000';
-    public disabled?: boolean = false;
-    public name?: string = undefined;
-    public active?: boolean = false;
-    public type?: string = undefined;
-    public target?: string = undefined;
-    public targetType?: "document" | "page" | "block" = undefined;
-    private _ButtonElement: HTMLButtonElement;
+    private _active: boolean = false;
+    private _color: string = '#000000';
+    private _type: string = '';
+    private _target: string = '';
+    private _targetType: "document" | "page" | "block" = "document";
+    private _ButtonElement: HTMLButtonElement = document.createElement('button');
+
+    get active(): boolean {
+        return this._active;
+    }
+
+    set active(value: boolean) {
+        this.setAttribute('active', value ? 'true' : 'false');
+    }
+
+    get type(): string {
+        return this._type;
+    }
+
+    set type(value: string) {
+        this.setAttribute('type', value);
+    }
+
+    get target(): string {
+        return this._target;
+    }
+
+    set target(value: string) {
+        this.setAttribute('target', value);
+    }
+
+    get targetType(): "document" | "page" | "block" {
+        return this._targetType;
+    }
+
+    set targetType(value: "document" | "page" | "block") {
+        this.setAttribute('target-type', value);
+    }
+
+    get disabled(): boolean {
+        return this._ButtonElement.disabled === true || false;
+    }
+
+    set disabled(value: boolean) {
+        this.setAttribute('disabled', value ? 'true' : 'false');
+    }
+
+    get color(): string {
+        return this._color;
+    }
+
+    set color(value: string) {
+        this.setAttribute('color', value);
+    }
+
+    get name(): string {
+        return this._ButtonElement.name || '';
+    }
+
+    set name(value: string) {
+        this.setAttribute('name', value);
+    }
 
     constructor() {
         super();
@@ -36,16 +90,15 @@ export class LabelButton extends HTMLElement implements LabelButtonAttributes {
                 display: block;
             }
             button {
-                color: #000000;
                 border: none;
-                outline: none;
                 border-left-style: solid;
                 border-left-width: 4px;
                 border-radius: 3px;
                 cursor: pointer;
-                line-height: 22px;
-                font-weight: 400;
                 display: inline-grid;
+                font-weight: 400;
+                line-height: 22px;
+                outline: none;
                 padding: 0.2rem 1rem;
             }
             .active {
@@ -54,10 +107,12 @@ export class LabelButton extends HTMLElement implements LabelButtonAttributes {
             button:focus {
                 outline: 2px solid #000000;
             }
+            button:disabled {
+                cursor: not-allowed;
+            }
         `;
         this.shadowRoot?.appendChild(style);
 
-        this._ButtonElement = document.createElement('button');
         this._ButtonElement.type = 'button';
         const labelSlot = document.createElement('slot');
         labelSlot.name = 'label';
@@ -69,29 +124,26 @@ export class LabelButton extends HTMLElement implements LabelButtonAttributes {
         return ['color', 'disabled', 'name', 'active', 'type', 'target', 'target-type'];
     }
 
-    attributeChangedCallback(
-        propertyName: string,
-        oldValue: string | null,
-        newValue: string | null) {
-        if (!this._ButtonElement) return;
+    attributeChangedCallback(propertyName: string, oldValue: string | null, newValue: string | null) {
         if (oldValue === newValue) return;
+
         if (propertyName === 'color') {
-            this.color = newValue || '#000000';
+            this._color = newValue || '#000000';
             this._updateColor();
         } else if (propertyName === 'active') {
-            this.active = (newValue == "true") || false;
+            this._active = (newValue == "true") || false;
             this._updateColor();
         } else if (propertyName === 'disabled') {
-            this._ButtonElement.disabled = newValue !== null;
+            this._ButtonElement.disabled = newValue === 'true' ? true : false;
+            this._updateColor();
         } else if (propertyName === 'name') {
             this._ButtonElement.name = newValue || '';
-            this.name = newValue || undefined;
         } else if (propertyName === 'type') {
-            this.type = newValue || undefined;
+            this._type = newValue || '';
         } else if (propertyName === 'target') {
-            this.target = newValue || undefined;
+            this._target = newValue || '';
         } else if (propertyName === 'target-type') {
-            this.targetType = newValue as "document" | "page" | "block" || undefined;
+            this._targetType = newValue as "document" | "page" | "block" || "document";
         }
     }
 
@@ -104,16 +156,16 @@ export class LabelButton extends HTMLElement implements LabelButtonAttributes {
     }
 
     private _onClick(event: MouseEvent) {
-        if (this.disabled) return;
+        if (this._ButtonElement.disabled) return;
 
         this.dispatchEvent(new CustomEvent('label-button-click', {
             detail: {
                 button: this,
-                name: this.name,
-                active: !this.active,
-                type: this.type,
-                target: this.target,
-                targetType: this.targetType
+                name: this._ButtonElement.name,
+                active: !this._active,
+                type: this._type,
+                target: this._target,
+                targetType: this._targetType
             },
             bubbles: true,
             composed: true
@@ -121,17 +173,22 @@ export class LabelButton extends HTMLElement implements LabelButtonAttributes {
     }
 
     private _updateColor() {
-        this._ButtonElement.style.borderColor = this.color;
-        if (this.active === true) {
-            const color = hexToRgbAString(this.color, 1);
-            const luminance = getRelativeLuminance(this.color, 1);
+        if (this._ButtonElement.disabled) {
+            this._ButtonElement.style.borderColor = 'var(--label-button-border-color-disabled, #000000)';
+            this._ButtonElement.style.backgroundColor = 'var(--label-button-background-color-disabled, #000000)';
+            this._ButtonElement.style.color = 'var(--label-button-color-disabled, #000000)';
+        } else if (this._active === true) {
+            this._ButtonElement.style.borderColor = this._color;
+            const color = hexToRgbAString(this._color, 1);
+            const luminance = getRelativeLuminance(this._color, 1);
             const fontColor = luminance < 0.5 ? '#ffffff' : '#000000'
             this._ButtonElement.classList.add('active');
             this._ButtonElement.style.backgroundColor = color;
             this._ButtonElement.style.color = fontColor;
         } else {
-            const color = hexToRgbAString(this.color, 0.2);
-            const luminance = getRelativeLuminance(this.color, 0.2);
+            this._ButtonElement.style.borderColor = this._color;
+            const color = hexToRgbAString(this._color, 0.2);
+            const luminance = getRelativeLuminance(this._color, 0.2);
             const fontColor = luminance < 0.5 ? '#ffffff' : '#000000'
             this._ButtonElement.classList.remove('active');
             this._ButtonElement.style.backgroundColor = color;

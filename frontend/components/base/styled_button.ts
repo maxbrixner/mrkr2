@@ -135,9 +135,8 @@ export class StyledButton extends HTMLElement implements StyledButtonAttributes 
                     color: var(--styled-button-color-primary, #000000);
                 }
 
-                button:not(:disabled):hover,
                 button:not(:disabled):focus {
-                    border-color: var(--styled-button-border-color-hover-primary, #000000);
+                    outline: 2px solid black; /*border-color: var(--styled-button-border-color-hover-primary, #000000);*/
                 }
             `;
                 break;
@@ -149,9 +148,8 @@ export class StyledButton extends HTMLElement implements StyledButtonAttributes 
                     color: inherit;
                 }
 
-                button:not(:disabled):hover,
                 button:not(:disabled):focus {
-                    border-color: inherit;
+                    outline: 2px solid black; /*border-color: inherit;*/
                 }
             `;
                 break;
@@ -163,9 +161,8 @@ export class StyledButton extends HTMLElement implements StyledButtonAttributes 
                         color: var(--styled-button-color, #000000);
                     }
 
-                    button:not(:disabled):hover,
                     button:not(:disabled):focus {
-                        border-color: var(--styled-button-border-color-hover, #000000);
+                        outline: 2px solid black; /*border-color: var(--styled-button-border-color-hover, #000000);*/
                     }
                 `;
                 break;

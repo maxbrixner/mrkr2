@@ -166,9 +166,8 @@ export class StyledInput extends HTMLElement implements StyledInputAttributes {
                 white-space: nowrap;
             }
 
-            input:not(:disabled):hover,
             input:not(:disabled):focus {
-                border-color: var(--styled-input-border-color-hover, #000000);
+                outline: 2px solid black; /*border-color: var(--styled-input-border-color-hover, #000000);*/
             }
 
             input:disabled {

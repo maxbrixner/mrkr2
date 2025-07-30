@@ -69,7 +69,7 @@ export class TextLabeler extends ClassificationLabeler implements Classification
             }
 
             .text-container:focus {
-                outline: 1px solid var(--primary-color); /* todo */
+                outline: 2px solid var(--primary-color); /* todo */
             }   
 
             .text-label-list-container {
@@ -213,6 +213,7 @@ export class TextLabeler extends ClassificationLabeler implements Classification
     }
 
     public clearLabelList(): void {
+        super.clearLabelList();
         if (!this._textLabelListContainer) {
             throw new Error("Text label list container is not initialized.");
         }
@@ -334,6 +335,29 @@ export class TextLabeler extends ClassificationLabeler implements Classification
             this._textLabelListContainer.classList.remove('done');
             this._editButton.setAttribute("disabled", "false");
         }
+    }
+
+    public disableButtons(): void {
+        super.disableButtons();
+        // disable all buttons in the text label container
+        const buttons = this._textLabelsContainer.querySelectorAll('label-button');
+        buttons.forEach((button) => {
+            console.log("Disabling button: ", button);
+            if (button instanceof LabelButton) {
+                button.setAttribute("disabled", "true");
+            }
+        });
+    }
+
+    public enableButtons(): void {
+        super.enableButtons();
+        const buttons = this._textLabelsContainer.querySelectorAll('label-button');
+        buttons.forEach((button) => {
+            console.log("Disabling button: ", button);
+            if (button instanceof LabelButton) {
+                button.removeAttribute('disabled');
+            }
+        });
     }
 
 }
