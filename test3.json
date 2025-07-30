@@ -1,0 +1,50 @@
+{
+    "labels": [],
+    "label_status": "open",
+    "pages": [
+        {
+            "id": "6d830b02-b5b0-4e25-9010-839be6cd534f",
+            "page": 1,
+            "labels": [],
+            "label_status": "open",
+            "blocks": [
+                {
+                    "id": "62f39311-2f56-452e-8358-8cf8d603407a",
+                    "position": {
+                        "left": 0.4724515378475189,
+                        "top": 0.020844753831624985,
+                        "width": 0.05173315480351448,
+                        "height": 0.008691303431987762
+                    },
+                    "labels": [],
+                    "label_status": "open",
+                    "content": ""
+                },
+                {
+                    "id": "da57c6da-afe1-4246-ab2e-7fff14c92ee3",
+                    "position": {
+                        "left": 0.14926905930042267,
+                        "top": 0.4462406039237976,
+                        "width": 0.7270997762680054,
+                        "height": 0.10076166689395905
+                    },
+                    "labels": [],
+                    "label_status": "open",
+                    "content": ""
+                },
+                {
+                    "id": "eed72a81-627e-4e31-af63-c686612b93c1",
+                    "position": {
+                        "left": 0.12023452669382095,
+                        "top": 0.6815009117126465,
+                        "width": 0.2700529098510742,
+                        "height": 0.017712466418743134
+                    },
+                    "labels": [],
+                    "label_status": "open",
+                    "content": ""
+                }
+            ]
+        }
+    ]
+}

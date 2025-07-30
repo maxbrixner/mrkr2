@@ -9,12 +9,6 @@ from typing import Any, List, Optional
 
 
 class OcrItemType(str, enum.Enum):
-    # Textract knows: 'KEY_VALUE_SET'|'PAGE'|'LINE'|'WORD'|'TABLE'|'CELL'|
-    # 'SELECTION_ELEMENT'|'MERGED_CELL'|'TITLE'|'QUERY'|'QUERY_RESULT'|
-    # 'SIGNATURE'|'TABLE_TITLE'|'TABLE_FOOTER'|'LAYOUT_TEXT'|'LAYOUT_TITLE'|
-    # 'LAYOUT_HEADER'|'LAYOUT_FOOTER'|'LAYOUT_SECTION_HEADER'|
-    # 'LAYOUT_PAGE_NUMBER'|'LAYOUT_LIST'|'LAYOUT_FIGURE'|
-    # 'LAYOUT_TABLE'|'LAYOUT_KEY_VALUE',
     page = "page"
     block = "block"
     paragraph = "paragraph"
@@ -25,8 +19,6 @@ class OcrItemType(str, enum.Enum):
 
 
 class OcrRelationshipType(str, enum.Enum):
-    # Textract knows: 'VALUE'|'CHILD'|'COMPLEX_FEATURES'|'MERGED_CELL'|
-    # 'TITLE'|'ANSWER'|'TABLE'|'TABLE_TITLE'|'TABLE_FOOTER',
     child = "child"
 
 # ---------------------------------------------------------------------------- #
