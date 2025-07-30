@@ -1,6 +1,6 @@
 /* -------------------------------------------------------------------------- */
 
-import { LabelButton } from './label_button.js';
+import { LabelButton } from './base/label_button.js';
 import { IconButton } from './base/icon_button.js';
 
 /* -------------------------------------------------------------------------- */
@@ -23,9 +23,6 @@ export class ClassificationLabeler extends HTMLElement implements Classification
     protected _checkButton?: IconButton = new IconButton();
     protected _style: HTMLStyleElement = document.createElement('style');
 
-    /**
-     * Creates an instance of LabelFragment.
-     */
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -33,9 +30,6 @@ export class ClassificationLabeler extends HTMLElement implements Classification
         this._populateShadowRoot();
     }
 
-    /**
-     * Returns an array of attribute names that this component observes.
-     */
     static get observedAttributes() {
         return ['heading', 'done'];
     }
@@ -241,6 +235,33 @@ export class ClassificationLabeler extends HTMLElement implements Classification
             this._checkButton.setAttribute("img", "/static/img/square-outline.svg");
             this._checkButton.ariaLabel = "Mark as done";
         }
+    }
+
+    public disableButtons(): void {
+        const buttons = this._classificationContainer.querySelectorAll('label-button');
+        buttons.forEach((button) => {
+            if (button instanceof LabelButton) {
+                button.setAttribute("disabled", "true");
+            }
+        });
+    }
+
+    public enableButtons(): void {
+        const buttons = this._classificationContainer.querySelectorAll('label-button');
+        buttons.forEach((button) => {
+            if (button instanceof LabelButton) {
+                button.removeAttribute("disabled");
+            }
+        });
+    }
+
+    public clearLabelList(): void {
+        const buttons = this._classificationContainer.querySelectorAll('label-button');
+        buttons.forEach((button) => {
+            if (button instanceof LabelButton) {
+                button.setAttribute("active", 'false');
+            }
+        });
     }
 
 }

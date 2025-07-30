@@ -5,8 +5,8 @@ import { DocumentViewer, PagesCreatedEvent, PageClickedEvent, HighlightClickedEv
 import { TabContainer } from './base/tab_container.js';
 import { ClassificationLabeler } from './classification_labeler.js';
 import { TextLabeler } from './text_labeler.js';
-import { LabelButton } from './label_button.js';
-import { combineHexColors, getRelativeLuminance, hexToRgbA, hexToRgb } from './utils/color_helpers.js';
+import { LabelButton } from './base/label_button.js';
+import { combineHexColors, getRelativeLuminance, hexToRgbAString } from './utils/color_helpers.js';
 import { MessageBox } from './base/message_box.js';
 
 /* -------------------------------------------------------------------------- */
@@ -617,9 +617,10 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             let backgroundColor = 'transparent'; // Default for non-labeled text
             let color = '#000000';
             if (overlappingLabels.length === 1) {
-                backgroundColor = hexToRgbA(labelDefinitions.find(def => def.name === overlappingLabels[0].name)?.color || "#ffffff", 0.2);
-                const luminance = getRelativeLuminance(backgroundColor);
-                color = "#000000"; ///"luminance < 0.5 ? '#ffffff' : '#00000'"
+                const labelColor = labelDefinitions.find(def => def.name === overlappingLabels[0].name)?.color || "#ffffff"
+                backgroundColor = hexToRgbAString(labelColor, 0.5)
+                const luminance = getRelativeLuminance(labelColor, 0.5);
+                color = luminance < 0.5 ? '#ffffff' : '#000000'
             } else if (overlappingLabels.length > 1) {
                 const colors: { [key: string]: string } = {};
                 overlappingLabels.forEach(label => {
@@ -628,9 +629,10 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                         colors[label.name] = definition.color;
                     }
                 });
-                backgroundColor = hexToRgbA(combineHexColors(Object.values(colors)));
-                //const luminance = getRelativeLuminance(hexToRgbA(backgroundColor));
-                color = "#000000";//luminance < 0.5 ? '#ffffff' : '#00000'
+                const labelColor = combineHexColors(Object.values(colors));
+                backgroundColor = hexToRgbAString(labelColor, 0.5);
+                const luminance = getRelativeLuminance(labelColor, 0.5);
+                color = luminance < 0.5 ? '#ffffff' : '#000000'
             }
 
             segments.push({ start, end, backgroundColor, color });
@@ -760,8 +762,8 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
             const selection = associatedLabeler.getSelection();
 
-            if (!selection) {
-                console.warn("No text selection found.");
+            if (!selection || !selection.text || selection.text === '') {
+                (document.querySelector('message-box') as MessageBox)?.showMessage(`Please select text first and then click on the label button`, 'info');
                 return;
             }
 
@@ -854,6 +856,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             event.stopPropagation();
 
             // todo: deactivate the label buttons
+            associatedLabeler.disableButtons();
 
             // clear the label list in place
             associatedBlock.labels.length = 0; // todo: only remove text labels, not classification? Otherwise also unactivate the classification buttons!
@@ -862,6 +865,8 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             associatedLabeler.makeTextEditable(this._onBlockTextBlur(associatedBlock, associatedLabeler, labelDefinitions));
 
             associatedLabeler.clearLabelList();
+
+
 
         }
     }
@@ -875,6 +880,8 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
             // for good measure
             associatedLabeler.addText(this._formatBlockText(associatedBlock, labelDefinitions));
+
+            associatedLabeler.enableButtons();
         }
     }
 

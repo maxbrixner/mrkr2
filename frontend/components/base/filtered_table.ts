@@ -337,6 +337,7 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
         this.clearContent();
 
         this._queryContent().then(content => {
+            this.clearContent(); // prevent race conditions
             this._tableElement.classList.remove('loading');
 
             if (!content || content.length === 0) {

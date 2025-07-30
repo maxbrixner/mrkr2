@@ -37,6 +37,12 @@ with sdk.MrkrClient(log_level="DEBUG") as client:
                     "color": "#F44336"
                 },
                 {
+                    "type": "classification_multiple",
+                    "target": "block",
+                    "name": "Blub",
+                    "color": "#F44336"
+                },
+                {
                     "type": "text",
                     "target": "block",
                     "name": "Name",
@@ -60,24 +66,13 @@ with sdk.MrkrClient(log_level="DEBUG") as client:
                 "config": {
                     "path": "demos",
                     "pdf_dpi": 200,
-                    "image_format": "WebP",
-                    "aws_access_key_id": "{{AWS_ACCESS_KEY_ID}}",
-                    "aws_secret_access_key": "{{AWS_SECRET_ACCESS_KEY}}",
-                    "aws_region_name": "{{AWS_REGION_NAME}}",
-                    "aws_account_id": "{{AWS_ACCOUNT_ID}}",
-                    "aws_role_name": "{{AWS_ROLE_NAME}}",
-                    "aws_bucket_name": "{{AWS_BUCKET_NAME}}"
+                    "image_format": "WebP"
                 },
             },
             "ocr_provider": {
-                "type": "textract",
+                "type": "tesseract",
                 "config": {
-                    "aws_access_key_id": "{{AWS_ACCESS_KEY_ID}}",
-                    "aws_secret_access_key": "{{AWS_SECRET_ACCESS_KEY}}",
-                    "aws_region_name": "{{AWS_REGION_NAME}}",
-                    "aws_account_id": "{{AWS_ACCOUNT_ID}}",
-                    "aws_role_name": "{{AWS_ROLE_NAME}}",
-                    "aws_bucket_name": "{{AWS_BUCKET_NAME}}"
+                    "language": "eng"
                 }
             }
         }
