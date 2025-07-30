@@ -23,9 +23,6 @@ export class ClassificationLabeler extends HTMLElement implements Classification
     protected _checkButton?: IconButton = new IconButton();
     protected _style: HTMLStyleElement = document.createElement('style');
 
-    /**
-     * Creates an instance of LabelFragment.
-     */
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -33,9 +30,6 @@ export class ClassificationLabeler extends HTMLElement implements Classification
         this._populateShadowRoot();
     }
 
-    /**
-     * Returns an array of attribute names that this component observes.
-     */
     static get observedAttributes() {
         return ['heading', 'done'];
     }
@@ -244,7 +238,6 @@ export class ClassificationLabeler extends HTMLElement implements Classification
     }
 
     public disableButtons(): void {
-        // disable all buttons in the classification container
         const buttons = this._classificationContainer.querySelectorAll('label-button');
         buttons.forEach((button) => {
             if (button instanceof LabelButton) {
@@ -254,7 +247,6 @@ export class ClassificationLabeler extends HTMLElement implements Classification
     }
 
     public enableButtons(): void {
-        // enable all buttons in the classification container
         const buttons = this._classificationContainer.querySelectorAll('label-button');
         buttons.forEach((button) => {
             if (button instanceof LabelButton) {

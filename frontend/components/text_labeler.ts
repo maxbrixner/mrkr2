@@ -7,7 +7,7 @@ import { ClassificationLabeler, ClassificationLabelerAttributes } from './classi
 /* -------------------------------------------------------------------------- */
 
 export interface TextLabelerAttributes extends ClassificationLabelerAttributes {
-    heading?: string
+    // ...
 }
 
 /* -------------------------------------------------------------------------- */
@@ -339,7 +339,6 @@ export class TextLabeler extends ClassificationLabeler implements Classification
 
     public disableButtons(): void {
         super.disableButtons();
-        // disable all buttons in the text label container
         const buttons = this._textLabelsContainer.querySelectorAll('label-button');
         buttons.forEach((button) => {
             console.log("Disabling button: ", button);
