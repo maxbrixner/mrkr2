@@ -6,7 +6,6 @@ import mrkr.sdk as sdk
 
 
 with sdk.MrkrClient(log_level="DEBUG") as client:
-
     projects = client.list_projects()
 
     if not any(x.name == "Local Demo Project" for x in projects):
@@ -36,12 +35,6 @@ with sdk.MrkrClient(log_level="DEBUG") as client:
                         "type": "classification_multiple",
                         "target": "page",
                         "name": "Attachment",
-                        "color": "#F44336"
-                    },
-                    {
-                        "type": "classification_multiple",
-                        "target": "block",
-                        "name": "Blub",
                         "color": "#F44336"
                     },
                     {

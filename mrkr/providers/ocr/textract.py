@@ -170,6 +170,7 @@ class TextractOcrProvider(BaseOcrProvider):
         self,
         textract_type: str
     ) -> schemas.OcrItemType | None:
+        # 'KEY_VALUE_SET' | 'TABLE' | 'CELL' | 'SELECTION_ELEMENT' | 'MERGED_CELL' | 'TITLE' | 'QUERY' | 'QUERY_RESULT' | 'SIGNATURE' | 'TABLE_TITLE' | 'TABLE_FOOTER' | 'LAYOUT_TEXT' | 'LAYOUT_TITLE' | 'LAYOUT_HEADER' | 'LAYOUT_FOOTER' | 'LAYOUT_SECTION_HEADER' | 'LAYOUT_PAGE_NUMBER' | 'LAYOUT_LIST' | 'LAYOUT_FIGURE' | 'LAYOUT_TABLE' | 'LAYOUT_KEY_VALUE'
         match textract_type:
             case 'PAGE':
                 return schemas.OcrItemType.page
@@ -177,24 +178,19 @@ class TextractOcrProvider(BaseOcrProvider):
                 return schemas.OcrItemType.line
             case 'WORD':
                 return schemas.OcrItemType.word
-            case 'LAYOUT_TEXT':
-                return schemas.OcrItemType.paragraph
             case _:
                 return schemas.OcrItemType.block
-
-            # 'KEY_VALUE_SET' | 'TABLE' | 'CELL' | 'SELECTION_ELEMENT' | 'MERGED_CELL' | 'TITLE' | 'QUERY' | 'QUERY_RESULT' | 'SIGNATURE' | 'TABLE_TITLE' | 'TABLE_FOOTER' | 'LAYOUT_TEXT' | 'LAYOUT_TITLE' | 'LAYOUT_HEADER' | 'LAYOUT_FOOTER' | 'LAYOUT_SECTION_HEADER' | 'LAYOUT_PAGE_NUMBER' | 'LAYOUT_LIST' | 'LAYOUT_FIGURE' | 'LAYOUT_TABLE' | 'LAYOUT_KEY_VALUE'
 
     def map_relationship_type(
         self,
         textract_type: str
     ) -> schemas.OcrRelationshipType | None:
+        # 'VALUE'|'CHILD'|'COMPLEX_FEATURES'|'MERGED_CELL'| 'TITLE'|'ANSWER'|'TABLE'|'TABLE_TITLE'|'TABLE_FOOTER'
         match textract_type:
             case 'CHILD':
                 return schemas.OcrRelationshipType.child
             case _:
                 return None
-
-        # 'VALUE'|'CHILD'|'COMPLEX_FEATURES'|'MERGED_CELL'| 'TITLE'|'ANSWER'|'TABLE'|'TABLE_TITLE'|'TABLE_FOOTER',
 
     async def _convert_result(
         self,
@@ -221,6 +217,9 @@ class TextractOcrProvider(BaseOcrProvider):
                         )
                     )
 
+            content = block.text \
+                if block_type == schemas.OcrItemType.word else None
+
             items.append(schemas.OcrItemSchema(
                 id=uuid.UUID(block.id),
                 type=block_type,
@@ -230,9 +229,13 @@ class TextractOcrProvider(BaseOcrProvider):
                 height=block.geometry.bounding_box.height,
                 page=page,
                 confidence=block.confidence,
-                content=block.text,
+                content=content,
                 relationships=relationships
             ))
+
+        # todo: eliminate children's children in relationships
+        # get an items complete lineage and see if it is a child of
+        # any parent item. If so, remove the relationship within the parent item
 
         return items
 

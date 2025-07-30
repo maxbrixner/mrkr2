@@ -1,5 +1,5 @@
 {
-    "id": "d440fc90-7ad4-43f6-a878-d4b9a4814c3e",
+    "id": "480bace5-5266-45bd-969e-b27aeae1dd48",
     "items": [
         {
             "id": "dea575a0-6372-46d7-8844-5cf505de9baf",
@@ -235,7 +235,7 @@
             "height": 0.008691303431987762,
             "page": 1,
             "confidence": 99.49398040771484,
-            "content": "Internal",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -252,7 +252,7 @@
             "height": 0.009304838255047798,
             "page": 1,
             "confidence": 99.5338363647461,
-            "content": "Von:",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -269,7 +269,7 @@
             "height": 0.011154242791235447,
             "page": 1,
             "confidence": 79.9244613647461,
-            "content": "info@vm-mustermann.de",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -286,7 +286,7 @@
             "height": 0.009738139808177948,
             "page": 1,
             "confidence": 99.72257995605469,
-            "content": "Gesendet:",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -303,7 +303,7 @@
             "height": 0.011692067608237267,
             "page": 1,
             "confidence": 97.69160461425781,
-            "content": "Dienstag, 31. Januar 2023 07:05:45",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -336,7 +336,7 @@
             "height": 0.009325475431978703,
             "page": 1,
             "confidence": 99.69328308105469,
-            "content": "An:",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -353,7 +353,7 @@
             "height": 0.011302525177598,
             "page": 1,
             "confidence": 79.38915252685547,
-            "content": "Vermittler.leben@allianz.de",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -370,7 +370,7 @@
             "height": 0.011545526795089245,
             "page": 1,
             "confidence": 99.29707336425781,
-            "content": "Anlagen:",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -387,7 +387,7 @@
             "height": 0.011864470317959785,
             "page": 1,
             "confidence": 65.85778045654297,
-            "content": "Maklervollmacht_einzeln.pdf",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -404,7 +404,7 @@
             "height": 0.009690516628324986,
             "page": 1,
             "confidence": 99.56472778320312,
-            "content": "Betreff:",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -421,7 +421,7 @@
             "height": 0.01200214121490717,
             "page": 1,
             "confidence": 99.25151062011719,
-            "content": "VEMA-Anzeige Maklermandat mit Bestands\u00fcbertragung und Detailauskunft f\u00fcr Kunde",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -466,7 +466,7 @@
             "height": 0.011773258447647095,
             "page": 1,
             "confidence": 99.32955932617188,
-            "content": "Hans Maier (VSNR AL-6234567890, VMNR 701234567)",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -503,7 +503,7 @@
             "height": 0.011794215999543667,
             "page": 1,
             "confidence": 99.7987060546875,
-            "content": "Sehr geehrte Damen und Herren,",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -536,7 +536,7 @@
             "height": 0.011499902233481407,
             "page": 1,
             "confidence": 99.55377197265625,
-            "content": "wir zeigen an, dass wir",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -569,7 +569,7 @@
             "height": 0.009426728822290897,
             "page": 1,
             "confidence": 99.65909576416016,
-            "content": "Hans Maier",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -590,7 +590,7 @@
             "height": 0.01139505673199892,
             "page": 1,
             "confidence": 98.34771728515625,
-            "content": "Hintergasse 1",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -611,7 +611,7 @@
             "height": 0.009676291607320309,
             "page": 1,
             "confidence": 99.42153930664062,
-            "content": "12345 M\u00fcnchen",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -632,7 +632,7 @@
             "height": 0.011876892298460007,
             "page": 1,
             "confidence": 99.5777587890625,
-            "content": "gem\u00e4\u00df anliegender Vollmacht vertreten und bitten Sie den Vertrag auf unser oben angef\u00fchrtes",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -697,7 +697,7 @@
             "height": 0.011660355143249035,
             "page": 1,
             "confidence": 97.98077392578125,
-            "content": "Courtagekonto zu \u00fcberf\u00fchren.",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -722,7 +722,7 @@
             "height": 0.011851978488266468,
             "page": 1,
             "confidence": 99.22505950927734,
-            "content": "Im Auftrag des Versicherungsnehmers widersprechen wir der Datenweitergabe an den bisherigen",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -779,7 +779,7 @@
             "height": 0.010031532496213913,
             "page": 1,
             "confidence": 99.55144500732422,
-            "content": "Vermittler ab sofort.",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -804,7 +804,7 @@
             "height": 0.011676686815917492,
             "page": 1,
             "confidence": 99.520263671875,
-            "content": "Bitte senden Sie uns in den n\u00e4chsten 7 Tagen",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -853,7 +853,7 @@
             "height": 0.011616150848567486,
             "page": 1,
             "confidence": 99.5495834350586,
-            "content": "einen aktuellen Vertragsauszug",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -878,7 +878,7 @@
             "height": 0.011921524070203304,
             "page": 1,
             "confidence": 99.37818908691406,
-            "content": "die dem Vertrag zu Grunde liegenden Vertragsbedingungen",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -919,7 +919,7 @@
             "height": 0.012011900544166565,
             "page": 1,
             "confidence": 95.06155395507812,
-            "content": "Antragskopien und sonstige vertragsrelevante Willenserkl\u00e4rungen des Versicherungsnehmers",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -960,7 +960,7 @@
             "height": 0.012115568853914738,
             "page": 1,
             "confidence": 99.43720245361328,
-            "content": "eine Schadenauskunft der letzten 5 Jahre (au\u00dfer bei Lebens- und Krankenversicherung)",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -1017,7 +1017,7 @@
             "height": 0.011729627847671509,
             "page": 1,
             "confidence": 99.57178497314453,
-            "content": "eine Information \u00fcber etwaige noch offene oder Schadenf\u00e4lle",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -1062,7 +1062,7 @@
             "height": 0.011689860373735428,
             "page": 1,
             "confidence": 99.37081146240234,
-            "content": "eine Information ob Beitragsr\u00fcckstand besteht",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -1095,7 +1095,7 @@
             "height": 0.012028621509671211,
             "page": 1,
             "confidence": 99.42057800292969,
-            "content": "Sollte es auf Grund der Bestands\u00fcbertragung zu einem Nachteil (z.B. Wegfall einer Sonderkondition)",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -1160,7 +1160,7 @@
             "height": 0.012272020801901817,
             "page": 1,
             "confidence": 99.29629516601562,
-            "content": "f\u00fcr den Versicherungsnehmer kommen, wird von der Bestands\u00fcbertragung abgesehen. Vielen Dank",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -1217,7 +1217,7 @@
             "height": 0.012117933481931686,
             "page": 1,
             "confidence": 99.40620422363281,
-            "content": "f\u00fcr eine kurzfristige R\u00fcckmeldung in diesem Fall!",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -1258,7 +1258,7 @@
             "height": 0.009914757683873177,
             "page": 1,
             "confidence": 99.11219024658203,
-            "content": "Mit freundlichen Gr\u00fc\u00dfen",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -1283,7 +1283,7 @@
             "height": 0.017712466418743134,
             "page": 1,
             "confidence": 99.85640716552734,
-            "content": "Max Mustermann",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -1304,7 +1304,7 @@
             "height": 0.011771861463785172,
             "page": 1,
             "confidence": 99.19056701660156,
-            "content": "Gesch\u00e4ftsf\u00fchrer Versicherungsmakler Max Mustermann GmbH",
+            "content": null,
             "relationships": [
                 {
                     "type": "child",
@@ -3309,25 +3309,8 @@
             "relationships": []
         },
         {
-            "id": "ac30fb1b-8a64-4415-bc86-c2a2c13323ec",
-            "type": "block",
-            "left": 0.4724515378475189,
-            "top": 0.020844753831624985,
-            "width": 0.05173315480351448,
-            "height": 0.008691303431987762,
-            "page": 1,
-            "confidence": 43.9697265625,
-            "content": null,
-            "relationships": [
-                {
-                    "type": "child",
-                    "id": "025cd8ec-4552-465d-b536-bd9afc9a7a61"
-                }
-            ]
-        },
-        {
             "id": "2c090471-df95-4c1a-a763-e630fdca308f",
-            "type": "paragraph",
+            "type": "block",
             "left": 0.1281638741493225,
             "top": 0.08768302947282791,
             "width": 0.7371279001235962,
@@ -3384,7 +3367,7 @@
         },
         {
             "id": "11861756-84e4-4f35-a82b-2431ebbaffb3",
-            "type": "paragraph",
+            "type": "block",
             "left": 0.11879605799913406,
             "top": 0.21607443690299988,
             "width": 0.24782061576843262,
@@ -3401,7 +3384,7 @@
         },
         {
             "id": "dfe2e098-a78f-428d-98af-52c592b6667c",
-            "type": "paragraph",
+            "type": "block",
             "left": 0.11873497068881989,
             "top": 0.242658331990242,
             "width": 0.16879227757453918,
@@ -3418,7 +3401,7 @@
         },
         {
             "id": "3150a712-9292-4750-9d6e-e7662cc703ae",
-            "type": "paragraph",
+            "type": "block",
             "left": 0.11949548870325089,
             "top": 0.2698451578617096,
             "width": 0.12089959532022476,
@@ -3443,7 +3426,7 @@
         },
         {
             "id": "f6c01f81-7c57-4d6c-a0b7-c4f38fe9fc2b",
-            "type": "paragraph",
+            "type": "block",
             "left": 0.11877796798944473,
             "top": 0.3305639922618866,
             "width": 0.7086799144744873,
@@ -3464,7 +3447,7 @@
         },
         {
             "id": "45e87b48-cb41-4368-8d75-e4e1103ac998",
-            "type": "paragraph",
+            "type": "block",
             "left": 0.11842197179794312,
             "top": 0.3745614290237427,
             "width": 0.7271209359169006,
@@ -3485,7 +3468,7 @@
         },
         {
             "id": "9c987844-0e76-4284-a169-13e5601469e6",
-            "type": "paragraph",
+            "type": "block",
             "left": 0.1196293756365776,
             "top": 0.41825994849205017,
             "width": 0.3340552747249603,
@@ -3539,7 +3522,7 @@
         },
         {
             "id": "b1b984c9-2e39-49a4-b6a1-78c670fc3684",
-            "type": "paragraph",
+            "type": "block",
             "left": 0.1496480256319046,
             "top": 0.4462428092956543,
             "width": 0.26276591420173645,
@@ -3556,7 +3539,7 @@
         },
         {
             "id": "91505d67-1f88-4b50-9190-90c647e61ade",
-            "type": "paragraph",
+            "type": "block",
             "left": 0.14964784681797028,
             "top": 0.4635326862335205,
             "width": 0.4729980528354645,
@@ -3573,7 +3556,7 @@
         },
         {
             "id": "bff6ebba-9a5d-4a8c-9dc2-298477df42f3",
-            "type": "paragraph",
+            "type": "block",
             "left": 0.14926958084106445,
             "top": 0.4814230501651764,
             "width": 0.7270987629890442,
@@ -3590,7 +3573,7 @@
         },
         {
             "id": "91ee831c-5ea1-432b-b418-19882e80194a",
-            "type": "paragraph",
+            "type": "block",
             "left": 0.1497231274843216,
             "top": 0.49923765659332275,
             "width": 0.6791563630104065,
@@ -3607,7 +3590,7 @@
         },
         {
             "id": "c01f3538-5496-4f75-9856-73b26abb05f4",
-            "type": "paragraph",
+            "type": "block",
             "left": 0.14949609339237213,
             "top": 0.5173731446266174,
             "width": 0.4887266159057617,
@@ -3624,7 +3607,7 @@
         },
         {
             "id": "0720637e-baee-4591-8ea8-6d10609c6a91",
-            "type": "paragraph",
+            "type": "block",
             "left": 0.149495929479599,
             "top": 0.535312294960022,
             "width": 0.3772425055503845,
@@ -3641,7 +3624,7 @@
         },
         {
             "id": "6dcafb9d-f88f-4b69-8dcd-69312283f635",
-            "type": "paragraph",
+            "type": "block",
             "left": 0.11859064549207687,
             "top": 0.5617096424102783,
             "width": 0.7480511665344238,
@@ -3666,7 +3649,7 @@
         },
         {
             "id": "a2c7b33e-2d5f-434f-bf19-863ec5c86561",
-            "type": "paragraph",
+            "type": "block",
             "left": 0.11945133656263351,
             "top": 0.6498064994812012,
             "width": 0.18444034457206726,
@@ -3700,7 +3683,7 @@
         },
         {
             "id": "f056c952-32da-46b5-bc70-02f8b49f1fdd",
-            "type": "paragraph",
+            "type": "block",
             "left": 0.1192057877779007,
             "top": 0.7203496694564819,
             "width": 0.4686633050441742,

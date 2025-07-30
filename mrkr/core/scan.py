@@ -295,14 +295,14 @@ def _get_item_children(
     Return a list of children for an OCR item.
     """
     result = []
-    for item in ocr_result.items:
-        if item.id == ocr_item.id:
+    for relationship in ocr_item.relationships:
+        if relationship.type != schemas.OcrRelationshipType.child:
             continue
 
-        for relationship in item.relationships:
-            if relationship.type == schemas.OcrRelationshipType.child \
-                    and relationship.id == ocr_item.id:
+        for item in ocr_result.items:
+            if item.id == relationship.id:
                 result.append(item)
+                break
 
     return result
 
