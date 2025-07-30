@@ -43,12 +43,10 @@ dependencies = [
   "boto3>=1.39.13"
 ]
 
-# Project URLs for users
 [project.urls]
 Source = "https://github.com/maxbrixner/mrkr2"
 Issues = "https://github.com/maxbrixner/mrkr2/issues"
 
-# Optional dependencies for specific features or development
 [project.optional-dependencies]
 dev = [
   "build>=1.2.2",
