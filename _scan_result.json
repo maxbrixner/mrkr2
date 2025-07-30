@@ -3,13 +3,13 @@
     "label_status": "open",
     "pages": [
         {
-            "id": "6d830b02-b5b0-4e25-9010-839be6cd534f",
+            "id": "dea575a0-6372-46d7-8844-5cf505de9baf",
             "page": 1,
             "labels": [],
             "label_status": "open",
             "blocks": [
                 {
-                    "id": "62f39311-2f56-452e-8358-8cf8d603407a",
+                    "id": "ac30fb1b-8a64-4415-bc86-c2a2c13323ec",
                     "position": {
                         "left": 0.4724515378475189,
                         "top": 0.020844753831624985,
@@ -21,7 +21,7 @@
                     "content": ""
                 },
                 {
-                    "id": "da57c6da-afe1-4246-ab2e-7fff14c92ee3",
+                    "id": "3d26d1aa-59cd-46fc-9fe7-197bc26af888",
                     "position": {
                         "left": 0.14926905930042267,
                         "top": 0.4462406039237976,
@@ -33,7 +33,7 @@
                     "content": ""
                 },
                 {
-                    "id": "eed72a81-627e-4e31-af63-c686612b93c1",
+                    "id": "0fca1f7e-5ef8-43fa-9090-f00a08070b54",
                     "position": {
                         "left": 0.12023452669382095,
                         "top": 0.6815009117126465,

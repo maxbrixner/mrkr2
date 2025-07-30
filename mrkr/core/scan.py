@@ -92,11 +92,6 @@ async def scan_project(
         )
 
         for document in documents:
-
-            # todo:
-            if document.id != 294:
-                continue
-
             await scan_document(
                 document_id=document.id,
                 force=force,
@@ -273,9 +268,10 @@ async def _create_document_data(
         labels=[]
     )
 
+    # todo
     import pathlib
     import json
-    with pathlib.Path("test3.json").open("w", encoding="utf-8") as file:
+    with pathlib.Path("_scan_result.json").open("w", encoding="utf-8") as file:
         json.dump(label_content.model_dump(), file, indent=4)
 
     crud.update_document_data_and_status(

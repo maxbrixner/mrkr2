@@ -87,26 +87,22 @@ class TextractOcrProvider(BaseOcrProvider):
             textract_result = await self._analyze_page(
                 image=image)
 
-            import pathlib
-            import json
-            with pathlib.Path("test.json").open("w", encoding="utf-8") as file:
-                json.dump(textract_result.model_dump(), file, indent=4)
-
             items += await self._convert_result(
                 textract_result=textract_result,
                 page=page+1
             )
 
-            with pathlib.Path("test2.json").open("w", encoding="utf-8") as file:
-                json.dump(schemas.OcrResultSchema(
-                    id=uuid.uuid4(),
-                    items=items
-                ).model_dump(), file, indent=4)
-
-        return schemas.OcrResultSchema(
+        ocr_result = schemas.OcrResultSchema(
             id=uuid.uuid4(),
             items=items
         )
+
+        import pathlib
+        import json
+        with pathlib.Path("_ocr_result.json").open("w", encoding="utf-8") as file:
+            json.dump(ocr_result.model_dump(), file, indent=4)
+
+        return ocr_result
 
     async def refresh_client(self) -> None:
         """
@@ -127,6 +123,14 @@ class TextractOcrProvider(BaseOcrProvider):
         """
         Call Textract to analyze the document layout.
         """
+        # todo
+        import json
+        import pathlib
+        with pathlib.Path("_textract_raw.json").open("r") as file:
+            content = json.load(file)
+
+        return TextractResult(**content)
+
         await self.refresh_client()
         if self._client is None:
             raise Exception("Client not initialized.")
