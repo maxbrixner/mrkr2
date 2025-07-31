@@ -124,12 +124,12 @@ class TextractOcrProvider(BaseOcrProvider):
         Call Textract to analyze the document layout.
         """
         # todo
-        import json
-        import pathlib
-        with pathlib.Path("_textract_raw.json").open("r") as file:
-            content = json.load(file)
+        # import json
+        # import pathlib
+        # with pathlib.Path("_textract_raw.json").open("r") as file:
+        #    content = json.load(file)
 
-        return TextractResult(**content)
+        # return TextractResult(**content)
 
         await self.refresh_client()
         if self._client is None:
