@@ -97,11 +97,6 @@ class TextractOcrProvider(BaseOcrProvider):
             items=items
         )
 
-        import pathlib
-        import json
-        with pathlib.Path("_ocr_result.json").open("w", encoding="utf-8") as file:
-            json.dump(ocr_result.model_dump(), file, indent=4)
-
         return ocr_result
 
     async def refresh_client(self) -> None:
@@ -123,14 +118,6 @@ class TextractOcrProvider(BaseOcrProvider):
         """
         Call Textract to analyze the document layout.
         """
-        # todo
-        # import json
-        # import pathlib
-        # with pathlib.Path("_textract_raw.json").open("r") as file:
-        #    content = json.load(file)
-
-        # return TextractResult(**content)
-
         await self.refresh_client()
         if self._client is None:
             raise Exception("Client not initialized.")
@@ -170,7 +157,12 @@ class TextractOcrProvider(BaseOcrProvider):
         self,
         textract_type: str
     ) -> schemas.OcrItemType | None:
-        # 'KEY_VALUE_SET' | 'TABLE' | 'CELL' | 'SELECTION_ELEMENT' | 'MERGED_CELL' | 'TITLE' | 'QUERY' | 'QUERY_RESULT' | 'SIGNATURE' | 'TABLE_TITLE' | 'TABLE_FOOTER' | 'LAYOUT_TEXT' | 'LAYOUT_TITLE' | 'LAYOUT_HEADER' | 'LAYOUT_FOOTER' | 'LAYOUT_SECTION_HEADER' | 'LAYOUT_PAGE_NUMBER' | 'LAYOUT_LIST' | 'LAYOUT_FIGURE' | 'LAYOUT_TABLE' | 'LAYOUT_KEY_VALUE'
+        # 'KEY_VALUE_SET' | 'TABLE' | 'CELL' | 'SELECTION_ELEMENT' |
+        # 'MERGED_CELL' | 'TITLE' | 'QUERY' | 'QUERY_RESULT' | 'SIGNATURE' |
+        # 'TABLE_TITLE' | 'TABLE_FOOTER' | 'LAYOUT_TEXT' | 'LAYOUT_TITLE' |
+        # 'LAYOUT_HEADER' | 'LAYOUT_FOOTER' | 'LAYOUT_SECTION_HEADER' |
+        # 'LAYOUT_PAGE_NUMBER' | 'LAYOUT_LIST' | 'LAYOUT_FIGURE' |
+        # 'LAYOUT_TABLE' | 'LAYOUT_KEY_VALUE'
         match textract_type:
             case 'PAGE':
                 return schemas.OcrItemType.page
@@ -185,7 +177,8 @@ class TextractOcrProvider(BaseOcrProvider):
         self,
         textract_type: str
     ) -> schemas.OcrRelationshipType | None:
-        # 'VALUE'|'CHILD'|'COMPLEX_FEATURES'|'MERGED_CELL'| 'TITLE'|'ANSWER'|'TABLE'|'TABLE_TITLE'|'TABLE_FOOTER'
+        # 'VALUE'|'CHILD'|'COMPLEX_FEATURES'|'MERGED_CELL'| 'TITLE'|'ANSWER'|
+        # 'TABLE'|'TABLE_TITLE'|'TABLE_FOOTER'
         match textract_type:
             case 'CHILD':
                 return schemas.OcrRelationshipType.child
@@ -233,10 +226,27 @@ class TextractOcrProvider(BaseOcrProvider):
                 relationships=relationships
             ))
 
-        # todo: eliminate children's children in relationships
-        # get an items complete lineage and see if it is a child of
-        # any parent item. If so, remove the relationship within the parent item
-
         return items
+
+    async def _get_item_children(
+        self,
+        item: schemas.OcrItemSchema,
+        items: List[schemas.OcrItemSchema]
+    ) -> List[schemas.OcrItemSchema]:
+        """
+        Recursively finds the children of an item based on its relationships.
+        """
+        children = []
+        for relationship in item.relationships:
+            if relationship.type != schemas.OcrRelationshipType.child:
+                continue
+            child_item = next(
+                (i for i in items if i.id == relationship.id), None)
+            if child_item:
+                children.append(child_item)
+                children += await self._get_item_children(
+                    item=child_item, items=items)
+
+        return children
 
 # ---------------------------------------------------------------------------- #

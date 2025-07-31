@@ -268,12 +268,6 @@ async def _create_document_data(
         labels=[]
     )
 
-    # todo
-    import pathlib
-    import json
-    with pathlib.Path("_scan_result.json").open("w", encoding="utf-8") as file:
-        json.dump(label_content.model_dump(), file, indent=4)
-
     crud.update_document_data_and_status(
         session=session,
         document=document,
@@ -350,6 +344,26 @@ def _get_item_content(
 # ---------------------------------------------------------------------------- #
 
 
+def _get_ocr_item_parents(
+    ocr_result: schemas.OcrResultSchema,
+    ocr_item: schemas.OcrItemSchema
+) -> List[schemas.OcrItemSchema]:
+    """
+    Return a list of parent items for a given OCR item.
+    """
+    parents = []
+    for item in ocr_result.items:
+        for relationship in item.relationships:
+            if relationship.type == schemas.OcrRelationshipType.child and \
+                    relationship.id == ocr_item.id:
+                parents.append(item)
+                break
+
+    return parents
+
+# ---------------------------------------------------------------------------- #
+
+
 def _initialize_label_blocks(
     ocr_result: schemas.OcrResultSchema,
     page: int
@@ -363,6 +377,19 @@ def _initialize_label_blocks(
             continue
 
         if item.page != page:
+            continue
+
+        parents = _get_ocr_item_parents(
+            ocr_result=ocr_result,
+            ocr_item=item
+        )
+
+        # Do not include blocks that are children of other blocks.
+        # In Textract, a line can be the child of a page and a layout block,
+        # which would lead to duplicate blocks in the label data.
+        if any(
+            [parent.type == schemas.OcrItemType.block for parent in parents]
+        ):
             continue
 
         result.append(
