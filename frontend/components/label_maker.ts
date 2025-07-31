@@ -232,7 +232,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 height: 100%;
                 overflow-y: auto;
                 padding: 1rem;
-                scrollbar-color: var(--label-maker-scrollbar-color, inherit);
+                scrollbar-color: var(--scrollbar-color, inherit);
                 scrollbar-gutter: stable;
                 scrollbar-width: thin;
                 width: 100%;

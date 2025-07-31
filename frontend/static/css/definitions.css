@@ -97,16 +97,13 @@
     --styled-button-font-weight: var(--font-weight-semibold);
     --styled-button-padding: var(--spacing-medium) var(--spacing-large);
     --styled-button-focus-outline: var(--focus-outline);
-
     --styled-button-background-color-disabled: var(--disabled-color);
     --styled-button-border-color-disabled: var(--border-color);
     --styled-button-color-disabled: var(--disabled-text-color);
-
     --styled-button-background-color: var(--surface-color);
     --styled-button-border-color: var(--border-color);
     --styled-button-border-color-hover: var(--primary-color);
     --styled-button-color: var(--text-color);
-
     --styled-button-background-color-primary: var(--primary-color);
     --styled-button-border-color-primary: var(--primary-color);
     --styled-button-border-color-hover-primary: var(--border-color);
@@ -119,11 +116,9 @@
     --styled-input-font-weight: var(--font-weight-normal);
     --styled-input-padding: var(--spacing-medium) var(--spacing-medium);
     --styled-input-focus-outline: var(--focus-outline);
-
     --styled-input-background-color-disabled: var(--disabled-color);
     --styled-input-border-color-disabled: var(--border-color);
     --styled-input-color-disabled: var(--disabled-text-color);
-
     --styled-input-background-color: var(--surface-color);
     --styled-input-border-color: var(--border-color);
     --styled-input-border-color-hover: var(--primary-color);
@@ -138,22 +133,18 @@
     --message-box-box-shadow: var(--box-shadow);
     --message-box-font-size: var(--font-size-medium);
     --message-box-padding: var(--spacing-large);
-
     --message-box-success-background-color: var(--success-color);
     --message-box-success-color: var(--on-success-color);
     --message-box-success-border-color: var(--border-color);
     --message-box-success-icon-filter: invert(1);
-
     --message-box-info-background-color: var(--info-color);
     --message-box-info-color: var(--on-info-color);
     --message-box-info-border-color: var(--border-color);
     --message-box-info-icon-filter: invert(1);
-
     --message-box-warning-background-color: var(--warning-color);
     --message-box-warning-color: var(--on-warning-color);
     --message-box-warning-border-color: var(--border-color);
     --message-box-warning-icon-filter: invert(1);
-
     --message-box-error-background-color: var(--error-color);
     --message-box-error-color: var(--on-error-color);
     --message-box-error-border-color: var(--border-color);
@@ -177,16 +168,12 @@
     --filtered-table-sort-icon-opacity: 0.5;
     --filtered-table-empty-message: 'No items found';
     --filtered-table-header-border-color: var(--border-color);
-
     --filtered-table-chip-processing-background-color: #90A4AE;
     --filtered-table-chip-processing-color: #000000;
-
     --filtered-table-chip-open-background-color: #80DEEA;
     --filtered-table-chip-open-color: #000000;
-
     --filtered-table-chip-done-background-color: #4CAF50;
     --filtered-table-chip-done-color: #000000;
-
     --filtered-table-chip-review-background-color: #FFC107;
     --filtered-table-chip-review-color: #000000;
 
@@ -230,22 +217,13 @@
     --document-viewer-page-focus-outline-color: var(--primary-color);
     --document-viewer-page-focus-outline-width: 2px;
 
-
     /* Label Button Variables */
     --label-button-background-color-disabled: var(--disabled-color);
     --label-button-border-color-disabled: var(--border-color);
     --label-button-color-disabled: var(--disabled-text-color);
     --label-button-focus-outline: var(--focus-outline);
 
-
-
-    --label-maker-scrollbar-color: var(--scrollbar-thumb) var(--surface-color);
-
-
-    --label-viewer-background-color: var(--surface-color);
-    --label-viewer-pulse-color: var(--primary-color);
-
-
-    --label-fragment-border-radius: var(--border-radius-medium);
-    --label-fragment-border-color: var(--border-color);
+    /* Labeler Variables */
+    --labeler-border-radius: var(--border-radius-medium);
+    --labeler-border-color: var(--border-color);
 }
