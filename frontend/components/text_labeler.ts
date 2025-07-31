@@ -231,7 +231,6 @@ export class TextLabeler extends ClassificationLabeler implements Classification
 
         if (!textNodes.includes(startContainer) || !textNodes.includes(endContainer)) {
             throw new Error("Start or end container is not a text node in the text container.");
-            return null;
         }
 
         let startReached = false;
