@@ -63,6 +63,7 @@ export class ClassificationLabeler extends HTMLElement {
                 gap: 1rem;
                 grid-template-columns: 1fr auto;
                 padding: 0.5em;
+                user-select: none;
             }
 
             .buttons {
@@ -71,6 +72,7 @@ export class ClassificationLabeler extends HTMLElement {
                 gap: 0.5rem;
                 grid-auto-columns: min-content;
                 grid-auto-flow: column;
+                user-select: none;
             }
 
             .title {
@@ -78,6 +80,7 @@ export class ClassificationLabeler extends HTMLElement {
                 font-size: 0.9rem;
                 overflow: hidden;
                 text-overflow: ellipsis;
+                user-select: none;
                 white-space: nowrap;
             }
 
@@ -87,6 +90,7 @@ export class ClassificationLabeler extends HTMLElement {
                 flex-wrap: wrap;
                 gap: 0.5em;
                 padding: 0.5em;
+                user-select: none;
             }
 
             .done {
