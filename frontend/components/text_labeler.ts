@@ -43,6 +43,7 @@ export class TextLabeler extends ClassificationLabeler implements Classification
                 flex-wrap: wrap;
                 gap: 8px;
                 padding: 8px;
+                user-select: none;
             }
 
             .text-labels-container.done {
@@ -74,6 +75,7 @@ export class TextLabeler extends ClassificationLabeler implements Classification
                 grid-template-columns: 1fr;
                 font-size: 0.8rem;
                 padding: 0.5rem;
+                user-select: none;
             }
 
             .text-label-list-container:empty {
@@ -89,6 +91,7 @@ export class TextLabeler extends ClassificationLabeler implements Classification
                 display: grid;
                 gap: 0.5rem;
                 grid-template-columns: auto 1fr min-content;
+                user-select: none;
             }
 
             .text-label-list-item > span {
@@ -175,8 +178,23 @@ export class TextLabeler extends ClassificationLabeler implements Classification
         this._textLabelListContainer.innerHTML = '';
     }
 
-    /* todo */
+    private _getTextNodes(node: Node): Node[] {
+        let textNodes: Node[] = [];
+        if (node.nodeType === Node.TEXT_NODE) {
+            textNodes.push(node);
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+            for (let child of node.childNodes) {
+                textNodes = textNodes.concat(this._getTextNodes(child));
+            }
+        }
+        return textNodes;
+    }
+
     public getSelection(): TextSelection | null {
+        if (!this.shadowRoot) {
+            throw new Error("Shadow Root is not initialized.");
+        }
+
         // Warning: this only works in Chrome-Based-Browsers,
         // see https://stackoverflow.com/questions/62054839/shadowroot-getselection
         const selection = (this.shadowRoot as any).getSelection();
@@ -185,51 +203,83 @@ export class TextLabeler extends ClassificationLabeler implements Classification
         }
 
         const range = selection.getRangeAt(0);
-        const commonAncestor = range.commonAncestorContainer;
+        let startContainer = range.startContainer;
+        let endContainer = range.endContainer;
+        let startOffset = range.startOffset;
+        let endOffset = range.endOffset;
 
-        if (commonAncestor != this._textContainer && !this._textContainer.contains(commonAncestor)) {
-            console.error("Selection is not within the text container.");
+        let textNodes = this._getTextNodes(this._textContainer);
+        if (textNodes.length === 0) {
+            console.error("No text nodes found in the text container.");
             return null;
         }
 
+        if (startContainer !== this._textContainer && !this._textContainer.contains(startContainer)) {
+            startContainer = textNodes[0];
+            startOffset = 0;
+        }
+
+        if (endContainer !== this._textContainer && !this._textContainer.contains(endContainer)) {
+            endContainer = textNodes[textNodes.length - 1];
+            endOffset = endContainer.textContent.length;
+        }
+
+        if (endContainer.nodeType !== Node.TEXT_NODE) {
+            endContainer = endContainer.childNodes[endOffset] || endContainer;
+            endOffset = 0;
+        }
+
+        if (!textNodes.includes(startContainer) || !textNodes.includes(endContainer)) {
+            throw new Error("Start or end container is not a text node in the text container.");
+        }
+
+        let startReached = false;
+        let endReached = false;
         let start = 0;
         let end = 0;
-        let startFound = false;
-        let endFound = false;
+        let text = '';
+        for (const node of textNodes) {
+            // before start container
+            if (node !== startContainer && !startReached) {
+                start += node.textContent?.length || 0;
+                end += node.textContent?.length || 0;
+            }
 
-        const spanNodes = this._textContainer.childNodes;
-        for (let spanNode of spanNodes) {
-            const textNodes = spanNode.childNodes;
-            for (let textNode of textNodes) {
-                if (textNode.nodeType !== Node.TEXT_NODE && !startFound) {
-                    start += 1;
-                }
-                if (textNode.nodeType !== Node.TEXT_NODE && !endFound) {
-                    end += 1;
-                }
-                if (textNode.nodeType !== Node.TEXT_NODE) {
-                    continue;
-                }
-                if (textNode !== range.startContainer && !startFound) {
-                    start += textNode.textContent?.length || 0;
-                }
-                if (textNode !== range.endContainer && !endFound) {
-                    end += textNode.textContent?.length || 0;
-                }
-                if (textNode === range.startContainer) {
-                    start += range.startOffset;
-                    startFound = true;
-                }
-                if (textNode === range.endContainer) {
-                    end += range.endOffset;
-                    endFound = true;
-                    break;
-                }
+            // at start container (but not at end container)
+            else if (node === startContainer && node !== endContainer) {
+                startReached = true;
+                start += startOffset;
+                end += node.textContent?.length || 0;
+                text += node.textContent?.substring(startOffset) || '';
+            }
+
+            // after start container and before end container
+            else if (node !== startContainer && startReached && node !== endContainer && !endReached) {
+                end += node.textContent?.length || 0;
+                text += node.textContent || '';
+            }
+
+            // at end container (but not at start container)
+            else if (node === endContainer && node !== startContainer) {
+                endReached = true;
+                end += endOffset;
+                text += node.textContent?.substring(0, endOffset) || '';
+                break;
+            }
+
+            // at both start and end container
+            else if (node === endContainer && node === startContainer) {
+                startReached = true;
+                endReached = true;
+                start += startOffset;
+                end += endOffset;
+                text += node.textContent?.substring(startOffset, endOffset) || '';
+                break;
             }
         }
 
         return {
-            text: selection.toString(),
+            text: text,
             start: start,
             end: end
         };
@@ -248,7 +298,11 @@ export class TextLabeler extends ClassificationLabeler implements Classification
     public makeTextEditable(onBlurCallback: CallableFunction | null = null): void {
         this._textContainer.contentEditable = 'true';
         this._textContainer.focus();
-        this._textContainer.addEventListener('blur', () => {
+        this._textContainer.addEventListener('blur', this._onTextContainerBlur(onBlurCallback), { once: true });
+    }
+
+    protected _onTextContainerBlur(onBlurCallback: CallableFunction | null): EventListener {
+        return (event: Event) => {
             this._textContainer.contentEditable = 'false';
 
             let text = "";
@@ -270,12 +324,10 @@ export class TextLabeler extends ClassificationLabeler implements Classification
                     }
                 }
             }
-
-
             if (onBlurCallback) {
                 onBlurCallback(text);
             }
-        }, { once: true });
+        }
     }
 
     protected _updateStatus(): void {
