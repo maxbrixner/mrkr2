@@ -190,7 +190,6 @@ export class TextLabeler extends ClassificationLabeler implements Classification
         return textNodes;
     }
 
-    /* todo */
     public getSelection(): TextSelection | null {
         if (!this.shadowRoot) {
             throw new Error("Shadow Root is not initialized.");
@@ -204,7 +203,6 @@ export class TextLabeler extends ClassificationLabeler implements Classification
         }
 
         const range = selection.getRangeAt(0);
-        const commonAncestor = range.commonAncestorContainer;
         let startContainer = range.startContainer;
         let endContainer = range.endContainer;
         let startOffset = range.startOffset;
@@ -219,13 +217,11 @@ export class TextLabeler extends ClassificationLabeler implements Classification
         if (startContainer !== this._textContainer && !this._textContainer.contains(startContainer)) {
             startContainer = textNodes[0];
             startOffset = 0;
-            console.log("startContainer before textContainer");
         }
 
         if (endContainer !== this._textContainer && !this._textContainer.contains(endContainer)) {
             endContainer = textNodes[textNodes.length - 1];
             endOffset = endContainer.textContent.length;
-            console.log("endContainer after textContainer");
         }
 
         let startReached = false;
@@ -234,18 +230,14 @@ export class TextLabeler extends ClassificationLabeler implements Classification
         let end = 0;
         let text = '';
         for (const node of textNodes) {
-            console.log(node);
-
             // before start container
             if (node !== startContainer && !startReached) {
-                console.log("a")
                 start += node.textContent?.length || 0;
                 end += node.textContent?.length || 0;
             }
 
             // at start container (but not at end container)
             else if (node === startContainer && node !== endContainer) {
-                console.log("b")
                 startReached = true;
                 start += startOffset;
                 end += node.textContent?.length || 0;
@@ -254,14 +246,12 @@ export class TextLabeler extends ClassificationLabeler implements Classification
 
             // after start container and before end container
             else if (node !== startContainer && startReached && node !== endContainer && !endReached) {
-                console.log("c")
                 end += node.textContent?.length || 0;
                 text += node.textContent || '';
             }
 
             // at end container (but not at start container)
             else if (node === endContainer && node !== startContainer) {
-                console.log("d")
                 endReached = true;
                 end += endOffset;
                 text += node.textContent?.substring(0, endOffset) || '';
@@ -270,7 +260,6 @@ export class TextLabeler extends ClassificationLabeler implements Classification
 
             // at both start and end container
             else if (node === endContainer && node === startContainer) {
-                console.log("e")
                 startReached = true;
                 endReached = true;
                 start += startOffset;
@@ -300,7 +289,11 @@ export class TextLabeler extends ClassificationLabeler implements Classification
     public makeTextEditable(onBlurCallback: CallableFunction | null = null): void {
         this._textContainer.contentEditable = 'true';
         this._textContainer.focus();
-        this._textContainer.addEventListener('blur', () => {
+        this._textContainer.addEventListener('blur', this._onTextContainerBlur(onBlurCallback), { once: true });
+    }
+
+    protected _onTextContainerBlur(onBlurCallback: CallableFunction | null): EventListener {
+        return (event: Event) => {
             this._textContainer.contentEditable = 'false';
 
             let text = "";
@@ -322,12 +315,10 @@ export class TextLabeler extends ClassificationLabeler implements Classification
                     }
                 }
             }
-
-
             if (onBlurCallback) {
                 onBlurCallback(text);
             }
-        }, { once: true });
+        }
     }
 
     protected _updateStatus(): void {
