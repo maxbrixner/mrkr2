@@ -16,6 +16,11 @@ interface LabelMakerAttributes {
     documentUrl?: string,
     imageUrl?: string,
     updateUrl?: string,
+    viewIcon?: string,
+    openIcon?: string,
+    doneIcon?: string,
+    editIcon?: string,
+    deleteIcon?: string
 }
 
 /* -------------------------------------------------------------------------- */
@@ -150,6 +155,12 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
     private _submitButton?: HTMLElement = undefined;
 
+    private _viewIcon?: string = undefined;
+    private _openIcon?: string = undefined;
+    private _doneIcon?: string = undefined;
+    private _editIcon?: string = undefined;
+    private _deleteIcon?: string = undefined;
+
     /**
      * Creates an instance of LabelMaker.
      */
@@ -164,7 +175,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
      * Returns an array of attribute names that this component observes.
      */
     static get observedAttributes() {
-        return ['document-url', 'project-url', 'image-url', 'update-url'];
+        return ['document-url', 'project-url', 'image-url', 'update-url', 'view-icon', 'open-icon', 'done-icon', 'edit-icon', 'delete-icon'];
     }
 
     /**
@@ -183,6 +194,16 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 this._documentViewer.setAttribute("url", this.imageUrl);
         } else if (propertyName === 'update-url') {
             this.updateUrl = newValue || undefined;
+        } else if (propertyName === 'view-icon') {
+            this._viewIcon = newValue || '';
+        } else if (propertyName === 'open-icon') {
+            this._openIcon = newValue || '';
+        } else if (propertyName === 'done-icon') {
+            this._doneIcon = newValue || '';
+        } else if (propertyName === 'edit-icon') {
+            this._editIcon = newValue || '';
+        } else if (propertyName === 'delete-icon') {
+            this._deleteIcon = newValue || '';
         }
     }
 
@@ -411,6 +432,9 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
         const classificationLabeler = new ClassificationLabeler();
         classificationLabeler.setAttribute('heading', 'Document');
+        classificationLabeler.viewIcon = this._viewIcon || '';
+        classificationLabeler.openIcon = this._openIcon || '';
+        classificationLabeler.doneIcon = this._doneIcon || '';
 
         if (this._document.data.label_status === 'done') {
             classificationLabeler.setAttribute('done', 'true');
@@ -459,6 +483,9 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         for (const page of this._document.data.pages) {
             const classificationLabeler = new ClassificationLabeler();
             classificationLabeler.setAttribute('heading', `Page ${page.page}`);
+            classificationLabeler.viewIcon = this._viewIcon || '';
+            classificationLabeler.openIcon = this._openIcon || '';
+            classificationLabeler.doneIcon = this._doneIcon || '';
             this._pageLabelers[page.page] = classificationLabeler;
             this._pageTab.appendChild(classificationLabeler);
 
@@ -524,6 +551,12 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
                 const textLabeler = new TextLabeler();
                 textLabeler.setAttribute('heading', `Block`);
+                textLabeler.viewIcon = this._viewIcon || '';
+                textLabeler.openIcon = this._openIcon || '';
+                textLabeler.doneIcon = this._doneIcon || '';
+                textLabeler.editIcon = this._editIcon || '';
+                textLabeler.deleteIcon = this._deleteIcon || '';
+
                 this._blockTab?.appendChild(textLabeler);
 
                 if (block.label_status === 'done') {

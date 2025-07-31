@@ -8,12 +8,18 @@ import { IconButton } from './base/icon_button.js';
 export interface ClassificationLabelerAttributes {
     heading?: string
     done?: boolean
+    viewIcon?: string
+    openIcon?: string
+    doneIcon?: string
 }
 
 /* -------------------------------------------------------------------------- */
 
 export class ClassificationLabeler extends HTMLElement implements ClassificationLabelerAttributes {
     protected _done: boolean = false;
+    protected _viewIcon?: string = undefined;
+    protected _openIcon?: string = undefined;
+    protected _doneIcon?: string = undefined;
     protected _headerDiv: HTMLDivElement = document.createElement('div');
     protected _buttonsDiv: HTMLDivElement = document.createElement('div');
     protected _titleDiv: HTMLSpanElement = document.createElement('div');
@@ -38,6 +44,30 @@ export class ClassificationLabeler extends HTMLElement implements Classification
         this.setAttribute('done', String(value));
     }
 
+    get viewIcon(): string {
+        return this._viewIcon || '';
+    }
+
+    set viewIcon(value: string) {
+        this.setAttribute('view-icon', value);
+    }
+
+    get openIcon(): string {
+        return this._openIcon || '';
+    }
+
+    set openIcon(value: string) {
+        this.setAttribute('open-icon', value);
+    }
+
+    get doneIcon(): string {
+        return this._doneIcon || '';
+    }
+
+    set doneIcon(value: string) {
+        this.setAttribute('done-icon', value);
+    }
+
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -46,7 +76,7 @@ export class ClassificationLabeler extends HTMLElement implements Classification
     }
 
     static get observedAttributes() {
-        return ['heading', 'done'];
+        return ['heading', 'done', 'view-icon', 'open-icon', 'done-icon'];
     }
 
     attributeChangedCallback(propertyName: string, oldValue: string | null, newValue: string | null) {
@@ -57,6 +87,13 @@ export class ClassificationLabeler extends HTMLElement implements Classification
         } else if (propertyName === 'done') {
             this._done = newValue === 'true';
             this._updateStatus();
+        } else if (propertyName === 'view-icon') {
+            this._viewIcon = newValue || '';
+            this._viewButton.setAttribute('img', this._viewIcon);
+        } else if (propertyName === 'open-icon') {
+            this._openIcon = newValue || '';
+        } else if (propertyName === 'done-icon') {
+            this._doneIcon = newValue || '';
         }
     }
 
@@ -143,7 +180,7 @@ export class ClassificationLabeler extends HTMLElement implements Classification
     }
 
     public addViewButton(): HTMLElement {
-        this._viewButton.setAttribute("img", "/static/img/eye-outline.svg");
+        this._viewButton.setAttribute("img", this._viewIcon || '');
         this._viewButton.ariaLabel = "View in document";
 
         this._buttonsDiv.appendChild(this._viewButton);
@@ -181,11 +218,11 @@ export class ClassificationLabeler extends HTMLElement implements Classification
     protected _updateStatus(): void {
         if (this._done) {
             this._classificationContainer.classList.add('done');
-            this._checkButton.setAttribute("img", "/static/img/checkbox-outline.svg");
+            this._checkButton.setAttribute("img", this._doneIcon || '');
             this._checkButton.ariaLabel = "Mark as not done";
         } else {
             this._classificationContainer.classList.remove('done');
-            this._checkButton.setAttribute("img", "/static/img/square-outline.svg");
+            this._checkButton.setAttribute("img", this._openIcon || '');
             this._checkButton.ariaLabel = "Mark as done";
         }
     }

@@ -28,7 +28,12 @@
     <label-maker document-url="{{ url_for('get_document', document_id=document.id) }}"
         project-url="{{ url_for('get_project', project_id=document.project.id) }}"
         image-url="{{ url_for('get_document_content', document_id=document.id) }}"
-        update-url="{{ url_for('update_label_data', document_id=document.id) }}">
+        update-url="{{ url_for('update_label_data', document_id=document.id) }}"
+        view-icon="{{ url_for('static', path='/img/eye-outline.svg') }}"
+        open-icon="{{ url_for('static', path='/img/square-outline.svg') }}"
+        done-icon="{{ url_for('static', path='/img/checkbox-outline.svg') }}"
+        edit-icon="{{ url_for('static', path='/img/create-outline.svg') }}"
+        delete-icon="{{ url_for('static', path='/img/close-outline.svg') }}">
     </label-maker>
 </main>
 {% endblock %}
