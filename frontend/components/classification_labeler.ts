@@ -152,8 +152,7 @@ export class ClassificationLabeler extends HTMLElement implements Classification
     }
 
     public addCheckButton(): HTMLElement {
-        this._checkButton.setAttribute("img", "/static/img/square-outline.svg");
-        this._checkButton.ariaLabel = "Mark as done";
+        this._updateStatus();
 
         this._buttonsDiv.appendChild(this._checkButton);
 
