@@ -568,7 +568,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                         const button = textLabeler.addTextLabelButton(
                             definition.name,
                             definition.color,
-                            definition.type,
                             false,
                         )
 
