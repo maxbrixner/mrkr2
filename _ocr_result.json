@@ -1,5 +1,5 @@
 {
-    "id": "480bace5-5266-45bd-969e-b27aeae1dd48",
+    "id": "d8327816-2032-4df8-be74-a1607ee04113",
     "items": [
         {
             "id": "dea575a0-6372-46d7-8844-5cf505de9baf",
@@ -3307,6 +3307,23 @@
             "confidence": 99.83238983154297,
             "content": "GmbH",
             "relationships": []
+        },
+        {
+            "id": "ac30fb1b-8a64-4415-bc86-c2a2c13323ec",
+            "type": "block",
+            "left": 0.4724515378475189,
+            "top": 0.020844753831624985,
+            "width": 0.05173315480351448,
+            "height": 0.008691303431987762,
+            "page": 1,
+            "confidence": 43.9697265625,
+            "content": null,
+            "relationships": [
+                {
+                    "type": "child",
+                    "id": "025cd8ec-4552-465d-b536-bd9afc9a7a61"
+                }
+            ]
         },
         {
             "id": "2c090471-df95-4c1a-a763-e630fdca308f",

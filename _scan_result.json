@@ -9,6 +9,18 @@
             "label_status": "open",
             "blocks": [
                 {
+                    "id": "ac30fb1b-8a64-4415-bc86-c2a2c13323ec",
+                    "position": {
+                        "left": 0.4724515378475189,
+                        "top": 0.020844753831624985,
+                        "width": 0.05173315480351448,
+                        "height": 0.008691303431987762
+                    },
+                    "labels": [],
+                    "label_status": "open",
+                    "content": "Internal"
+                },
+                {
                     "id": "2c090471-df95-4c1a-a763-e630fdca308f",
                     "position": {
                         "left": 0.1281638741493225,
@@ -103,78 +115,6 @@
                     "labels": [],
                     "label_status": "open",
                     "content": "einen aktuellen Vertragsauszug\ndie dem Vertrag zu Grunde liegenden Vertragsbedingungen\nAntragskopien und sonstige vertragsrelevante Willenserkl\u00e4rungen des Versicherungsnehmers\neine Schadenauskunft der letzten 5 Jahre (au\u00dfer bei Lebens- und Krankenversicherung)\neine Information \u00fcber etwaige noch offene oder Schadenf\u00e4lle\neine Information ob Beitragsr\u00fcckstand besteht"
-                },
-                {
-                    "id": "b1b984c9-2e39-49a4-b6a1-78c670fc3684",
-                    "position": {
-                        "left": 0.1496480256319046,
-                        "top": 0.4462428092956543,
-                        "width": 0.26276591420173645,
-                        "height": 0.011616288684308529
-                    },
-                    "labels": [],
-                    "label_status": "open",
-                    "content": "einen aktuellen Vertragsauszug"
-                },
-                {
-                    "id": "91505d67-1f88-4b50-9190-90c647e61ade",
-                    "position": {
-                        "left": 0.14964784681797028,
-                        "top": 0.4635326862335205,
-                        "width": 0.4729980528354645,
-                        "height": 0.011921652592718601
-                    },
-                    "labels": [],
-                    "label_status": "open",
-                    "content": "die dem Vertrag zu Grunde liegenden Vertragsbedingungen"
-                },
-                {
-                    "id": "bff6ebba-9a5d-4a8c-9dc2-298477df42f3",
-                    "position": {
-                        "left": 0.14926958084106445,
-                        "top": 0.4814230501651764,
-                        "width": 0.7270987629890442,
-                        "height": 0.012012017890810966
-                    },
-                    "labels": [],
-                    "label_status": "open",
-                    "content": "Antragskopien und sonstige vertragsrelevante Willenserkl\u00e4rungen des Versicherungsnehmers"
-                },
-                {
-                    "id": "91ee831c-5ea1-432b-b418-19882e80194a",
-                    "position": {
-                        "left": 0.1497231274843216,
-                        "top": 0.49923765659332275,
-                        "width": 0.6791563630104065,
-                        "height": 0.012115679681301117
-                    },
-                    "labels": [],
-                    "label_status": "open",
-                    "content": "eine Schadenauskunft der letzten 5 Jahre (au\u00dfer bei Lebens- und Krankenversicherung)"
-                },
-                {
-                    "id": "c01f3538-5496-4f75-9856-73b26abb05f4",
-                    "position": {
-                        "left": 0.14949609339237213,
-                        "top": 0.5173731446266174,
-                        "width": 0.4887266159057617,
-                        "height": 0.011729731224477291
-                    },
-                    "labels": [],
-                    "label_status": "open",
-                    "content": "eine Information \u00fcber etwaige noch offene oder Schadenf\u00e4lle"
-                },
-                {
-                    "id": "0720637e-baee-4591-8ea8-6d10609c6a91",
-                    "position": {
-                        "left": 0.149495929479599,
-                        "top": 0.535312294960022,
-                        "width": 0.3772425055503845,
-                        "height": 0.011689954437315464
-                    },
-                    "labels": [],
-                    "label_status": "open",
-                    "content": "eine Information ob Beitragsr\u00fcckstand besteht"
                 },
                 {
                     "id": "6dcafb9d-f88f-4b69-8dcd-69312283f635",
