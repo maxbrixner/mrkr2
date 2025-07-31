@@ -22,6 +22,17 @@
     <script type="module" src="{{ url_for('static', path='/js/base/message_box.js') }}"></script>
     {% block scripts %}
     {% endblock %}
+
+    <style>
+        @font-face {
+            font-family: 'Geist';
+            font-style: normal;
+            font-weight: 100 900;
+            font-display: block;
+            src: local('Geist'),
+            url('{{ url_for("static", path="/font/Geist-VariableFont_wght.ttf") }}') format('woff2'),
+        }
+    </style>
 </head>
 
 <body>

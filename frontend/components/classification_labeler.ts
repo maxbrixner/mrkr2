@@ -1,6 +1,6 @@
 /* -------------------------------------------------------------------------- */
 
-import { LabelButton } from './label_button.js';
+import { LabelButton } from './base/label_button.js';
 import { IconButton } from './base/icon_button.js';
 
 /* -------------------------------------------------------------------------- */
@@ -12,20 +12,32 @@ export interface ClassificationLabelerAttributes {
 
 /* -------------------------------------------------------------------------- */
 
-
 export class ClassificationLabeler extends HTMLElement implements ClassificationLabelerAttributes {
-    public heading?: string = undefined;
-    public done?: boolean = false;
+    protected _done: boolean = false;
     protected _headerDiv: HTMLDivElement = document.createElement('div');
     protected _buttonsDiv: HTMLDivElement = document.createElement('div');
     protected _titleDiv: HTMLSpanElement = document.createElement('div');
     protected _classificationContainer: HTMLDivElement = document.createElement('div');
-    protected _checkButton?: IconButton = new IconButton();
+    protected _checkButton: IconButton = new IconButton();
+    protected _viewButton: IconButton = new IconButton();
     protected _style: HTMLStyleElement = document.createElement('style');
 
-    /**
-     * Creates an instance of LabelFragment.
-     */
+    get heading(): string {
+        return this._titleDiv.textContent || '';
+    }
+
+    set heading(value: string) {
+        this.setAttribute('heading', value);
+    }
+
+    get done(): boolean {
+        return this._done;
+    }
+
+    set done(value: boolean) {
+        this.setAttribute('done', String(value));
+    }
+
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -33,51 +45,29 @@ export class ClassificationLabeler extends HTMLElement implements Classification
         this._populateShadowRoot();
     }
 
-    /**
-     * Returns an array of attribute names that this component observes.
-     */
     static get observedAttributes() {
         return ['heading', 'done'];
     }
 
-    /**
-     * Handles changes to the attributes of the component.
-     */
-    attributeChangedCallback(
-        propertyName: string,
-        oldValue: string | null,
-        newValue: string | null) {
+    attributeChangedCallback(propertyName: string, oldValue: string | null, newValue: string | null) {
         if (oldValue === newValue) return;
 
         if (propertyName === 'heading') {
-            this.heading = newValue || undefined;
-            this._titleDiv.textContent = this.heading || "Label Element";
+            this._titleDiv.textContent = newValue || "Label Element";
         } else if (propertyName === 'done') {
-            this.done = newValue === 'true';
+            this._done = newValue === 'true';
             this._updateStatus();
         }
     }
 
-    /**
-     * Called when the component is added to the DOM.
-     */
     connectedCallback() {
-        this._populateShadowRoot();
-
-        this._updateStatus();
-
+        // ...
     }
 
-    /**
-     * Called when the component is removed from the DOM.
-     */
     disconnectedCallback() {
         // ...
     }
 
-    /**
-     * Populates the shadow root with the component's structure.
-     */
     protected _populateShadowRoot() {
         if (!this.shadowRoot) {
             throw new Error("Shadow Root is not initialized.");
@@ -85,8 +75,8 @@ export class ClassificationLabeler extends HTMLElement implements Classification
 
         this._style.textContent = `
             :host {
-                border: 1px solid var(--label-fragment-border-color);
-                border-radius: var(--label-fragment-border-radius);
+                border: 1px solid var(--labeler-border-color);
+                border-radius: var(--labeler-border-radius);
                 display: grid;
                 grid-auto-rows: min-content;
                 user-select: none;
@@ -94,12 +84,11 @@ export class ClassificationLabeler extends HTMLElement implements Classification
 
             .header {
                 align-items: center;
-                background-color: var(--label-fragment-title-background-color);
-                color: var(--label-fragment-title-color);
                 display: grid;
                 gap: 1rem;
                 grid-template-columns: 1fr auto;
                 padding: 0.5em;
+                user-select: none;
             }
 
             .buttons {
@@ -108,6 +97,7 @@ export class ClassificationLabeler extends HTMLElement implements Classification
                 gap: 0.5rem;
                 grid-auto-columns: min-content;
                 grid-auto-flow: column;
+                user-select: none;
             }
 
             .title {
@@ -115,15 +105,17 @@ export class ClassificationLabeler extends HTMLElement implements Classification
                 font-size: 0.9rem;
                 overflow: hidden;
                 text-overflow: ellipsis;
+                user-select: none;
                 white-space: nowrap;
             }
 
             .classification-container {
-                border-top: 1px solid var(--label-fragment-border-color);
+                border-top: 1px solid var(--labeler-border-color);
                 display: flex;
                 flex-wrap: wrap;
                 gap: 0.5em;
                 padding: 0.5em;
+                user-select: none;
             }
 
             .done {
@@ -141,7 +133,6 @@ export class ClassificationLabeler extends HTMLElement implements Classification
         this.shadowRoot?.appendChild(this._headerDiv);
 
         this._titleDiv.className = "title";
-        this._titleDiv.textContent = this.heading || "Label Element";
         this._headerDiv.appendChild(this._titleDiv);
 
         this._buttonsDiv.className = "buttons";
@@ -151,41 +142,24 @@ export class ClassificationLabeler extends HTMLElement implements Classification
         this.shadowRoot?.appendChild(this._classificationContainer);
     }
 
-    /**
-     * Adds a view button to the classification container.
-     */
     public addViewButton(): HTMLElement {
-        const button = new IconButton();
-        button.setAttribute("img", "/static/img/eye-outline.svg");
-        button.ariaLabel = "View in document";
+        this._viewButton.setAttribute("img", "/static/img/eye-outline.svg");
+        this._viewButton.ariaLabel = "View in document";
 
-        this._buttonsDiv.appendChild(button);
+        this._buttonsDiv.appendChild(this._viewButton);
 
-        return (button);
+        return (this._viewButton);
     }
 
-    /**
-     * Adds a view button to the classification container.
-     */
     public addCheckButton(): HTMLElement {
-        if (!this._checkButton) {
-            throw new Error("Check button is not defined.");
-        }
+        this._updateStatus();
 
         this._buttonsDiv.appendChild(this._checkButton);
 
         return (this._checkButton);
     }
 
-    /**
-     * Adds a label button to the classification container.
-     */
-    public addClassificationButton(
-        name: string,
-        color: string,
-        type: 'classification_single' | 'classification_multiple',
-        active: boolean
-    ): HTMLElement {
+    public addClassificationButton(name: string, color: string, type: 'classification_single' | 'classification_multiple', active: boolean): HTMLElement {
         const button = new LabelButton();
         button.setAttribute("color", color);
         button.setAttribute("name", name);
@@ -204,43 +178,43 @@ export class ClassificationLabeler extends HTMLElement implements Classification
         return (button);
     }
 
-    public toggleDone(): boolean {
-
-        if (!this._classificationContainer) {
-            throw new Error("Classification container is not defined.");
-        }
-
-        if (!this._checkButton) {
-            throw new Error("Check button is not defined.");
-        }
-
-        if (!this._classificationContainer.classList.contains('done')) {
+    protected _updateStatus(): void {
+        if (this._done) {
             this._classificationContainer.classList.add('done');
             this._checkButton.setAttribute("img", "/static/img/checkbox-outline.svg");
             this._checkButton.ariaLabel = "Mark as not done";
-            return true;
         } else {
             this._classificationContainer.classList.remove('done');
             this._checkButton.setAttribute("img", "/static/img/square-outline.svg");
             this._checkButton.ariaLabel = "Mark as done";
-            return false;
         }
-
     }
 
-    protected _updateStatus(): void {
-        if (!this._checkButton)
-            return;
+    public disableButtons(): void {
+        const buttons = this._classificationContainer.querySelectorAll('label-button');
+        buttons.forEach((button) => {
+            if (button instanceof LabelButton) {
+                button.setAttribute("disabled", "true");
+            }
+        });
+    }
 
-        if (this.done) {
-            this._classificationContainer.classList.add('done');
-            this._checkButton.setAttribute("img", "/static/img/checkbox-outline.svg");
-            this._checkButton.ariaLabel = "Mark as not done";
-        } else {
-            this._classificationContainer.classList.remove('done');
-            this._checkButton.setAttribute("img", "/static/img/square-outline.svg");
-            this._checkButton.ariaLabel = "Mark as done";
-        }
+    public enableButtons(): void {
+        const buttons = this._classificationContainer.querySelectorAll('label-button');
+        buttons.forEach((button) => {
+            if (button instanceof LabelButton) {
+                button.removeAttribute("disabled");
+            }
+        });
+    }
+
+    public clearLabelList(): void {
+        const buttons = this._classificationContainer.querySelectorAll('label-button');
+        buttons.forEach((button) => {
+            if (button instanceof LabelButton) {
+                button.setAttribute("active", 'false');
+            }
+        });
     }
 
 }

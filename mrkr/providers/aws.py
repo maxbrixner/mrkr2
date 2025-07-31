@@ -3,13 +3,12 @@
 import boto3
 import re
 import os
-import io
 import logging
 import pydantic
 import datetime
 import asyncio
 import functools
-from typing import Any, AsyncGenerator
+from typing import Any
 
 # ---------------------------------------------------------------------------- #
 
@@ -190,164 +189,5 @@ class AwsSession(boto3.session.Session):
                 aws_session_token=self._temp_credentials.SessionToken
             )
         )
-
-    async def get_async_bucket(self, bucket_name: str) -> Any:
-        """
-        Return an AWS S3 bucket resource wrapper for asynchronous operations.
-        """
-        bucket_name = self.resolve_config(bucket_name)
-
-        resource = await self.get_resource(service_name="s3")
-
-        loop = asyncio.get_running_loop()
-
-        bucket = await loop.run_in_executor(
-            None,
-            functools.partial(
-                resource.Bucket,
-                name=bucket_name
-            )
-        )
-
-        return AsyncBucketWrapper(bucket=bucket)
-
-    async def get_async_textract_client(self) -> Any:
-        """
-        Return an AWS Textract client.
-        """
-        client = await self.get_client(service_name="textract")
-        return AsyncTextractWrapper(textract_client=client)
-
-# ---------------------------------------------------------------------------- #
-
-
-class BucketObjectMetadata(pydantic.BaseModel):
-    content_type: str = pydantic.Field(alias="ContentType")
-    etag: str = pydantic.Field(alias="ETag")
-
-
-class AsyncBucketWrapper():
-    """
-    A wrapper for an AWS S3 bucket to provide an asynchronous interface
-    for file operations.
-    """
-    _bucket: Any
-
-    def __init__(self, bucket: Any) -> None:
-        """
-        Initialize the bucket wrapper with the AWS configuration.
-        """
-        self._bucket = bucket
-
-    async def list_objects(
-        self,
-        prefix: str,
-        max_keys: int = 1000
-    ) -> AsyncGenerator[Any, None]:
-        """
-        List objects in the bucket with the specified prefix.
-        """
-        loop = asyncio.get_running_loop()
-
-        response = await loop.run_in_executor(
-            None,
-            functools.partial(
-                self._bucket.objects.filter,
-                Prefix=prefix,
-                MaxKeys=max_keys
-            )
-        )
-
-        for object in response:
-            yield object
-
-    async def get_object_metadata(
-        self,
-        key: str
-    ) -> BucketObjectMetadata | None:
-        """
-        Retrieve the matadata for an S3 object.
-        """
-        loop = asyncio.get_running_loop()
-
-        matched_object = None
-        async for object in self.list_objects(prefix=key):
-            if object.key == key:
-                matched_object = object
-
-        if matched_object is None:
-            return None
-
-        response = await loop.run_in_executor(
-            None,
-            matched_object.get
-        )
-
-        return BucketObjectMetadata(**(response))
-
-    async def is_file(self, key: str) -> bool:
-        """
-        Check whether an S3 object is a file
-        """
-        metadata = await self.get_object_metadata(key=key)
-
-        if not metadata:
-            return False
-
-        if not metadata.content_type.lower().startswith(
-                "application/x-directory"):
-            return True
-
-        return False
-
-    async def is_folder(self, key: str) -> bool:
-        """
-        Check whether an S3 object is a folder.
-        """
-        key = key.rstrip("/")
-        key += "/"
-
-        metadata = await self.get_object_metadata(key=key)
-
-        if not metadata:
-            return False
-
-        if metadata.content_type.lower().startswith(
-                "application/x-directory"):
-            return True
-
-        return False
-
-    async def download_fileobj(
-        self,
-        key: str,
-        stream: io.BytesIO
-    ) -> None:
-        loop = asyncio.get_running_loop()
-
-        await loop.run_in_executor(
-            None,
-            functools.partial(
-                self._bucket.download_fileobj,
-                Key=key,
-                Fileobj=stream
-            )
-        )
-        stream.seek(0)
-
-# ---------------------------------------------------------------------------- #
-
-
-class AsyncTextractWrapper():
-    """
-    A wrapper for AWS Textract to provide an asynchronous interface.
-    """
-    _client: Any
-
-    def __init__(self, textract_client: Any) -> None:
-        """
-        Initialize the Textract wrapper with the AWS Textract client.
-        """
-        self._client = textract_client
 
 # ---------------------------------------------------------------------------- #

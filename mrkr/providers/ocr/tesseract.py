@@ -6,7 +6,7 @@ import pydantic
 import uuid
 import asyncio
 import functools
-from typing import Any, List, Self
+from typing import List
 
 # ---------------------------------------------------------------------------- #
 
@@ -61,23 +61,6 @@ class TesseractOcrProvider(BaseOcrProvider):
             4: schemas.OcrItemType.line,
             5: schemas.OcrItemType.word
         }
-
-    async def __aenter__(self) -> Self:
-        """
-        Implement this method to initialize the OCR provider.
-        """
-        return self
-
-    async def __aexit__(
-        self,
-        exc_type: Any,
-        exc_value: Any,
-        traceback: Any
-    ) -> None:
-        """
-        Implement this method to clean up resources used by the OCR provider.
-        """
-        pass
 
     async def ocr(self) -> schemas.OcrResultSchema:
         """
@@ -137,13 +120,29 @@ class TesseractOcrProvider(BaseOcrProvider):
             f"{result.line_num[line]}_" \
             f"{result.word_num[line]}"
 
+    def _get_short_line_id(
+        self,
+        result: TesseractResult,
+        line: int
+    ) -> str:
+        """
+        Generate a unique ID for a line based on its attributes.
+        """
+        short_id = f"{result.page_num[line]}" \
+            + f"_{result.block_num[line]}" if result.block_num[line] != 0 else "" \
+            + f"_{result.par_num[line]}" if result.par_num[line] != 0 else "" \
+            + f"_{result.line_num[line]}" if result.line_num[line] != 0 else "" \
+            + f"_{result.word_num[line]}" if result.word_num[line] != 0 else ""
+
+        return short_id
+
     def _get_parent_id(
         self,
         result: TesseractResult,
         line: int
     ) -> str | None:
         """
-        Generate a unique ID for a line based on its attributes.
+        Get the parent ID of a line in the Tesseract result.
         """
         match self._type_map[result.level[line]]:
             case schemas.OcrItemType.page:
@@ -164,6 +163,46 @@ class TesseractOcrProvider(BaseOcrProvider):
                     f"{result.line_num[line]}_0"
             case _:
                 return None
+
+    def _get_children_ids(
+        self,
+        result: TesseractResult,
+        line: int
+    ) -> List[str]:
+        """
+        Get the parent ID of a line in the Tesseract result.
+        """
+        children_ids = []
+        for index in range(len(result.level)):
+            if result.level[index] != result.level[line] + 1:
+                # just return the immediate children to avoid double
+                # counting
+                continue
+
+            if result.level[line] == 1:  # line is a page
+                if result.page_num[index] == result.page_num[line]:
+                    children_ids.append(self._get_line_id(
+                        result=result, line=index))
+            elif result.level[line] == 2:  # line is a block
+                if result.page_num[index] == result.page_num[line] and \
+                   result.block_num[index] == result.block_num[line]:
+                    children_ids.append(self._get_line_id(
+                        result=result, line=index))
+            elif result.level[line] == 3:  # line is a paragraph
+                if result.page_num[index] == result.page_num[line] and \
+                   result.block_num[index] == result.block_num[line] and \
+                        result.par_num[index] == result.par_num[line]:
+                    children_ids.append(self._get_line_id(
+                        result=result, line=index))
+            elif result.level[line] == 4:  # line is a line
+                if result.page_num[index] == result.page_num[line] and \
+                   result.block_num[index] == result.block_num[line] and \
+                   result.par_num[index] == result.par_num[line] and \
+                   result.line_num[index] == result.line_num[line]:
+                    children_ids.append(self._get_line_id(
+                        result=result, line=index))
+
+        return children_ids
 
     def _create_item_map(
         self,
@@ -192,33 +231,29 @@ class TesseractOcrProvider(BaseOcrProvider):
         """
         Convert the Tesseract OCR result to the target schema.
         """
-        type_map = {
-            1: schemas.OcrItemType.page,
-            2: schemas.OcrItemType.block,
-            3: schemas.OcrItemType.paragraph,
-            4: schemas.OcrItemType.line,
-            5: schemas.OcrItemType.word
-        }
         item_map = self._create_item_map(result=result)
 
         items = []
         for i in range(len(result.level)):
             id = self._get_line_id(result=result, line=i)
-            parent_id = self._get_parent_id(result=result, line=i)
 
-            if parent_id:
-                relationships = [
+            children = self._get_children_ids(
+                result=result,
+                line=i
+            )
+
+            relationships = []
+            for child in children:
+                relationships.append(
                     schemas.OcrRelationshipSchema(
                         type=schemas.OcrRelationshipType.child,
-                        id=item_map[parent_id]
+                        id=item_map[child]
                     )
-                ]
-            else:
-                relationships = []
+                )
 
             item = schemas.OcrItemSchema(
                 id=item_map[id],
-                type=type_map[result.level[i]],
+                type=self._type_map[result.level[i]],
                 page=page,
                 left=round(result.left[i] / dimensions[0], 5),
                 top=round(result.top[i] / dimensions[1], 5),
@@ -226,7 +261,7 @@ class TesseractOcrProvider(BaseOcrProvider):
                 height=round(result.height[i] / dimensions[1], 5),
                 confidence=result.conf[i] if result.conf[i] != -1 else None,
                 content=result.text[i] if len(result.text[i]) > 0 else None,
-                relationships=relationships,
+                relationships=relationships
             )
 
             items.append(item)

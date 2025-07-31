@@ -4,17 +4,26 @@ import pathlib
 import logging
 import asyncio
 import io
-from typing import AsyncGenerator, Optional
+import pydantic
+import functools
+from typing import Any, AsyncGenerator, Optional
 
 # ---------------------------------------------------------------------------- #
 
 import mrkr.schemas as schemas
 from .base import BaseFileProvider
-from ..aws import AwsSession, AsyncBucketWrapper
+from ..aws import AwsSession
 
 # ---------------------------------------------------------------------------- #
 
 logger = logging.getLogger("mrkr.providers.file")
+
+# ---------------------------------------------------------------------------- #
+
+
+class BucketObjectMetadata(pydantic.BaseModel):
+    content_type: str = pydantic.Field(alias="ContentType")
+    etag: str = pydantic.Field(alias="ETag")
 
 # ---------------------------------------------------------------------------- #
 
@@ -25,12 +34,10 @@ class S3FileProvider(BaseFileProvider):
     """
     _config: schemas.FileProviderS3ConfigSchema
     _session: AwsSession | None
-    _bucket: AsyncBucketWrapper | None
+    _bucket: Any | None
 
     def __init__(self, config: schemas.FileProviderS3ConfigSchema):
         super().__init__(config=config)
-
-        aws_config = schemas.AwsConfigSchema(**self._config.model_dump())
 
         self._session = None
         self._bucket = None
@@ -53,7 +60,18 @@ class S3FileProvider(BaseFileProvider):
         if self._bucket is None:
             raise Exception("Bucket not initialized.")
 
-        return await self._bucket.is_file(key=str(self.filename))
+        key = str(self.filename)
+
+        metadata = await self._get_object_metadata(key=key)
+
+        if not metadata:
+            return False
+
+        if not metadata.content_type.lower().startswith(
+                "application/x-directory"):
+            return True
+
+        return False
 
     @property
     async def is_folder(self) -> bool:
@@ -64,7 +82,18 @@ class S3FileProvider(BaseFileProvider):
         if self._bucket is None:
             raise Exception("Bucket not initialized.")
 
-        return await self._bucket.is_folder(key=str(self.filename))
+        key = str(self.filename).rstrip("/") + "/"
+
+        metadata = await self._get_object_metadata(key=key)
+
+        if not metadata:
+            return False
+
+        if metadata.content_type.lower().startswith(
+                "application/x-directory"):
+            return True
+
+        return False
 
     async def read(
         self,
@@ -86,8 +115,7 @@ class S3FileProvider(BaseFileProvider):
 
         try:
             stream = io.BytesIO()
-            await self._bucket.download_fileobj(
-                key=str(self.filename),
+            await self._download_fileobj(
                 stream=stream
             )
 
@@ -119,24 +147,100 @@ class S3FileProvider(BaseFileProvider):
         if not await self.is_folder:
             raise Exception(f"Object '{self.filename}' is not a folder.")
 
-        async for object in self._bucket.list_objects(prefix=str(self.filename)):
-            if object.key.endswith("/"):
-                continue
+        loop = asyncio.get_running_loop()
 
-            filename = pathlib.Path(object.key).name
-            yield filename
+        key = str(self.filename).rstrip("/") + "/"
+
+        response = await loop.run_in_executor(
+            None,
+            functools.partial(
+                self._bucket.objects.filter,
+                Prefix=key
+            )
+        )
+
+        for object in response:
+            if object.key.endswith('/'):
+                continue
+            yield object.key[len(str(self.filename))+1:]
 
     async def refresh_bucket(self) -> None:
         """
         Refresh the S3 bucket if needed.
         """
+        aws_config = schemas.AwsS3ConfigSchema(**self._config.model_dump())
+
         if self._session is None:
-            aws_config = schemas.AwsConfigSchema(**self._config.model_dump())
             self._session = AwsSession(config=aws_config)
 
         if self._bucket is None:
-            self._bucket = await self._session.get_async_bucket(
-                bucket_name=self._config.aws_bucket_name)
+            resource = await self._session.get_resource(service_name="s3")
 
+            loop = asyncio.get_running_loop()
+
+            self._bucket = await loop.run_in_executor(
+                None,
+                functools.partial(
+                    resource.Bucket,
+                    name=self._session.resolve_config(
+                        aws_config.aws_bucket_name)
+                )
+            )
+
+    async def _get_object_metadata(
+        self,
+        key: str
+    ) -> BucketObjectMetadata | None:
+        """
+        Retrieve the matadata for an S3 object.
+        """
+        loop = asyncio.get_running_loop()
+
+        await self.refresh_bucket()
+        if self._bucket is None:
+            raise Exception("Bucket not initialized.")
+
+        response = await loop.run_in_executor(
+            None,
+            functools.partial(
+                self._bucket.objects.filter,
+                Prefix=key
+            )
+        )
+
+        matched_object = None
+        for object in response:
+            if object.key == key:
+                matched_object = object
+
+        if matched_object is None:
+            return None
+
+        response = await loop.run_in_executor(
+            None,
+            matched_object.get
+        )
+
+        return BucketObjectMetadata(**(response))
+
+    async def _download_fileobj(
+        self,
+        stream: io.BytesIO
+    ) -> None:
+        loop = asyncio.get_running_loop()
+
+        await self.refresh_bucket()
+        if self._bucket is None:
+            raise Exception("Bucket not initialized.")
+
+        await loop.run_in_executor(
+            None,
+            functools.partial(
+                self._bucket.download_fileobj,
+                Key=str(self.filename),
+                Fileobj=stream
+            )
+        )
+        stream.seek(0)
 
 # ---------------------------------------------------------------------------- #

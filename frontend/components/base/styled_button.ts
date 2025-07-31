@@ -113,6 +113,10 @@ export class StyledButton extends HTMLElement implements StyledButtonAttributes 
                 color: var(--styled-button-color-disabled, #888888);
                 cursor: not-allowed;
             }
+
+            button:not(:disabled):focus {
+                outline: var(--styled-button-focus-outline, 2px solid #000000);
+            }
         `;
 
         this.shadowRoot.appendChild(style);
@@ -134,11 +138,6 @@ export class StyledButton extends HTMLElement implements StyledButtonAttributes 
                     border-color: var(--styled-button-border-color-primary, #000000);
                     color: var(--styled-button-color-primary, #000000);
                 }
-
-                button:not(:disabled):hover,
-                button:not(:disabled):focus {
-                    border-color: var(--styled-button-border-color-hover-primary, #000000);
-                }
             `;
                 break;
             case 'inherit':
@@ -148,11 +147,6 @@ export class StyledButton extends HTMLElement implements StyledButtonAttributes 
                     border-color: transparent;
                     color: inherit;
                 }
-
-                button:not(:disabled):hover,
-                button:not(:disabled):focus {
-                    border-color: inherit;
-                }
             `;
                 break;
             default:
@@ -161,11 +155,6 @@ export class StyledButton extends HTMLElement implements StyledButtonAttributes 
                         background-color: var(--styled-button-background-color, #ffffff);
                         border-color: var(--styled-button-border-color, #000000);
                         color: var(--styled-button-color, #000000);
-                    }
-
-                    button:not(:disabled):hover,
-                    button:not(:disabled):focus {
-                        border-color: var(--styled-button-border-color-hover, #000000);
                     }
                 `;
                 break;

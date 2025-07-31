@@ -289,14 +289,14 @@ def _get_item_children(
     Return a list of children for an OCR item.
     """
     result = []
-    for item in ocr_result.items:
-        if item.id == ocr_item.id:
+    for relationship in ocr_item.relationships:
+        if relationship.type != schemas.OcrRelationshipType.child:
             continue
 
-        for relationship in item.relationships:
-            if relationship.type == schemas.OcrRelationshipType.child \
-                    and relationship.id == ocr_item.id:
+        for item in ocr_result.items:
+            if item.id == relationship.id:
                 result.append(item)
+                break
 
     return result
 
@@ -344,6 +344,26 @@ def _get_item_content(
 # ---------------------------------------------------------------------------- #
 
 
+def _get_ocr_item_parents(
+    ocr_result: schemas.OcrResultSchema,
+    ocr_item: schemas.OcrItemSchema
+) -> List[schemas.OcrItemSchema]:
+    """
+    Return a list of parent items for a given OCR item.
+    """
+    parents = []
+    for item in ocr_result.items:
+        for relationship in item.relationships:
+            if relationship.type == schemas.OcrRelationshipType.child and \
+                    relationship.id == ocr_item.id:
+                parents.append(item)
+                break
+
+    return parents
+
+# ---------------------------------------------------------------------------- #
+
+
 def _initialize_label_blocks(
     ocr_result: schemas.OcrResultSchema,
     page: int
@@ -357,6 +377,19 @@ def _initialize_label_blocks(
             continue
 
         if item.page != page:
+            continue
+
+        parents = _get_ocr_item_parents(
+            ocr_result=ocr_result,
+            ocr_item=item
+        )
+
+        # Do not include blocks that are children of other blocks.
+        # In Textract, a line can be the child of a page and a layout block,
+        # which would lead to duplicate blocks in the label data.
+        if any(
+            [parent.type == schemas.OcrItemType.block for parent in parents]
+        ):
             continue
 
         result.append(

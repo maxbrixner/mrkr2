@@ -55,6 +55,15 @@ class AwsS3ConfigSchema(AwsConfigSchema):
 # ---------------------------------------------------------------------------- #
 
 
+class AwsTextractConfigSchema(AwsConfigSchema):
+    """
+    Base configuration schema for AWS Textract via boto3.
+    """
+    pass
+
+# ---------------------------------------------------------------------------- #
+
+
 class FileProviderType(str, enum.Enum):
     """
     Enum for project file provider types.
@@ -164,8 +173,11 @@ class OcrProviderTextractConfigSchema(OcrProviderConfigSchema, AwsConfigSchema):
     """
     Configuration for the AWS Textract OCR provider.
     """
-    pass
-
+    image_format: str = pydantic.Field(
+        default="JPEG",
+        description="The image format to use when sending images to Textract.",
+        examples=["JPEG"]
+    )
 # ---------------------------------------------------------------------------- #
 
 
