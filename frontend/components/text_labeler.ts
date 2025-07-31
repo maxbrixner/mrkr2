@@ -7,7 +7,8 @@ import { ClassificationLabeler, ClassificationLabelerAttributes } from './classi
 /* -------------------------------------------------------------------------- */
 
 export interface TextLabelerAttributes extends ClassificationLabelerAttributes {
-    // ...
+    editIcon?: string
+    deleteIcon?: string
 }
 
 /* -------------------------------------------------------------------------- */
@@ -25,6 +26,47 @@ export class TextLabeler extends ClassificationLabeler implements Classification
     private _textContainer: HTMLDivElement = document.createElement('div');
     private _textLabelListContainer: HTMLDivElement = document.createElement('div');
     private _editButton = new IconButton();
+    private _editIcon?: string = undefined;
+    private _deleteIcon?: string = undefined;
+
+    get editIcon(): string {
+        return this._editIcon || '';
+    }
+
+    set editIcon(value: string) {
+        this.setAttribute('edit-icon', value);
+    }
+
+    get deleteIcon(): string {
+        return this._deleteIcon || '';
+    }
+
+    set deleteIcon(value: string) {
+        this.setAttribute('delete-icon', value);
+    }
+
+    static get observedAttributes() {
+        return [...super.observedAttributes, 'edit-icon', 'delete-icon'];
+    }
+
+    attributeChangedCallback(propertyName: string, oldValue: string | null, newValue: string | null) {
+        if (oldValue === newValue) return;
+        super.attributeChangedCallback(propertyName, oldValue, newValue);
+
+        if (propertyName === 'editIcon') {
+            this._titleDiv.textContent = newValue || "Label Element";
+        } else if (propertyName === 'done') {
+            this._done = newValue === 'true';
+            this._updateStatus();
+        } else if (propertyName === 'viewIcon') {
+            this._viewIcon = newValue || '';
+            this._viewButton.setAttribute('img', this._viewIcon);
+        } else if (propertyName === 'edit-icon') {
+            this._editIcon = newValue || '';
+        } else if (propertyName === 'delete-icon') {
+            this._deleteIcon = newValue || '';
+        }
+    }
 
     constructor() {
         super();
@@ -118,7 +160,7 @@ export class TextLabeler extends ClassificationLabeler implements Classification
     }
 
     public addEditButton(): HTMLElement {
-        this._editButton.setAttribute("img", "/static/img/create-outline.svg");
+        this._editButton.setAttribute("img", this._editIcon || '');
         this._editButton.ariaLabel = "Edit text";
 
         this._buttonsDiv.appendChild(this._editButton);
@@ -157,7 +199,7 @@ export class TextLabeler extends ClassificationLabeler implements Classification
         labelContent.textContent = content;
 
         const deleteButton = new IconButton();
-        deleteButton.setAttribute("img", "/static/img/close-outline.svg");
+        deleteButton.setAttribute("img", this._deleteIcon || '');
 
         labelListItem.appendChild(labelName);
         labelListItem.appendChild(labelContent);
