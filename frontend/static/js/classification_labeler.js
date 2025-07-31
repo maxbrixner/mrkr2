@@ -33,7 +33,7 @@ export class ClassificationLabeler extends HTMLElement {
         if (oldValue === newValue)
             return;
         if (propertyName === 'heading') {
-            this._titleDiv.textContent = this.heading || "Label Element";
+            this._titleDiv.textContent = newValue || "Label Element";
         }
         else if (propertyName === 'done') {
             this._done = newValue === 'true';
@@ -105,7 +105,6 @@ export class ClassificationLabeler extends HTMLElement {
         this._headerDiv.className = "header";
         this.shadowRoot?.appendChild(this._headerDiv);
         this._titleDiv.className = "title";
-        this._titleDiv.textContent = this.heading || "Label Element";
         this._headerDiv.appendChild(this._titleDiv);
         this._buttonsDiv.className = "buttons";
         this._headerDiv.appendChild(this._buttonsDiv);
