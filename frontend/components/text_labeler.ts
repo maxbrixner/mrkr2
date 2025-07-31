@@ -224,6 +224,16 @@ export class TextLabeler extends ClassificationLabeler implements Classification
             endOffset = endContainer.textContent.length;
         }
 
+        if (endContainer.nodeType !== Node.TEXT_NODE) {
+            endContainer = endContainer.childNodes[endOffset] || endContainer;
+            endOffset = 0;
+        }
+
+        if (!textNodes.includes(startContainer) || !textNodes.includes(endContainer)) {
+            throw new Error("Start or end container is not a text node in the text container.");
+            return null;
+        }
+
         let startReached = false;
         let endReached = false;
         let start = 0;
