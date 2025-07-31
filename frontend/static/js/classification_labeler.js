@@ -2,6 +2,9 @@ import { LabelButton } from './base/label_button.js';
 import { IconButton } from './base/icon_button.js';
 export class ClassificationLabeler extends HTMLElement {
     _done = false;
+    _viewIcon = undefined;
+    _openIcon = undefined;
+    _doneIcon = undefined;
     _headerDiv = document.createElement('div');
     _buttonsDiv = document.createElement('div');
     _titleDiv = document.createElement('div');
@@ -21,13 +24,31 @@ export class ClassificationLabeler extends HTMLElement {
     set done(value) {
         this.setAttribute('done', String(value));
     }
+    get viewIcon() {
+        return this._viewIcon || '';
+    }
+    set viewIcon(value) {
+        this.setAttribute('view-icon', value);
+    }
+    get openIcon() {
+        return this._openIcon || '';
+    }
+    set openIcon(value) {
+        this.setAttribute('open-icon', value);
+    }
+    get doneIcon() {
+        return this._doneIcon || '';
+    }
+    set doneIcon(value) {
+        this.setAttribute('done-icon', value);
+    }
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
         this._populateShadowRoot();
     }
     static get observedAttributes() {
-        return ['heading', 'done'];
+        return ['heading', 'done', 'view-icon', 'open-icon', 'done-icon'];
     }
     attributeChangedCallback(propertyName, oldValue, newValue) {
         if (oldValue === newValue)
@@ -38,6 +59,16 @@ export class ClassificationLabeler extends HTMLElement {
         else if (propertyName === 'done') {
             this._done = newValue === 'true';
             this._updateStatus();
+        }
+        else if (propertyName === 'view-icon') {
+            this._viewIcon = newValue || '';
+            this._viewButton.setAttribute('img', this._viewIcon);
+        }
+        else if (propertyName === 'open-icon') {
+            this._openIcon = newValue || '';
+        }
+        else if (propertyName === 'done-icon') {
+            this._doneIcon = newValue || '';
         }
     }
     connectedCallback() {
@@ -112,7 +143,7 @@ export class ClassificationLabeler extends HTMLElement {
         this.shadowRoot?.appendChild(this._classificationContainer);
     }
     addViewButton() {
-        this._viewButton.setAttribute("img", "/static/img/eye-outline.svg");
+        this._viewButton.setAttribute("img", this._viewIcon || '');
         this._viewButton.ariaLabel = "View in document";
         this._buttonsDiv.appendChild(this._viewButton);
         return (this._viewButton);
@@ -139,12 +170,12 @@ export class ClassificationLabeler extends HTMLElement {
     _updateStatus() {
         if (this._done) {
             this._classificationContainer.classList.add('done');
-            this._checkButton.setAttribute("img", "/static/img/checkbox-outline.svg");
+            this._checkButton.setAttribute("img", this._doneIcon || '');
             this._checkButton.ariaLabel = "Mark as not done";
         }
         else {
             this._classificationContainer.classList.remove('done');
-            this._checkButton.setAttribute("img", "/static/img/square-outline.svg");
+            this._checkButton.setAttribute("img", this._openIcon || '');
             this._checkButton.ariaLabel = "Mark as done";
         }
     }

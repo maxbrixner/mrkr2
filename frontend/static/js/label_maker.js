@@ -20,13 +20,18 @@ class LabelMaker extends HTMLElement {
     _blockTab = undefined;
     _pageLabelers = {};
     _submitButton = undefined;
+    _viewIcon = undefined;
+    _openIcon = undefined;
+    _doneIcon = undefined;
+    _editIcon = undefined;
+    _deleteIcon = undefined;
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
         this._populateShadowRoot();
     }
     static get observedAttributes() {
-        return ['document-url', 'project-url', 'image-url', 'update-url'];
+        return ['document-url', 'project-url', 'image-url', 'update-url', 'view-icon', 'open-icon', 'done-icon', 'edit-icon', 'delete-icon'];
     }
     attributeChangedCallback(propertyName, oldValue, newValue) {
         if (oldValue === newValue)
@@ -44,6 +49,21 @@ class LabelMaker extends HTMLElement {
         }
         else if (propertyName === 'update-url') {
             this.updateUrl = newValue || undefined;
+        }
+        else if (propertyName === 'view-icon') {
+            this._viewIcon = newValue || '';
+        }
+        else if (propertyName === 'open-icon') {
+            this._openIcon = newValue || '';
+        }
+        else if (propertyName === 'done-icon') {
+            this._doneIcon = newValue || '';
+        }
+        else if (propertyName === 'edit-icon') {
+            this._editIcon = newValue || '';
+        }
+        else if (propertyName === 'delete-icon') {
+            this._deleteIcon = newValue || '';
         }
     }
     connectedCallback() {
@@ -210,6 +230,9 @@ class LabelMaker extends HTMLElement {
         }
         const classificationLabeler = new ClassificationLabeler();
         classificationLabeler.setAttribute('heading', 'Document');
+        classificationLabeler.viewIcon = this._viewIcon || '';
+        classificationLabeler.openIcon = this._openIcon || '';
+        classificationLabeler.doneIcon = this._doneIcon || '';
         if (this._document.data.label_status === 'done') {
             classificationLabeler.setAttribute('done', 'true');
         }
@@ -238,6 +261,9 @@ class LabelMaker extends HTMLElement {
         for (const page of this._document.data.pages) {
             const classificationLabeler = new ClassificationLabeler();
             classificationLabeler.setAttribute('heading', `Page ${page.page}`);
+            classificationLabeler.viewIcon = this._viewIcon || '';
+            classificationLabeler.openIcon = this._openIcon || '';
+            classificationLabeler.doneIcon = this._doneIcon || '';
             this._pageLabelers[page.page] = classificationLabeler;
             this._pageTab.appendChild(classificationLabeler);
             if (page.label_status === 'done') {
@@ -270,6 +296,11 @@ class LabelMaker extends HTMLElement {
                 const highlight = this._documentViewer.addHighlight(page.page, block.position.left, block.position.top, block.position.width, block.position.height, `Block ${block.id}`, block.id);
                 const textLabeler = new TextLabeler();
                 textLabeler.setAttribute('heading', `Block`);
+                textLabeler.viewIcon = this._viewIcon || '';
+                textLabeler.openIcon = this._openIcon || '';
+                textLabeler.doneIcon = this._doneIcon || '';
+                textLabeler.editIcon = this._editIcon || '';
+                textLabeler.deleteIcon = this._deleteIcon || '';
                 this._blockTab?.appendChild(textLabeler);
                 if (block.label_status === 'done') {
                     textLabeler.setAttribute('done', 'true');

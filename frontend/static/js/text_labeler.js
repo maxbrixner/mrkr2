@@ -6,6 +6,45 @@ export class TextLabeler extends ClassificationLabeler {
     _textContainer = document.createElement('div');
     _textLabelListContainer = document.createElement('div');
     _editButton = new IconButton();
+    _editIcon = undefined;
+    _deleteIcon = undefined;
+    get editIcon() {
+        return this._editIcon || '';
+    }
+    set editIcon(value) {
+        this.setAttribute('edit-icon', value);
+    }
+    get deleteIcon() {
+        return this._deleteIcon || '';
+    }
+    set deleteIcon(value) {
+        this.setAttribute('delete-icon', value);
+    }
+    static get observedAttributes() {
+        return [...super.observedAttributes, 'edit-icon', 'delete-icon'];
+    }
+    attributeChangedCallback(propertyName, oldValue, newValue) {
+        if (oldValue === newValue)
+            return;
+        super.attributeChangedCallback(propertyName, oldValue, newValue);
+        if (propertyName === 'editIcon') {
+            this._titleDiv.textContent = newValue || "Label Element";
+        }
+        else if (propertyName === 'done') {
+            this._done = newValue === 'true';
+            this._updateStatus();
+        }
+        else if (propertyName === 'viewIcon') {
+            this._viewIcon = newValue || '';
+            this._viewButton.setAttribute('img', this._viewIcon);
+        }
+        else if (propertyName === 'edit-icon') {
+            this._editIcon = newValue || '';
+        }
+        else if (propertyName === 'delete-icon') {
+            this._deleteIcon = newValue || '';
+        }
+    }
     constructor() {
         super();
         this._populateChildShadowRoot();
@@ -89,7 +128,7 @@ export class TextLabeler extends ClassificationLabeler {
         return (this._textContainer);
     }
     addEditButton() {
-        this._editButton.setAttribute("img", "/static/img/create-outline.svg");
+        this._editButton.setAttribute("img", this._editIcon || '');
         this._editButton.ariaLabel = "Edit text";
         this._buttonsDiv.appendChild(this._editButton);
         return (this._editButton);
@@ -117,7 +156,7 @@ export class TextLabeler extends ClassificationLabeler {
         const labelContent = document.createElement("span");
         labelContent.textContent = content;
         const deleteButton = new IconButton();
-        deleteButton.setAttribute("img", "/static/img/close-outline.svg");
+        deleteButton.setAttribute("img", this._deleteIcon || '');
         labelListItem.appendChild(labelName);
         labelListItem.appendChild(labelContent);
         labelListItem.appendChild(deleteButton);
