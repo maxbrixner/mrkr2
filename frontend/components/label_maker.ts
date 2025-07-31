@@ -854,11 +854,10 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         return (event: Event) => {
             event.stopPropagation();
 
-            // todo: deactivate the label buttons
             associatedLabeler.disableButtons();
 
             // clear the label list in place
-            associatedBlock.labels.length = 0; // todo: only remove text labels, not classification? Otherwise also unactivate the classification buttons!
+            associatedBlock.labels.length = 0;
             associatedLabeler.addText(this._formatBlockText(associatedBlock, labelDefinitions));
 
             associatedLabeler.makeTextEditable(this._onBlockTextBlur(associatedBlock, associatedLabeler, labelDefinitions));
@@ -874,8 +873,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         return (text: string) => {
             associatedBlock.labels.length = 0; // todo: only remove text labels, not classification? Otherwise also unactivate the classification buttons!
             associatedBlock.content = text.trim();
-
-            // todo: reactivate the label buttons
 
             // for good measure
             associatedLabeler.addText(this._formatBlockText(associatedBlock, labelDefinitions));
@@ -911,7 +908,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                     if (success) {
                         (document.querySelector('message-box') as MessageBox)?.showMessage(`Label data submitted successfully.`, 'info');
                     } else {
-                        // todo: show error message
                         (document.querySelector('message-box') as MessageBox)?.showMessage(`Unable to submit label data.`, 'error', 'Server Error');
                     }
                 })

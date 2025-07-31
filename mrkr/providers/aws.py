@@ -3,13 +3,12 @@
 import boto3
 import re
 import os
-import io
 import logging
 import pydantic
 import datetime
 import asyncio
 import functools
-from typing import Any, AsyncGenerator
+from typing import Any
 
 # ---------------------------------------------------------------------------- #
 

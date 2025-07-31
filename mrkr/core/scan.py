@@ -100,8 +100,6 @@ async def scan_project(
                 ocr_provider=ocr_provider
             )
 
-            return
-
         logger.debug(f"Scan of project {project_id} successful.")
     except Exception as exception:
         logger.exception(exception)
@@ -270,6 +268,12 @@ async def _create_document_data(
         labels=[]
     )
 
+    # todo
+    import pathlib
+    import json
+    with pathlib.Path("_scan_result.json").open("w", encoding="utf-8") as file:
+        json.dump(label_content.model_dump(), file, indent=4)
+
     crud.update_document_data_and_status(
         session=session,
         document=document,
@@ -291,14 +295,14 @@ def _get_item_children(
     Return a list of children for an OCR item.
     """
     result = []
-    for item in ocr_result.items:
-        if item.id == ocr_item.id:
+    for relationship in ocr_item.relationships:
+        if relationship.type != schemas.OcrRelationshipType.child:
             continue
 
-        for relationship in item.relationships:
-            if relationship.type == schemas.OcrRelationshipType.child \
-                    and relationship.id == ocr_item.id:
+        for item in ocr_result.items:
+            if item.id == relationship.id:
                 result.append(item)
+                break
 
     return result
 
