@@ -1,6 +1,6 @@
 # Mrkr
 
-A tool to label pages, blocks and text within images and PDF files.
+A tool to label pages, blocks, and text within images and PDF files.
 
 The backend is built with FastAPI, and the frontend uses WebComponents written in TypeScript.
 
@@ -29,7 +29,7 @@ Create an environment file:
 cp .env.example .env
 ```
 
-Install Poppler, Tesseract and any required language packs. A an example, for Arch Linux use:
+Install Poppler, Tesseract and any required language packs. As an example, for Arch Linux use:
 
 ```bash
 sudo pacman -S poppler tesseract tesseract-data-eng tesseract-data-deu
@@ -47,7 +47,7 @@ Alternatively, in Visual Studio Code, press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kb
 
 ### 1.3. Start the Test Database
 
-Add a database password to the `.env` file.  
+Set a database password in the ``.env`` file.
 Use Docker Compose to start the test database. The configuration is located in the `.deploy` folder.
 
 Alternatively, in Visual Studio Code, you can use `Terminal > Run Task` to execute the `build dev database` and `run dev database` tasks.
@@ -122,7 +122,7 @@ with sdk.MrkrClient(url="http://localhost:8000") as client:
     # ...
 ```
 
-You may pass further arguments to the client:
+You may pass additional arguments to the client:
 
 |Argument|Description|
 |-|-|
@@ -146,31 +146,7 @@ with sdk.MrkrClient(url="http://localhost:8000") as client:
     print("users:", users)
 ```
 
-#### 2.2.2. List Projects
-
-List all projects:
-
-```python
-import mrkr.sdk as sdk
-
-with sdk.MrkrClient(url="http://localhost:8000") as client:
-    projects = client.list_projects()
-    print("projects:", projects)
-```
-
-#### 2.2.3 List Documents
-
-List the documents of a project:
-
-```python
-import mrkr.sdk as sdk
-
-with sdk.MrkrClient(url="http://localhost:8000") as client:
-    documents = client.list_documents(project_id=1)
-    print("documents:", documents)
-```
-
-#### 2.2.4. Create a User
+#### 2.2.2. Create a User
 
 Create a new user:
 
@@ -187,7 +163,74 @@ with sdk.MrkrClient(url="http://localhost:8000") as client:
     )
 ```
 
-#### 2.2.5. Create a Project
+Instead of passing a dictionary, you can also use ``sdk.schemas.UserCreateSchema`` to get type hints.
+
+#### 2.2.3. List Projects
+
+List all projects:
+
+```python
+import mrkr.sdk as sdk
+
+with sdk.MrkrClient(url="http://localhost:8000") as client:
+    projects = client.list_projects()
+    print("projects:", projects)
+```
+
+#### 2.2.4. List Documents
+
+List the documents of a project:
+
+```python
+import mrkr.sdk as sdk
+
+with sdk.MrkrClient(url="http://localhost:8000") as client:
+    documents = client.list_documents(project_id=1)
+    print("documents:", documents)
+```
+
+#### 2.2.5. Export a Project (with configurations)
+
+Export a project including its configuration:
+
+```python
+import mrkr.sdk as sdk
+
+with sdk.MrkrClient(url="http://localhost:8000") as client:
+    project = client.get_project(project_id=1)
+    print(f"Project name: {project.name}")
+    print(f"Project config: {project.config}")
+```
+
+#### 2.2.6. Update a Project's Name
+
+Update the name of a project:
+
+```python
+with sdk.MrkrClient(url="http://localhost:8000") as client:
+    client.update_project_name(project_id=1, name="New Name")
+```
+
+#### 2.2.7. Export a Document (with labels)
+
+Export a document including its labels:
+
+```python
+import mrkr.sdk as sdk
+
+with sdk.MrkrClient(url="http://localhost:8000") as client:
+    document = client.get_document(document_id=1)
+    print(f"Document Labels: {document.data.labels}")
+
+    for page in document.data.pages:
+        print(f"Page {page.page} labels: {page.labels}")
+
+        for block in page.blocks:
+            print(f"Block contents: {block.content}")
+            print(f"Block labels: {block.labels}")
+```
+
+#### 2.2.8. Create a Project
 
 Create a new project:
 
@@ -245,11 +288,85 @@ with sdk.MrkrClient(url="http://localhost:8000") as client:
                 }
             }
         }
+    )
 ```
 
-Instead of passing a dictionary, you can also use ``sdk.ProjectCreateSchema`` to get type hints.
+Instead of passing a dictionary, you can also use ``sdk.schemas.ProjectCreateSchema`` to get type hints.
 
-A label can have the following **targets**:
+#### 2.3. Update a Project's Configuration
+
+Update the configuration of a project:
+
+```python
+with sdk.MrkrClient(url="http://localhost:8000") as client:
+    client.update_project_configuration(
+        project_id=1,
+        config={
+            "label_definitions": [
+                {
+                    "type": "classification_single",
+                    "target": "document",
+                    "name": "Letter",
+                    "color": "#4CAF50"
+                },
+                {
+                    "type": "classification_single",
+                    "target": "document",
+                    "name": "Email",
+                    "color": "#2196F3"
+                },
+                {
+                    "type": "classification_multiple",
+                    "target": "page",
+                    "name": "Cover Page",
+                    "color": "#FF9800"
+                },
+                {
+                    "type": "classification_multiple",
+                    "target": "page",
+                    "name": "Attachment",
+                    "color": "#F44336"
+                },
+                {
+                    "type": "text",
+                    "target": "block",
+                    "name": "Name",
+                    "color": "#607D8B"
+                },
+                {
+                    "type": "text",
+                    "target": "block",
+                    "name": "IBAN",
+                    "color": "#8BC34A"
+                },
+                {
+                    "type": "text",
+                    "target": "block",
+                    "name": "Street",
+                    "color": "#3F51B5"
+                }
+            ],
+            "file_provider": {
+                "type": "local",
+                "config": {
+                    "path": "demo",
+                    "pdf_dpi": 200,
+                    "image_format": "WebP"
+                }
+            },
+            "ocr_provider": {
+                "type": "tesseract",
+                "config": {
+                    "language": "eng"
+                }
+            }
+        }
+    )
+```
+
+Instead of passing a dictionary, you can also use ``sdk.schemas.ProjectConfigSchema`` to get type hints.
+
+A label can **target** the following:
 
 |Target|Description|
 |-|-|
@@ -261,22 +378,24 @@ A label can have the following **types**:
 
 |Type|Description|
 |-|-|
-|classification_single|A classification label that unselects all other labels for its target once it is selected|
+|classification_single|A classification label that deselects all other labels for its target when selected.|
 |classification_multiple|A classification label that allows other classification labels for the same target|
 |text|A label that targets a substring within a block|
 
-Text labels can only target blocks!
+Note: text labels can only target blocks.
 
 The following file providers are available:
 
 |Type|Description|Configuration|
 |-|-|-|
-|local|Serves local files from a folder, e.g. within the Docker container|Expects a ``path`` config variable|
+|local|Serves local files from a folder, e.g. within the Docker container|Requires a ``path`` configuration variable|
+|s3|Serves files from an AWS S3 bucket|Requires ``path``, ``aws_access_key_id``, ``aws_secret_access_key``, ``aws_region_name``, ``aws_account_id``, ``aws_role_name``, ``aws_bucket_name`` configuration variables|
 
-All file providers expect a ``pdf_dpi`` (defaults to 200) and an ``image_format`` (defaults to JPEG).
+All file providers require a ``pdf_dpi`` (default: 200) and an ``image_format`` (default: JPEG).
 
 The following OCR providers are available:
 
 |Type|Description|Configuration|
 |-|-|-|
-|tesseract|Uses Google's tesseract for OCR.|Expects a ``language`` config variable, e.g. ``eng``or ``deu``|
+|tesseract|Uses Google's tesseract for OCR.|Requires a ``language`` configuration variable, e.g., ``eng`` or ``deu``|
+|textract|Uses AWS's textract for OCR|Requires ``aws_access_key_id``, ``aws_secret_access_key``, ``aws_region_name``, ``aws_account_id``, ``aws_role_name``, ``aws_bucket_name`` configuration variables|

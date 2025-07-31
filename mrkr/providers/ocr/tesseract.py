@@ -6,8 +6,7 @@ import pydantic
 import uuid
 import asyncio
 import functools
-from typing import Any, List, Optional, Self
-from PIL import Image
+from typing import Any, List, Self
 
 # ---------------------------------------------------------------------------- #
 
@@ -63,26 +62,9 @@ class TesseractOcrProvider(BaseOcrProvider):
             5: schemas.OcrItemType.word
         }
 
-    async def __aenter__(self) -> Self:
-        """
-        Implement this method to initialize the OCR provider.
-        """
-        return self
-
-    async def __aexit__(
-        self,
-        exc_type: Any,
-        exc_value: Any,
-        traceback: Any
-    ) -> None:
-        """
-        Implement this method to clean up resources used by the OCR provider.
-        """
-        pass
-
     async def ocr(self) -> schemas.OcrResultSchema:
         """
-        Implement this method to perform OCR on the file and return the result.
+        Perform OCR on the file and return the result.
         """
         items = []
         for page, image in enumerate(self._images):

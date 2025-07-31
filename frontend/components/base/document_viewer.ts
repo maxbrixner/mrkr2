@@ -43,12 +43,17 @@ interface PageContentSchema {
 /* -------------------------------------------------------------------------- */
 
 export class DocumentViewer extends HTMLElement implements DocumentViewerAttributes {
-    public url: string | undefined;
+    private _url: string = '';
     private _pages: { [page: number]: HTMLButtonElement } = {};
 
-    /**
-     * Creates an instance of LabelMaker.
-     */
+    get url(): string {
+        return this.getAttribute('url') || '';
+    }
+
+    set url(value: string) {
+        this.setAttribute('url', value || '');
+    }
+
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -56,43 +61,28 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         this._populateShadowRoot();
     }
 
-    /**
-     * Returns an array of attribute names that this component observes.
-     */
     static get observedAttributes() {
         return ["url"];
     }
 
-    /**
-     * Handles changes to the attributes of the component.
-     */
     attributeChangedCallback(propertyName: string, oldValue: string | null, newValue: string | null) {
         if (oldValue === newValue) return;
 
         if (propertyName === 'url') {
-            this.url = newValue || undefined;
+            this._url = newValue || '';
             this._reset()
             this._addPages();
         }
     }
 
-    /**
-     * Called when the component is added to the DOM.
-     */
     connectedCallback() {
         // ...
     }
 
-    /**
-     * Called when the component is removed from the DOM.
-     */
     disconnectedCallback() {
         // ...
     }
 
-    /**
-     * Populates the shadow root with the component's structure.
-     */
     private _populateShadowRoot() {
         if (!this.shadowRoot) {
             throw new Error("Shadow Root is not initialized.");
@@ -161,14 +151,14 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
 
            :host(.loading)::before {
                 animation: spin 1s linear infinite;    
-                border: 4px solid var(--spinner-color, #000000);
+                border: var(--spinner-border-large) solid var(--spinner-color, #000000);
                 border-radius: 50%; 
-                border-top: 4px solid var(--spinner-color-top, #ffffff);
+                border-top: var(--spinner-border-large) solid var(--spinner-color-top, #ffffff);
                 content: "";
                 display: block;
-                height: 30px;
+                height: var(--spinner-size-large, 30px);
                 margin: 2rem auto;
-                width: 30px;
+                width: var(--spinner-size-large, 30px);
             }
 
             @keyframes spin {
@@ -200,23 +190,17 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
             }
         `
 
-        this.shadowRoot?.appendChild(style);
+        this.shadowRoot.appendChild(style);
 
         this.classList.add('loading');
     }
 
-    /**
-     * Resets the viewer by clearing the content and preparing for a new document.
-     */
     private _reset() {
         this.innerHTML = '';
         this.classList.add('loading');
         this._pages = {};
     }
 
-    /**
-     * Queries the content of the document and adds pages to the viewer.
-     */
     private _addPages() {
         this._queryContent()
             .then((content: PageContentSchema[]) => {
@@ -233,9 +217,6 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
             });
     }
 
-    /**
-     * Dispatches a custom event indicating that pages have been created.
-     */
     private _dispatchPagesCreatedEvent() {
         this.dispatchEvent(new CustomEvent<PagesCreatedEvent>('pages-created', {
             detail: {},
@@ -244,9 +225,6 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         }));
     }
 
-    /**
-     * Adds a single page to the viewer.
-     */
     private _addPage(page: number, aspect_ratio: number, format: string, content: string) {
         if (!this.shadowRoot) {
             throw new Error("Shadow Root is not initialized.");
@@ -280,9 +258,6 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         return this._pages[page];
     }
 
-    /**
-     * Dispatches a custom event when a page is clicked.
-     */
     private _dispatchPageClickedEvent(page: number) {
         this.dispatchEvent(new CustomEvent<PageClickedEvent>('page-clicked', {
             detail: {
@@ -293,9 +268,6 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         }));
     }
 
-    /**
-     * Adds a highlight to a specific page in the document viewer.
-     */
     public addHighlight(
         page: number,
         left: number,
@@ -328,9 +300,6 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         return (highlightElement);
     }
 
-    /**
-     * Dispatches a custom event when a highlight is clicked.
-     */
     private _dispatchHighlightClickedEvent(id: string) {
         this.dispatchEvent(new CustomEvent<HighlightClickedEvent>('highlight-clicked', {
             detail: {
@@ -341,9 +310,6 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         }));
     }
 
-    /**
-     * Returns the MIME type based on the image format.
-     */
     private _getMimeFromFormat(format: string): string {
         switch (format.toLowerCase()) {
             case 'jpeg':
@@ -360,15 +326,12 @@ export class DocumentViewer extends HTMLElement implements DocumentViewerAttribu
         }
     }
 
-    /**
-     * Queries the content of the document and returns it as an array of PageContentSchema.
-     */
     private async _queryContent(): Promise<PageContentSchema[]> {
-        if (!this.url) {
+        if (!this._url) {
             throw new Error("URL is not set for DocumentViewer");
         }
 
-        const response = await fetch(this.url);
+        const response = await fetch(this._url);
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }

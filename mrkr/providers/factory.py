@@ -1,12 +1,12 @@
-from typing import Callable, Type
-
 # ---------------------------------------------------------------------------- #
 
 import mrkr.schemas as schemas
 from .file.base import BaseFileProvider
 from .file.local import LocalFileProvider
+from .file.s3 import S3FileProvider
 from .ocr.base import BaseOcrProvider
 from .ocr.tesseract import TesseractOcrProvider
+from .ocr.textract import TextractOcrProvider
 
 # ---------------------------------------------------------------------------- #
 
@@ -28,6 +28,17 @@ def get_file_provider(
                 )
 
             return LocalFileProvider(
+                config=project_config.file_provider.config)
+        case schemas.FileProviderType.s3:
+            if not isinstance(
+                project_config.file_provider.config,
+                schemas.FileProviderS3ConfigSchema
+            ):
+                raise ValueError(
+                    "S3 file provider was configured incorrectly."
+                )
+
+            return S3FileProvider(
                 config=project_config.file_provider.config)
         case _:
             raise ValueError(
@@ -55,6 +66,17 @@ def get_ocr_provider(
                 )
 
             return TesseractOcrProvider(
+                config=project_config.ocr_provider.config)
+        case schemas.OcrProviderType.textract:
+            if not isinstance(
+                project_config.ocr_provider.config,
+                schemas.OcrProviderTextractConfigSchema
+            ):
+                raise ValueError(
+                    "Textract OCR provider was configured incorrectly."
+                )
+
+            return TextractOcrProvider(
                 config=project_config.ocr_provider.config)
         case _:
             raise ValueError(

@@ -113,3 +113,42 @@ def get_project(
     return session.get(models.Project, id)
 
 # ---------------------------------------------------------------------------- #
+
+
+def update_project_configuration(
+    session: sqlmodel.Session,
+    project: models.Project,
+    config: schemas.ProjectConfigSchema | Dict,
+) -> models.Project:
+    """
+    Update a documents label data and status in the database.
+    """
+    if isinstance(config, schemas.ProjectConfigSchema):
+        config = config.model_dump()
+
+    project.config = config
+
+    session.add(project)
+    session.commit()
+    session.refresh(project)
+    return project
+
+# ---------------------------------------------------------------------------- #
+
+
+def update_project_name(
+    session: sqlmodel.Session,
+    project: models.Project,
+    name: str
+) -> models.Project:
+    """
+    Update a project's name.
+    """
+    project.name = name
+
+    session.add(project)
+    session.commit()
+    session.refresh(project)
+    return project
+
+# ---------------------------------------------------------------------------- #

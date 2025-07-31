@@ -8,6 +8,62 @@ from typing import Optional, List, Self
 # ---------------------------------------------------------------------------- #
 
 
+class AwsConfigSchema(pydantic.BaseModel):
+    """
+    Base configuration schema for AWS via boto3.
+    """
+    aws_access_key_id: str = pydantic.Field(
+        ...,
+        description="The AWS access key for S3.",
+        examples=["AKIAIOSFODNN7EXAMPLE"]
+    )
+    aws_account_id: str = pydantic.Field(
+        ...,
+        description="The AWS account ID for the S3 bucket.",
+        examples=["123456789012"]
+    )
+    aws_region_name: str = pydantic.Field(
+        ...,
+        description="The AWS region where the S3 bucket is located.",
+        examples=["us-west-2"]
+    )
+    aws_role_name: str = pydantic.Field(
+        ...,
+        description="The AWS IAM role name for accessing the S3 bucket.",
+        examples=["S3AccessRole"]
+    )
+    aws_secret_access_key: str = pydantic.Field(
+        ...,
+        description="The AWS secret access key for S3.",
+        examples=["wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"]
+    )
+
+
+# ---------------------------------------------------------------------------- #
+
+
+class AwsS3ConfigSchema(AwsConfigSchema):
+    """
+    Base configuration schema for AWS S3 via boto3.
+    """
+    aws_bucket_name: str = pydantic.Field(
+        ...,
+        description="The name of the S3 bucket.",
+        examples=["my-s3-bucket"]
+    )
+
+# ---------------------------------------------------------------------------- #
+
+
+class AwsTextractConfigSchema(AwsConfigSchema):
+    """
+    Base configuration schema for AWS Textract via boto3.
+    """
+    pass
+
+# ---------------------------------------------------------------------------- #
+
+
 class FileProviderType(str, enum.Enum):
     """
     Enum for project file provider types.
@@ -45,46 +101,20 @@ class FileProviderLocalConfigSchema(FileProviderConfigSchema):
     """
     Configuration for a local file provider.
     """
-    pass
+    bucket_name: str = pydantic.Field(
+        default="JPEG",
+        description="The image format to use when converting PDF files.",
+        examples=["JPEG"]
+    )
 
 # ---------------------------------------------------------------------------- #
 
 
-class FileProviderS3ConfigSchema(FileProviderConfigSchema):
+class FileProviderS3ConfigSchema(FileProviderConfigSchema, AwsS3ConfigSchema):
     """
     Configuration for an AWS S3 file provider.
     """
-    access_key: str = pydantic.Field(
-        ...,
-        description="The AWS access key for S3.",
-        examples=["AKIAIOSFODNN7EXAMPLE"]
-    )
-    account_id: str = pydantic.Field(
-        ...,
-        description="The AWS account ID for the S3 bucket.",
-        examples=["123456789012"]
-    )
-    bucket: str = pydantic.Field(
-        ...,
-        description="The name of the S3 bucket.",
-        examples=["my-s3-bucket"]
-    )
-    region: str = pydantic.Field(
-        ...,
-        description="The AWS region where the S3 bucket is located.",
-        examples=["us-west-2"]
-    )
-    role_name: str = pydantic.Field(
-        ...,
-        description="The AWS IAM role name for accessing the S3 bucket.",
-        examples=["S3AccessRole"]
-    )
-    secret_access_key: str = pydantic.Field(
-        ...,
-        description="The AWS secret access key for S3.",
-        examples=["wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"]
-    )
-
+    pass
 
 # ---------------------------------------------------------------------------- #
 
@@ -139,36 +169,15 @@ class OcrProviderTesseractConfigSchema(OcrProviderConfigSchema):
 # ---------------------------------------------------------------------------- #
 
 
-class OcrProviderTextractConfigSchema(OcrProviderConfigSchema):
+class OcrProviderTextractConfigSchema(OcrProviderConfigSchema, AwsConfigSchema):
     """
     Configuration for the AWS Textract OCR provider.
     """
-    access_key: str = pydantic.Field(
-        ...,
-        description="The AWS access key for S3.",
-        examples=["AKIAIOSFODNN7EXAMPLE"]
+    image_format: str = pydantic.Field(
+        default="JPEG",
+        description="The image format to use when sending images to Textract.",
+        examples=["JPEG"]
     )
-    account_id: str = pydantic.Field(
-        ...,
-        description="The AWS account ID for the S3 bucket.",
-        examples=["123456789012"]
-    )
-    region: str = pydantic.Field(
-        ...,
-        description="The AWS region where the S3 bucket is located.",
-        examples=["us-west-2"]
-    )
-    role_name: str = pydantic.Field(
-        ...,
-        description="The AWS IAM role name for accessing the S3 bucket.",
-        examples=["TextractRole"]
-    )
-    secret_access_key: str = pydantic.Field(
-        ...,
-        description="The AWS secret access key for S3.",
-        examples=["wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"]
-    )
-
 # ---------------------------------------------------------------------------- #
 
 
@@ -294,6 +303,19 @@ class ProjectSchema(pydantic.BaseModel):
         description="Configuration for the project."
     )
 
+
+# ---------------------------------------------------------------------------- #
+
+
+class UpdateProjectNameSchema(pydantic.BaseModel):
+    """
+    API-Schema for updating a project's name.
+    """
+    name: str = pydantic.Field(
+        ...,
+        description="The new name for the project.",
+        examples=["My Project"]
+    )
 
 # ---------------------------------------------------------------------------- #
 

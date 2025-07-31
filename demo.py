@@ -4,11 +4,12 @@ import mrkr.sdk as sdk
 
 # ---------------------------------------------------------------------------- #
 
-with sdk.MrkrClient(url="https://posit-dev.srv.allianz/mrkr2", log_level="DEBUG") as client:
+
+with sdk.MrkrClient(log_level="DEBUG") as client:
 
     # create demo project
     project_id = client.create_project(
-        name="Demo Project",
+        name="Demo Project 8",
         config={
             "label_definitions": [
                 {
@@ -36,6 +37,12 @@ with sdk.MrkrClient(url="https://posit-dev.srv.allianz/mrkr2", log_level="DEBUG"
                     "color": "#F44336"
                 },
                 {
+                    "type": "classification_multiple",
+                    "target": "block",
+                    "name": "Blub",
+                    "color": "#F44336"
+                },
+                {
                     "type": "text",
                     "target": "block",
                     "name": "Name",
@@ -55,12 +62,12 @@ with sdk.MrkrClient(url="https://posit-dev.srv.allianz/mrkr2", log_level="DEBUG"
                 }
             ],
             "file_provider": {
-                "type": "local",
+                "type": "s3",
                 "config": {
-                    "path": "demo",
+                    "path": "demos",
                     "pdf_dpi": 200,
                     "image_format": "WebP"
-                }
+                },
             },
             "ocr_provider": {
                 "type": "tesseract",
@@ -70,6 +77,8 @@ with sdk.MrkrClient(url="https://posit-dev.srv.allianz/mrkr2", log_level="DEBUG"
             }
         }
     )
+
+    exit(0)
 
     print(f"Created project with ID: {project_id}")
 
@@ -129,20 +138,5 @@ with sdk.MrkrClient(url="https://posit-dev.srv.allianz/mrkr2", log_level="DEBUG"
             "password": "demo_password"
         }
     )
-
-    # list projects
-    projects = client.list_projects()
-    print("projects:", projects)
-
-    # list documents
-    for project in projects:
-        documents = client.list_project_documents(
-            project_id=project.id
-        )
-        print(f"Documents for project {project.name}: {documents}")
-
-    # list users
-    users = client.list_users()
-    print("users:", users)
 
 # ---------------------------------------------------------------------------- #

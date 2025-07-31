@@ -12,9 +12,6 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
     private _slots: HTMLSlotElement[] = [];
     private _tabs: HTMLButtonElement[] = [];
 
-    /**
-     * Creates an instance of the TabContainer component.
-     */
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -22,37 +19,22 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
         this._populateShadowRoot();
     }
 
-    /**
-     * Returns an array of attribute names that this component observes.
-     */
     static get observedAttributes() {
         return [];
     }
 
-    /**
-     * Handles changes to the attributes of the component.
-     */
     attributeChangedCallback() {
         //..
     }
 
-    /**
-     * Called when the component is added to the DOM.
-     */
     connectedCallback() {
         // ...
     }
 
-    /**
-     * Called when the component is removed from the DOM.
-     */
     disconnectedCallback() {
         //..
     }
 
-    /**
-     * Populates the shadow root with the component's structure.
-     */
     private _populateShadowRoot() {
         if (!this.shadowRoot) {
             throw new Error("Shadow Root is not initialized.");
@@ -120,14 +102,14 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
 
            :host(.loading)::before {
                 animation: spin 1s linear infinite;    
-                border: 4px solid var(--spinner-color, #000000);
+                border: var(--spinner-border-large) solid var(--spinner-color, #000000);
                 border-radius: 50%; 
-                border-top: 4px solid var(--spinner-color-top, #ffffff);
+                border-top: var(--spinner-border-large) solid var(--spinner-color-top, #ffffff);
                 content: "";
                 display: block;
-                height: 30px;
+                height: var(--spinner-size-large, 30px);
                 margin: 4rem auto;
-                width: 30px;
+                width: var(--spinner-size-large, 30px);
             }
 
             @keyframes spin {
@@ -146,9 +128,6 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
         this.classList.add('loading');
     }
 
-    /**
-     * Resets the component's state by clearing the tab bar and content elements.
-     */
     private _reset() {
         if (!this.shadowRoot) {
             throw new Error("Shadow Root is not initialized.");
@@ -165,9 +144,6 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
         this.classList.add('loading');
     }
 
-    /**
-     * Updates the tabs in the container.
-     */
     public updateTabs() {
         if (!this.shadowRoot) {
             throw new Error("Shadow Root is not initialized.");
@@ -212,10 +188,6 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
         });
     }
 
-    /**
-     * Handles the click event on a tab button.
-     * This method updates the active slot and tab based on the clicked tab.
-     */
     private _onTabClick(slot: HTMLSlotElement, tab: HTMLButtonElement) {
         this._slots.forEach(slot => {
             slot.classList.remove('active');
@@ -227,9 +199,6 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
         tab.classList.add('active');
     }
 
-    /**
-     * Switches to a specific tab by its slot name.
-     */
     public switchToTab(slotName: string) {
         const slot = this._slots.find(s => s.name === slotName);
         const tab = this._tabs.find(t => t.name === slotName);

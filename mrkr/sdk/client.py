@@ -144,6 +144,15 @@ class MrkrClient():
                     proxies=self.proxies,
                     timeout=self.timeout
                 )
+            case "put":
+                response = requests.put(
+                    url=url,
+                    params=params,
+                    json=json,
+                    cert=self.cert,
+                    proxies=self.proxies,
+                    timeout=self.timeout
+                )
             case _:
                 raise ValueError(f"Unsupported HTTP method: {method}")
 
@@ -202,6 +211,40 @@ class MrkrClient():
             endpoint=f"/project/{project_id}/scan"
         )
 
+    def update_project_name(
+        self,
+        project_id: int,
+        name: schemas.UpdateProjectNameSchema | str
+    ) -> None:
+        """
+        Update the name of a project.
+        """
+        if isinstance(name, str):
+            name = schemas.UpdateProjectNameSchema(name=name)
+
+        self._call_api(
+            method="PUT",
+            endpoint=f"/project/{project_id}/name",
+            json=name.model_dump()
+        )
+
+    def update_project_configuration(
+        self,
+        project_id: int,
+        config: schemas.ProjectConfigSchema | Dict
+    ) -> None:
+        """
+        Update the configuration of a project.
+        """
+        if isinstance(config, dict):
+            config = schemas.ProjectConfigSchema(**config)
+
+        self._call_api(
+            method="PUT",
+            endpoint=f"/project/{project_id}/config",
+            json=config.model_dump()
+        )
+
     def list_projects(
         self
     ) -> List[schemas.ProjectListSchema]:
@@ -228,6 +271,28 @@ class MrkrClient():
         )
         return [schemas.DocumentListSchema.model_validate(item)
                 for item in response.json()]
+
+    def get_project(
+        self,
+        project_id: int
+    ) -> schemas.ProjectSchema:
+        response = self._call_api(
+            method="GET",
+            endpoint=f"/project/{project_id}"
+        )
+
+        return schemas.ProjectSchema(**response.json())
+
+    def get_document(
+        self,
+        document_id: int
+    ) -> schemas.DocumentSchema:
+        response = self._call_api(
+            method="GET",
+            endpoint=f"/document/{document_id}"
+        )
+
+        return schemas.DocumentSchema(**response.json())
 
     def create_user(
         self,
@@ -260,5 +325,6 @@ class MrkrClient():
 
         return [schemas.UserListSchema.model_validate(item)
                 for item in response.json()]
+
 
 # ---------------------------------------------------------------------------- #
