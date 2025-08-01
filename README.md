@@ -185,7 +185,7 @@ List the documents of a project:
 import mrkr.sdk as sdk
 
 with sdk.MrkrClient(url="http://localhost:8000") as client:
-    documents = client.list_documents(project_id=1)
+    documents = client.list_project_documents(project_id=1)
     print("documents:", documents)
 ```
 
