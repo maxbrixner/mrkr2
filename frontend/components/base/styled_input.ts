@@ -2,7 +2,6 @@
 
 export interface StyledInputAttributes {
     autocapitalize?: 'none' | 'off' | 'on' | 'sentences' | 'words';
-    autocorrect?: 'on' | 'off';
     autocomplete?: 'on' | 'off';
     disabled?: boolean;
     type?: 'text' | 'password' | 'email' | 'number' | 'search';
@@ -23,15 +22,6 @@ export class StyledInput extends HTMLElement implements StyledInputAttributes {
 
     set autocapitalize(value: 'none' | 'off' | 'on' | 'sentences' | 'words') {
         this.setAttribute('autocapitalize', value);
-    }
-
-    get autocorrect() {
-        const value = this.getAttribute('autocorrect');
-        return value === 'on' || value === 'off' ? value : 'off';
-    }
-
-    set autocorrect(value: 'on' | 'off') {
-        this.setAttribute('autocorrect', value);
     }
 
     get autocomplete() {
@@ -105,8 +95,6 @@ export class StyledInput extends HTMLElement implements StyledInputAttributes {
 
         if (propertyName === 'autocapitalize') {
             this._InputElement.autocapitalize = newValue as 'none' | 'off' | 'on' | 'sentences' | 'words';
-        } else if (propertyName === 'autocorrect') {
-            this._InputElement.setAttribute('autocorrect', newValue || 'off');
         } else if (propertyName === 'autocomplete') {
             this._InputElement.setAttribute('autocomplete', newValue || 'off');
         } else if (propertyName === 'disabled') {

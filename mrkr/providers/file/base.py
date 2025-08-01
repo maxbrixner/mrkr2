@@ -104,11 +104,16 @@ class BaseFileProvider:
 
         if self.path.lower().endswith('.pdf'):
             images = await self._read_pdf_file(page=page)
-        else:
+        elif self.path.lower().endswith(
+                ('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tif', '.tiff')):
             if not page or page == 1:
                 images = [await self._read_image_file()]
             else:
                 return []
+        else:
+            raise Exception(
+                f"Unsupported file format for image conversion: {self.path}"
+            )
 
         return images
 
