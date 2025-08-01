@@ -161,9 +161,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
     private _editIcon?: string = undefined;
     private _deleteIcon?: string = undefined;
 
-    /**
-     * Creates an instance of LabelMaker.
-     */
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -171,16 +168,10 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         this._populateShadowRoot();
     }
 
-    /**
-     * Returns an array of attribute names that this component observes.
-     */
     static get observedAttributes() {
         return ['document-url', 'project-url', 'image-url', 'update-url', 'view-icon', 'open-icon', 'done-icon', 'edit-icon', 'delete-icon'];
     }
 
-    /**
-     * Handles changes to the attributes of the component.
-     */
     attributeChangedCallback(propertyName: string, oldValue: string | null, newValue: string | null) {
         if (oldValue === newValue) return;
 
@@ -207,9 +198,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         }
     }
 
-    /**
-     * Called when the component is added to the DOM.
-     */
     connectedCallback() {
         this._addEventListeners();
         this._submitButton = document.getElementById('submit_labels') || undefined;
@@ -221,16 +209,10 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         this._submitButton.addEventListener('click', this._onSubmitButtonClick());
     }
 
-    /**
-     * Called when the component is removed from the DOM.
-     */
     disconnectedCallback() {
         this._removeEventListeners();
     }
 
-    /**
-     * Populates the shadow root with the component's structure.
-     */
     private _populateShadowRoot() {
         if (!this.shadowRoot) {
             throw new Error("Shadow Root is not initialized.");
@@ -293,9 +275,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         this.shadowRoot.appendChild(this._resizablePanes);
     }
 
-    /**
-     * Adds event listeners to the component.
-     */
     private _addEventListeners() {
         if (!this.shadowRoot) {
             throw new Error("Shadow Root is not initialized.");
@@ -305,9 +284,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         this.shadowRoot.addEventListener('page-clicked', this._onPageClicked.bind(this));
     }
 
-    /**
-     * Remove event listeners to the component.
-     */
     private _removeEventListeners() {
         if (!this.shadowRoot) {
             throw new Error("Shadow Root is not initialized.");
@@ -317,18 +293,12 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         this.shadowRoot.removeEventListener('page-clicked', this._onPageClicked.bind(this));
     }
 
-    /**
-     * Event listener for 'pages-created' events.
-     */
     private _onPagesCreated(event: Event) {
         event.stopPropagation();
         const customEvent = event as CustomEvent<PagesCreatedEvent>;
         this._queryContent(this._populateContent.bind(this));
     }
 
-    /**
-     * Event listener for 'page-clicked' events.
-     */
     private _onPageClicked(event: Event) {
         event.stopPropagation();
         const customEvent = event as CustomEvent<PageClickedEvent>;
@@ -344,9 +314,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         }, { once: true });
     }
 
-    /**
-     * Queries the document and project content from the specified URLs.
-     */
     private _queryContent(callback: CallableFunction) {
         this._queryDocument()
             .then((document: DocumentSchema) => {
@@ -371,10 +338,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             });
     }
 
-    /**
-     * Populates the content of the document viewer with highlights based on 
-     * the document data.
-     */
     private _populateContent() {
         if (!this._document || !this._project) {
             throw new Error("Document or project data is not available.");
@@ -384,9 +347,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         this._submitButton?.removeAttribute('disabled');
     }
 
-    /**
-     * Adds tabs to the tab container based on the label definitions in the project.
-     */
     private _addTabsToTabContainer() {
         if (!this._document || !this._project) {
             throw new Error("Document or project data is not available.");
@@ -715,9 +675,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
     }
 
-    /**
-     * On click event listener for document highlights.
-     */
     private _onHighlightClick(associatedTab: string, associatedLabeler: HTMLElement): EventListener {
         return (event: Event) => {
             event.stopPropagation();
@@ -732,9 +689,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         }
     }
 
-    /**
-     * On click event listener for classification laben buttons.
-     */
     private _onClassificationLabelButtonClick(associatedLabelList: (LabelSchema | TextLabelSchema)[], labelName: string, labelType: "classification_multiple" | "classification_single"): EventListener {
         return (event: Event) => {
             event.stopPropagation();
@@ -785,9 +739,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         }
     }
 
-    /**
-     * On click event listener for classification laben buttons.
-     */
     private _onTextLabelButtonClick(associatedLabelList: (LabelSchema | TextLabelSchema)[], associatedLabeler: TextLabeler, associatedBlock: BlockLabelDataSchema, labelDefinitions: LabelDefinitionSchema[], labelName: string): EventListener {
         return (event: Event) => {
             event.stopPropagation();
@@ -843,9 +794,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         }
     }
 
-    /**
-     * On click event listener for classification laben buttons.
-     */
     private _onPageViewButtonClick(page: number): EventListener {
         return (event: Event) => {
             event.stopPropagation();
@@ -864,9 +812,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         }
     }
 
-    /**
-     * On click event listener for classification laben buttons.
-     */
     private _onBlockViewButtonClick(associatedViewerElement: HTMLElement): EventListener {
         return (event: Event) => {
             event.stopPropagation();
@@ -880,9 +825,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         }
     }
 
-    /**
-     * On click event listener for classification laben buttons.
-     */
     private _onBlockEditButtonClick(associatedLabeler: TextLabeler, associatedBlock: BlockLabelDataSchema, labelDefinitions: LabelDefinitionSchema[]): EventListener {
         return (event: Event) => {
             event.stopPropagation();
@@ -928,9 +870,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         }
     }
 
-    /**
-     * On click event listener for classification laben buttons.
-     */
     private _onSubmitButtonClick(): EventListener {
         return (event: Event) => {
             event.stopPropagation();
@@ -953,9 +892,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         }
     }
 
-    /**
-     * Fetches document from the specified URL.
-     */
     private async _queryDocument(): Promise<DocumentSchema> {
         if (!this.documentUrl) {
             throw new Error(`Document URL is not set`);
@@ -974,9 +910,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         return content;
     }
 
-    /**
-     * Fetches project from the specified URL.
-     */
     private async _queryProject(): Promise<ProjectSchema> {
         if (!this.projectUrl) {
             throw new Error(`Project URL is not set`);
@@ -995,9 +928,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         return content;
     }
 
-    /**
-     * Updates label data using the label data URL.
-     */
     private async _submitLabelData(): Promise<boolean> {
         if (!this.updateUrl) {
             throw new Error(`Label data update URL is not set`);

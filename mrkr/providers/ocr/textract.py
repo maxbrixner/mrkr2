@@ -124,6 +124,16 @@ class TextractOcrProvider(BaseOcrProvider):
 
         loop = asyncio.get_running_loop()
 
+        if image.mode != "RGB":
+            logger.debug("Converting image to RGB mode for Textract.")
+            image = await loop.run_in_executor(
+                None,
+                functools.partial(
+                    image.convert,
+                    mode="RGB"
+                )
+            )
+
         logger.debug("Calling Textract to analyze the page...")
 
         bytesIO = io.BytesIO()
