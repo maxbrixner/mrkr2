@@ -275,9 +275,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         this.shadowRoot.appendChild(this._resizablePanes);
     }
 
-    /**
-     * Adds event listeners to the component.
-     */
     private _addEventListeners() {
         if (!this.shadowRoot) {
             throw new Error("Shadow Root is not initialized.");
@@ -287,9 +284,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         this.shadowRoot.addEventListener('page-clicked', this._onPageClicked.bind(this));
     }
 
-    /**
-     * Remove event listeners to the component.
-     */
     private _removeEventListeners() {
         if (!this.shadowRoot) {
             throw new Error("Shadow Root is not initialized.");
