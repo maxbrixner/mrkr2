@@ -175,6 +175,10 @@ export class TextLabeler extends ClassificationLabeler {
         if (node.nodeType === Node.TEXT_NODE) {
             textNodes.push(node);
         }
+        else if (node.nodeName === 'BR') {
+            const brTextNode = document.createTextNode('\n');
+            textNodes.push(brTextNode);
+        }
         else if (node.nodeType === Node.ELEMENT_NODE) {
             for (let child of node.childNodes) {
                 textNodes = textNodes.concat(this._getTextNodes(child));

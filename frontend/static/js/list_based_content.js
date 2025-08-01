@@ -95,7 +95,6 @@ export class ListBasedContent extends HTMLElement {
         this._searchInput.type = "search";
         this._searchInput.placeholder = "Filter Projects...";
         this._searchInput.autocomplete = "off";
-        this._searchInput.autocorrect = "off";
         this._searchInput.autocapitalize = "off";
         this._searchInput.spellcheck = false;
         this._searchInput.ariaLabel = "Filter Projects";
