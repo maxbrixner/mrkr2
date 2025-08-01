@@ -7,13 +7,6 @@ export class StyledInput extends HTMLElement {
     set autocapitalize(value) {
         this.setAttribute('autocapitalize', value);
     }
-    get autocorrect() {
-        const value = this.getAttribute('autocorrect');
-        return value === 'on' || value === 'off' ? value : 'off';
-    }
-    set autocorrect(value) {
-        this.setAttribute('autocorrect', value);
-    }
     get autocomplete() {
         const value = this.getAttribute('autocomplete');
         return value === 'on' || value === 'off' ? value : 'off';
@@ -71,9 +64,6 @@ export class StyledInput extends HTMLElement {
             return;
         if (propertyName === 'autocapitalize') {
             this._InputElement.autocapitalize = newValue;
-        }
-        else if (propertyName === 'autocorrect') {
-            this._InputElement.setAttribute('autocorrect', newValue || 'off');
         }
         else if (propertyName === 'autocomplete') {
             this._InputElement.setAttribute('autocomplete', newValue || 'off');
