@@ -89,6 +89,14 @@ def create_app() -> fastapi.FastAPI:
     app.include_router(routerv1)
     app.include_router(routergui)
 
+    app.add_api_route(
+        path="/",
+        endpoint=lambda: fastapi.responses.RedirectResponse(
+            url=app.url_path_for("projects_page"),
+            status_code=fastapi.status.HTTP_302_FOUND),
+        methods=["GET"],
+    )
+
     app.add_exception_handler(
         Exception, exceptions.exception_handler)
     app.add_exception_handler(
