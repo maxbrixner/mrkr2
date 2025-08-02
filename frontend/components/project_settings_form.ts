@@ -9,6 +9,8 @@ import { StyledTextarea } from './base/styled_textarea.js';
 
 interface ProjectSettingsFormAttributes {
     createProjectUrl?: string;
+    existingName?: string;
+    existingConfig?: string;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -26,6 +28,22 @@ export class ProjectSettingsForm extends HTMLElement implements ProjectSettingsF
         this.setAttribute('create-project-url', value || '');
     }
 
+    get existingName(): string {
+        return this._nameInput.value;
+    }
+
+    set existingName(value: string) {
+        this.setAttribute('existing-name', value || '');
+    }
+
+    get existingConfig(): string {
+        return this._configTextarea.value;
+    }
+
+    set existingConfig(value: string) {
+        this.setAttribute('existing-config', value || '');
+    }
+
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -34,7 +52,7 @@ export class ProjectSettingsForm extends HTMLElement implements ProjectSettingsF
     }
 
     static get observedAttributes() {
-        return ['create-project-url'];
+        return ['create-project-url', 'existing-name', 'existing-config'];
     }
 
     attributeChangedCallback(propertyName: string, oldValue: string | null, newValue: string | null) {
@@ -42,8 +60,20 @@ export class ProjectSettingsForm extends HTMLElement implements ProjectSettingsF
 
         if (propertyName === 'create-project-url') {
             this._createProjectUrl = newValue || '';
+        } else if (propertyName === 'existing-name') {
+            console.log('Setting existing name:', newValue);
+            this._nameInput.value = newValue || '';
+        } else if (propertyName === 'existing-config') {
+            console.log('Setting existing config:', newValue);
+            try {
+                const config = JSON.parse(newValue?.replace(/'/g, '"') || '{}');
+                console.log('Setting existing config:', config);
+                this._configTextarea.value = JSON.stringify(config, null, 2);
+            } catch (e) {
+                console.error('Invalid JSON format for existing config:', e);
+                this._configTextarea.value = '';
+            }
         }
-
     }
 
     connectedCallback() {
@@ -136,11 +166,10 @@ export class ProjectSettingsForm extends HTMLElement implements ProjectSettingsF
     private _onConfigInputBlur(event: Event) {
         const config = this._configTextarea.value.trim();
         try {
-            console.log("a")
             JSON.parse(config);
             this._configTextarea.value = JSON.stringify(JSON.parse(config), null, 2);
         } catch (e) {
-            console.log("b")
+            // ...
         }
     }
 
@@ -207,7 +236,7 @@ export class ProjectSettingsForm extends HTMLElement implements ProjectSettingsF
                 }
             } else {
                 if (messageBox) {
-                    messageBox.showMessage(`Unable to create project. This is most likely due to an invalid configuration.`, 'error', 'Server Error');
+                    messageBox.showMessage(`Unable to create project. This is most likely due to an invalid configuration or a project with this name already exists.`, 'error', 'Server Error');
                 }
             }
         }).catch(error => {

@@ -99,3 +99,39 @@ async def create_project_page(
     )
 
 # ---------------------------------------------------------------------------- #
+
+
+@router.get(
+    "/{project_id}/edit",
+    summary="GUI to edit an existing project",
+    response_class=fastapi.responses.HTMLResponse
+)
+async def edit_project_page(
+    project_id: int,
+    request: fastapi.Request,
+    templates: services.TemplatesDependency,
+    session: database.DatabaseDependency
+) -> fastapi.responses.HTMLResponse:
+    """
+    GUI to edit an existing project.
+    """
+    project = crud.get_project(
+        session=session,
+        id=project_id
+    )
+
+    if not project:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
+
+    return templates.TemplateResponse(
+        "edit_project.html",
+        context={
+            "request": request,
+            "project": project
+        }
+    )
+
+# ---------------------------------------------------------------------------- #

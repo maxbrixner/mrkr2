@@ -19,6 +19,7 @@ export class ProjectsContent extends ListBasedContent implements ProjectsContent
     private _projectGuiUrl: string = '';
     private _scanUrl: string = '';
     private _createUrl: string = '';
+    private _editUrl: string = '';
 
     private _scanButton: StyledButton = new StyledButton();
     private _createButton: StyledButton = new StyledButton();
@@ -49,6 +50,14 @@ export class ProjectsContent extends ListBasedContent implements ProjectsContent
         this.setAttribute('create-url', value);
     }
 
+    get editUrl() {
+        return this._editUrl;
+    }
+
+    set editUrl(value: string) {
+        this._editButton.setAttribute('href', value);
+    }
+
     constructor() {
         super();
 
@@ -56,7 +65,7 @@ export class ProjectsContent extends ListBasedContent implements ProjectsContent
     }
 
     static get observedAttributes() {
-        return [...super.observedAttributes, 'project-gui-url', 'scan-url', 'create-url'];
+        return [...super.observedAttributes, 'project-gui-url', 'scan-url', 'create-url', 'edit-url'];
     }
 
     attributeChangedCallback(propertyName: string, oldValue: string | null, newValue: string | null) {
@@ -70,6 +79,8 @@ export class ProjectsContent extends ListBasedContent implements ProjectsContent
             this._scanUrl = newValue || '';
         } else if (propertyName === 'create-url') {
             this._createUrl = newValue || '';
+        } else if (propertyName === 'edit-url') {
+            this._editUrl = newValue || '';
         }
     }
 
@@ -153,7 +164,12 @@ export class ProjectsContent extends ListBasedContent implements ProjectsContent
     }
 
     private _onEditButtonClick(event: Event) {
-        window.location.href = this._createUrl;
+        const selectedRows = this._table.getSelectedRows();
+        console.log(selectedRows);
+        if (selectedRows.length !== 1 || !selectedRows[0] || !selectedRows[0].id) {
+            return;
+        }
+        window.location.href = this._editUrl.replace("[ID]", String(selectedRows[0].id));
     }
 }
 
