@@ -106,14 +106,14 @@ async def create_project_page(
     summary="GUI to edit an existing project",
     response_class=fastapi.responses.HTMLResponse
 )
-async def edit_project_page(
+async def update_project_page(
     project_id: int,
     request: fastapi.Request,
     templates: services.TemplatesDependency,
     session: database.DatabaseDependency
 ) -> fastapi.responses.HTMLResponse:
     """
-    GUI to edit an existing project.
+    GUI to update an existing project.
     """
     project = crud.get_project(
         session=session,
@@ -127,7 +127,7 @@ async def edit_project_page(
         )
 
     return templates.TemplateResponse(
-        "edit_project.html",
+        "update_project.html",
         context={
             "request": request,
             "project": project

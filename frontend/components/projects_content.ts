@@ -19,11 +19,11 @@ export class ProjectsContent extends ListBasedContent implements ProjectsContent
     private _projectGuiUrl: string = '';
     private _scanUrl: string = '';
     private _createUrl: string = '';
-    private _editUrl: string = '';
+    private _updateUrl: string = '';
 
     private _scanButton: StyledButton = new StyledButton();
     private _createButton: StyledButton = new StyledButton();
-    private _editButton: StyledButton = new StyledButton();
+    private _updateButton: StyledButton = new StyledButton();
 
 
     get projectGuiUrl() {
@@ -50,12 +50,12 @@ export class ProjectsContent extends ListBasedContent implements ProjectsContent
         this.setAttribute('create-url', value);
     }
 
-    get editUrl() {
-        return this._editUrl;
+    get updateUrl() {
+        return this._updateUrl;
     }
 
-    set editUrl(value: string) {
-        this._editButton.setAttribute('href', value);
+    set updateUrl(value: string) {
+        this._updateButton.setAttribute('href', value);
     }
 
     constructor() {
@@ -65,7 +65,7 @@ export class ProjectsContent extends ListBasedContent implements ProjectsContent
     }
 
     static get observedAttributes() {
-        return [...super.observedAttributes, 'project-gui-url', 'scan-url', 'create-url', 'edit-url'];
+        return [...super.observedAttributes, 'project-gui-url', 'scan-url', 'create-url', 'update-url'];
     }
 
     attributeChangedCallback(propertyName: string, oldValue: string | null, newValue: string | null) {
@@ -79,8 +79,8 @@ export class ProjectsContent extends ListBasedContent implements ProjectsContent
             this._scanUrl = newValue || '';
         } else if (propertyName === 'create-url') {
             this._createUrl = newValue || '';
-        } else if (propertyName === 'edit-url') {
-            this._editUrl = newValue || '';
+        } else if (propertyName === 'update-url') {
+            this._updateUrl = newValue || '';
         }
     }
 
@@ -109,11 +109,11 @@ export class ProjectsContent extends ListBasedContent implements ProjectsContent
         this._createButton.addEventListener('click', (event: Event) => this._onCreateButtonClick(event));
         this._buttonsDiv.appendChild(this._createButton);
 
-        this._editButton.ariaLabel = "Edit Project";
-        this._editButton.textContent = "Edit";
-        this._editButton.addEventListener('click', (event: Event) => this._onEditButtonClick(event));
-        this._editButton.disabled = true;
-        this._buttonsDiv.appendChild(this._editButton);
+        this._updateButton.ariaLabel = "Update Project";
+        this._updateButton.textContent = "Edit";
+        this._updateButton.addEventListener('click', (event: Event) => this._onupdateButtonClick(event));
+        this._updateButton.disabled = true;
+        this._buttonsDiv.appendChild(this._updateButton);
 
         this._scanButton.ariaLabel = "Schedule Scan";
         this._scanButton.textContent = "Schedule Scan";
@@ -135,7 +135,7 @@ export class ProjectsContent extends ListBasedContent implements ProjectsContent
     protected _onSelectionChanged(event: CustomEvent<SelectionChangedEvent>) {
         const detail = event.detail;
         this._scanButton.disabled = detail.none;
-        this._editButton.disabled = !detail.one;
+        this._updateButton.disabled = !detail.one;
     }
 
     private _onScanButtonClick(event: Event) {
@@ -163,13 +163,13 @@ export class ProjectsContent extends ListBasedContent implements ProjectsContent
         window.location.href = this._createUrl;
     }
 
-    private _onEditButtonClick(event: Event) {
+    private _onupdateButtonClick(event: Event) {
         const selectedRows = this._table.getSelectedRows();
         console.log(selectedRows);
         if (selectedRows.length !== 1 || !selectedRows[0] || !selectedRows[0].id) {
             return;
         }
-        window.location.href = this._editUrl.replace("[ID]", String(selectedRows[0].id));
+        window.location.href = this._updateUrl.replace("[ID]", String(selectedRows[0].id));
     }
 }
 

@@ -23,6 +23,7 @@
 
 {% block main %}
 <main class="settings-main">
-    <project-settings-form create-project-url="{{ url_for('create_project') }}"></project-settings-form>
+    <project-settings-form create-project-url="{{ url_for('create_project') }}"
+        existing="false"></project-settings-form>
 </main>
 {% endblock %}

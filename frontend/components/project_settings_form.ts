@@ -1,7 +1,6 @@
 /* -------------------------------------------------------------------------- */
 
 import { MessageBox } from './base/message_box.js';
-import { StyledButton } from './base/styled_button.js';
 import { StyledInput } from './base/styled_input.js';
 import { StyledTextarea } from './base/styled_textarea.js';
 
@@ -9,16 +8,20 @@ import { StyledTextarea } from './base/styled_textarea.js';
 
 interface ProjectSettingsFormAttributes {
     createProjectUrl?: string;
+    updateProjectConfigUrl?: string;
     existingName?: string;
     existingConfig?: string;
+    existing?: boolean;
 }
 
 /* -------------------------------------------------------------------------- */
 
 export class ProjectSettingsForm extends HTMLElement implements ProjectSettingsFormAttributes {
     private _createProjectUrl: string = '';
+    private _updateProjectConfigUrl: string = '';
     private _nameInput: StyledInput = new StyledInput();
     private _configTextarea: StyledTextarea = new StyledTextarea();
+    private _existing: boolean = false;
 
     get createProjectUrl(): string {
         return this._createProjectUrl;
@@ -26,6 +29,14 @@ export class ProjectSettingsForm extends HTMLElement implements ProjectSettingsF
 
     set createProjectUrl(value: string) {
         this.setAttribute('create-project-url', value || '');
+    }
+
+    get updateProjectConfigUrl(): string {
+        return this._updateProjectConfigUrl;
+    }
+
+    set updateProjectConfigUrl(value: string) {
+        this.setAttribute('update-project-config-url', value || '');
     }
 
     get existingName(): string {
@@ -44,6 +55,14 @@ export class ProjectSettingsForm extends HTMLElement implements ProjectSettingsF
         this.setAttribute('existing-config', value || '');
     }
 
+    get existing(): boolean {
+        return this._existing;
+    }
+
+    set existing(value: boolean) {
+        this.setAttribute('existing', String(value));
+    }
+
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -52,7 +71,7 @@ export class ProjectSettingsForm extends HTMLElement implements ProjectSettingsF
     }
 
     static get observedAttributes() {
-        return ['create-project-url', 'existing-name', 'existing-config'];
+        return ['create-project-url', 'update-project-config-url', 'existing-name', 'existing-config', 'existing'];
     }
 
     attributeChangedCallback(propertyName: string, oldValue: string | null, newValue: string | null) {
@@ -60,6 +79,8 @@ export class ProjectSettingsForm extends HTMLElement implements ProjectSettingsF
 
         if (propertyName === 'create-project-url') {
             this._createProjectUrl = newValue || '';
+        } else if (propertyName === 'update-project-config-url') {
+            this._updateProjectConfigUrl = newValue || '';
         } else if (propertyName === 'existing-name') {
             console.log('Setting existing name:', newValue);
             this._nameInput.value = newValue || '';
@@ -73,6 +94,14 @@ export class ProjectSettingsForm extends HTMLElement implements ProjectSettingsF
                 console.error('Invalid JSON format for existing config:', e);
                 this._configTextarea.value = '';
             }
+        } else if (propertyName === 'existing') {
+            this._existing = newValue === 'true';
+            if (this._existing) {
+                this._nameInput.disabled = true;
+            } else {
+                this._nameInput.disabled = false;
+                this._configTextarea.disabled = false;
+            }
         }
     }
 
@@ -82,6 +111,7 @@ export class ProjectSettingsForm extends HTMLElement implements ProjectSettingsF
         this._configTextarea.addEventListener('blur', this._onConfigInputBlur.bind(this));
 
         document.getElementById('create-project-button')?.addEventListener('click', this._onCreateProjectButtonClick.bind(this));
+        document.getElementById('update-project-button')?.addEventListener('click', this._onUpdateProjectButtonClick.bind(this));
     }
 
     disconnectedCallback() {
@@ -90,6 +120,7 @@ export class ProjectSettingsForm extends HTMLElement implements ProjectSettingsF
         this._configTextarea.removeEventListener('blur', this._onConfigInputBlur.bind(this));
 
         document.getElementById('create-project-button')?.removeEventListener('click', this._onCreateProjectButtonClick.bind(this));
+        document.getElementById('update-project-button')?.removeEventListener('click', this._onUpdateProjectButtonClick.bind(this));
     }
 
     private _populateShadowRoot() {
@@ -211,16 +242,15 @@ export class ProjectSettingsForm extends HTMLElement implements ProjectSettingsF
     }
 
     private _onCreateProjectButtonClick() {
+        if (this._existing) {
+            return;
+        }
         if (!this._validate(true)) {
             return;
         }
-
         const name = this._nameInput.value.trim();
         const config = this._configTextarea.value.trim();
-
         const messageBox = document.querySelector('message-box') as MessageBox;
-
-        console.log(this._createProjectUrl)
 
         fetch(this._createProjectUrl, {
             method: 'POST',
@@ -242,7 +272,38 @@ export class ProjectSettingsForm extends HTMLElement implements ProjectSettingsF
         }).catch(error => {
             messageBox?.showMessage(`Unable to create project. This is most likely due to a network error.`, 'error', error.message);
         });
+    }
 
+    private _onUpdateProjectButtonClick() {
+        if (!this._existing) {
+            return;
+        }
+        if (!this._validate(true)) {
+            return;
+        }
+        const config = this._configTextarea.value.trim();
+        const messageBox = document.querySelector('message-box') as MessageBox;
+
+        fetch(this._updateProjectConfigUrl, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(JSON.parse(this._configTextarea.value))
+
+        }).then(response => {
+            if (response.ok) {
+                if (messageBox) {
+                    messageBox.showMessage(`Project has been updated successfully.`, 'success');
+                }
+            } else {
+                if (messageBox) {
+                    messageBox.showMessage(`Unable to update project. This is most likely due to an invalid configuration.`, 'error', 'Server Error');
+                }
+            }
+        }).catch(error => {
+            messageBox?.showMessage(`Unable to update project. This is most likely due to a network error.`, 'error', error.message);
+        });
     }
 
 }
