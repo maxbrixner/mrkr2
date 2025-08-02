@@ -51,7 +51,7 @@ Issues = "https://github.com/maxbrixner/mrkr2/issues"
 dev = [
   "build>=1.2.2",
   "mypy>=1.15.0",
-  "setuptools>=68.0.0",
+  "setuptools>=80.9.0",
 ]
 
 [tool.setuptools]
