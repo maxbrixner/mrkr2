@@ -111,6 +111,8 @@ async def update_label_data(
     """
     Update the label data for the document.
     """
+    import time
+    time.sleep(1)  # Simulate a delay for the sake of example
     document = crud.get_document(session=session, id=document_id)
 
     if not document:

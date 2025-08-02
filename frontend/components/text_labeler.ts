@@ -2,6 +2,7 @@
 
 import { LabelButton } from './base/label_button.js';
 import { IconButton } from './base/icon_button.js';
+import { MessageBox } from './base/message_box.js';
 import { ClassificationLabeler, ClassificationLabelerAttributes } from './classification_labeler.js';
 
 /* -------------------------------------------------------------------------- */
@@ -275,7 +276,8 @@ export class TextLabeler extends ClassificationLabeler implements Classification
         }
 
         if (!textNodes.includes(startContainer) || !textNodes.includes(endContainer)) {
-            throw new Error("Start or end container is not a text node in the text container.");
+            (document.querySelector('message-box') as MessageBox)?.showMessage(`Invalid selection.`, 'error');
+            return null;
         }
 
         let startReached = false;
@@ -339,7 +341,6 @@ export class TextLabeler extends ClassificationLabeler implements Classification
         }
     }
 
-    /* todo */
     public makeTextEditable(onBlurCallback: CallableFunction | null = null): void {
         this._textContainer.contentEditable = 'true';
         this._textContainer.focus();
@@ -351,22 +352,12 @@ export class TextLabeler extends ClassificationLabeler implements Classification
             this._textContainer.contentEditable = 'false';
 
             let text = "";
-            const spanNodes = this._textContainer.childNodes;
-            for (let spanNode of spanNodes) {
-                const textNodes = spanNode.childNodes;
-
-                // in empty nodes, if user adds text, the text idiotically gets inserted before the span.
-                if (spanNode.nodeType == Node.TEXT_NODE) {
-                    text += spanNode.textContent;
-                    continue;
-                }
-
-                for (let textNode of textNodes) {
-                    if (textNode.nodeType !== Node.TEXT_NODE) {
-                        text += "\n"
-                    } else {
-                        text += textNode.textContent;
-                    }
+            const textNodes = this._getTextNodes(this._textContainer);
+            for (let textNode of textNodes) {
+                if (textNode.nodeType !== Node.TEXT_NODE) {
+                    text += "\n"
+                } else {
+                    text += textNode.textContent;
                 }
             }
             if (onBlurCallback) {

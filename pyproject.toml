@@ -51,8 +51,7 @@ Issues = "https://github.com/maxbrixner/mrkr2/issues"
 dev = [
   "build>=1.2.2",
   "mypy>=1.15.0",
-  "setuptools>=59.0.1",  # Ensure compatibility with the environment
-  "setuptools_scm[toml]>=8.3.1"
+  "setuptools>=68.0.0",
 ]
 
 [tool.setuptools]
