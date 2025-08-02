@@ -30,6 +30,8 @@ The backend is built with FastAPI, and the frontend uses WebComponents written i
     - [2.3.3. Export a Project (with configurations)](#233-export-a-project-with-configurations)
     - [2.3.4. Export a Document (with labels)](#234-export-a-document-with-labels)
 - [3. Sample Configurations](#3-sample-configurations)
+  - [3.1. A Local Configuration](#31-a-local-configuration)
+  - [3.2. An AWS Configuration](#32-an-aws-configuration)
 
 ## 1. Getting Started with Development 🚀
 
