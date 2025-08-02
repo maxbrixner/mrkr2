@@ -1,0 +1,156 @@
+import { IconButton } from './icon_button.js';
+export class MessageBox extends HTMLElement {
+    _closeIcon = undefined;
+    _hideAfter = undefined;
+    _maxMessages = undefined;
+    get closeIcon() {
+        return this._closeIcon || '';
+    }
+    set closeIcon(value) {
+        this.setAttribute('close-icon', value);
+    }
+    get hideAfter() {
+        return this._hideAfter || 5000;
+    }
+    set hideAfter(value) {
+        if (value < 0) {
+            throw new Error("hideAfter must be a non-negative number");
+        }
+        this.setAttribute('hide-after', value.toString());
+    }
+    get maxMessages() {
+        return this._maxMessages || 5;
+    }
+    set maxMessages(value) {
+        if (value < 1) {
+            throw new Error("maxMessages must be at least 1");
+        }
+        this.setAttribute('max-messages', value.toString());
+    }
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this._populateShadowRoot();
+    }
+    static get observedAttributes() {
+        return ['close-icon', 'max-messages', 'hide-after'];
+    }
+    attributeChangedCallback(propertyName, oldValue, newValue) {
+        if (oldValue === newValue)
+            return;
+        if (propertyName === 'close-icon') {
+            this._closeIcon = newValue || '';
+        }
+        else if (propertyName === 'hide-after') {
+            this._hideAfter = newValue ? parseInt(newValue, 10) : undefined;
+        }
+        else if (propertyName === 'max-messages') {
+            this._maxMessages = newValue ? parseInt(newValue, 10) : undefined;
+        }
+    }
+    connectedCallback() {
+    }
+    disconnectedCallback() {
+    }
+    _populateShadowRoot() {
+        if (!this.shadowRoot) {
+            throw new Error("Shadow Root is not initialized.");
+        }
+        const style = document.createElement('style');
+        style.textContent = `
+            :host {
+                background-color: transparent;    
+                display: grid;
+                gap: .5rem;
+                grid-auto-rows: min-content;
+                left: 10%;
+                position: fixed;
+                right: 10%;
+                bottom: 1rem;
+                z-index: 10;
+            }
+
+            .message {
+                border: 1px solid transparent;
+                border-radius: 5px;
+                box-shadow: var(--message-box-box-shadow, none);
+                display: grid;
+                font-size: var(--message-box-font-size, 1rem);
+                grid-template-areas: "text button";
+                grid-template-columns: 1fr min-content;
+                padding: var(--message-box-padding, 1rem);
+            }
+        `;
+        this.shadowRoot.appendChild(style);
+    }
+    showMessage(message, type = 'info', details) {
+        if (!this.shadowRoot) {
+            throw new Error("Shadow Root is not initialized.");
+        }
+        if (this.shadowRoot.children.length >= (this._maxMessages || 5)) {
+            try {
+                const messages = Array.from(this.shadowRoot.querySelectorAll('.message'));
+                if (messages.length > 0) {
+                    this.shadowRoot.removeChild(messages[0]);
+                }
+            }
+            catch (error) {
+            }
+        }
+        const messageElement = document.createElement('div');
+        messageElement.innerHTML = message;
+        messageElement.className = `message ${type}`;
+        if (this._closeIcon) {
+            const closeButton = new IconButton();
+            closeButton.ariaLabel = 'Close message';
+            closeButton.mode = 'inherit';
+            closeButton.img = this._closeIcon || '';
+            closeButton.filter = `var(--message-box-${type}-icon-filter, none)`;
+            closeButton.addEventListener('click', () => {
+                this.shadowRoot?.removeChild(messageElement);
+            }, { once: true });
+            messageElement.appendChild(closeButton);
+        }
+        messageElement.style.backgroundColor = `var(--message-box-${type}-background-color, #ffffff)`;
+        messageElement.style.color = `var(--message-box-${type}-color, #000000)`;
+        messageElement.style.borderColor = `var(--message-box-${type}-border-color, #000000)`;
+        this.shadowRoot.appendChild(messageElement);
+        switch (type) {
+            case 'success':
+                if (details) {
+                    console.log(`Details: ${details}`);
+                }
+                break;
+            case 'info':
+                if (details) {
+                    console.info(`Details: ${details}`);
+                }
+                break;
+            case 'warning':
+                if (details) {
+                    console.warn(`Details: ${details}`);
+                }
+                break;
+            case 'error':
+                if (details) {
+                    console.error(`Details: ${details}`);
+                }
+                break;
+            default:
+                throw new Error(`Unknown message type: ${type}`);
+        }
+        if (this._hideAfter && this._hideAfter > 0) {
+            setTimeout(() => {
+                if (this.shadowRoot) {
+                    try {
+                        this.shadowRoot.removeChild(messageElement);
+                    }
+                    catch (error) {
+                        return;
+                    }
+                }
+            }, this._hideAfter);
+        }
+    }
+}
+customElements.define('message-box', MessageBox);
