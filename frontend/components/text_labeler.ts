@@ -2,6 +2,7 @@
 
 import { LabelButton } from './base/label_button.js';
 import { IconButton } from './base/icon_button.js';
+import { MessageBox } from './base/message_box.js';
 import { ClassificationLabeler, ClassificationLabelerAttributes } from './classification_labeler.js';
 
 /* -------------------------------------------------------------------------- */
@@ -275,7 +276,8 @@ export class TextLabeler extends ClassificationLabeler implements Classification
         }
 
         if (!textNodes.includes(startContainer) || !textNodes.includes(endContainer)) {
-            throw new Error("Start or end container is not a text node in the text container.");
+            (document.querySelector('message-box') as MessageBox)?.showMessage(`Invalid selection.`, 'error');
+            return null;
         }
 
         let startReached = false;
