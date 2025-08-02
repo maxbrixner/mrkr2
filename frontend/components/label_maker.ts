@@ -8,6 +8,7 @@ import { TextLabeler } from './text_labeler.js';
 import { LabelButton } from './base/label_button.js';
 import { combineHexColors, getRelativeLuminance, hexToRgbAString } from './utils/color_helpers.js';
 import { MessageBox } from './base/message_box.js';
+import { StyledButton } from './base/styled_button.js';
 
 /* -------------------------------------------------------------------------- */
 
@@ -569,7 +570,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
                 textLabeler.addText(this._formatBlockText(block, labelDefinitions));
 
-                highlight.addEventListener('click', this._onHighlightClick("Block", textLabeler));
+                highlight.addEventListener('click', this._onHighlightClick(textLabeler));
 
                 this._addTextLabelsToList(textLabeler, block, labelDefinitions);
 
@@ -612,9 +613,10 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         }
     }
 
+    /* todo: to here */
+
     private _formatBlockText(block: BlockLabelDataSchema, labelDefinitions: LabelDefinitionSchema[]): string {
         let content = block.content
-
 
         if (!block.labels || block.labels.length === 0) {
             content = content.replace(/\n/g, '<br>');
@@ -637,9 +639,14 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             const end = sortedPoints[i + 1];
             const mid = (start + end) / 2;
 
-            const overlappingLabels = labels.filter(label => mid >= label.start && mid < label.end);
+            const overlappingLabels = labels.filter(label =>
+                (label.start >= start && label.start < end) || /* start within original label */
+                (label.end > start && label.end <= end) ||     /* end within original label */
+                (label.start >= start && label.end <= end) ||  /* start and end within original label */
+                (label.start < start && label.end > end)       /* complete overlap */
+            );
 
-            let backgroundColor = 'transparent'; // Default for non-labeled text
+            let backgroundColor = 'transparent';
             let color = '#000000';
             if (overlappingLabels.length === 1) {
                 const labelColor = labelDefinitions.find(def => def.name === overlappingLabels[0].name)?.color || "#ffffff"
@@ -661,8 +668,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             }
 
             segments.push({ start, end, backgroundColor, color });
-
-
         }
 
         let html = '';
@@ -680,14 +685,13 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         return html;
     }
 
-
     private _addTextLabelsToList(labeler: TextLabeler, block: BlockLabelDataSchema, labelDefinitions: LabelDefinitionSchema[]) {
         if (!labeler || !block || !labelDefinitions) {
             throw new Error("Labeler, block or label definitions are not available.");
         }
 
         for (const label of block.labels) {
-            if (!('start' in label && 'end' in label)) continue; // Only text labels
+            if (!('start' in label && 'end' in label)) continue;
 
             const definition = labelDefinitions.find(def => def.name === label.name);
             if (!definition) continue;
@@ -695,12 +699,12 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             const color = definition.color || '#000000';
             const content = block.content.substring(label.start, label.end);
 
-            const labelItemContainer = labeler.addTextLabelToList(label.name, color, content)
+            const labelItemContainer = labeler.addTextLabelToList(label.name, color, content);
 
             const labelItem = labelItemContainer[0];
             const deleteButton = labelItemContainer[1];
 
-            const labelId = label.id || (crypto as any).randomUUID(); // Ensure label has an ID
+            const labelId = label.id || (crypto as any).randomUUID();
             label.id = labelId; // Assign ID to the label for internal use
 
             deleteButton.addEventListener("click", this._onTextLabelDeleteButtonClick(block, labelDefinitions, labeler, labelItem, block.labels, labelId))
@@ -709,13 +713,12 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
     }
 
     private _onPageClicked(event: Event) {
-        event.stopPropagation();
         const customEvent = event as CustomEvent<PageClickedEvent>;
-        this._tabContainer.switchToTab("Page");
         const associatedLabeler = this._pageLabelers[customEvent.detail.page];
         if (!associatedLabeler) {
-            throw new Error(`Page labeler for page ${customEvent.detail.page} not found.`);
+            return // there might be no page labels
         }
+        this._tabContainer.switchToTab("Page");
         associatedLabeler.scrollIntoView({ behavior: 'smooth', block: 'center' });
         associatedLabeler.classList.add('pulsing');
         associatedLabeler.addEventListener('animationend', () => {
@@ -723,11 +726,9 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         }, { once: true });
     }
 
-    private _onHighlightClick(associatedTab: string, associatedLabeler: HTMLElement): EventListener {
+    private _onHighlightClick(associatedLabeler: HTMLElement): EventListener {
         return (event: Event) => {
-            event.stopPropagation();
-
-            this._tabContainer.switchToTab(associatedTab);
+            this._tabContainer.switchToTab("Block");
 
             associatedLabeler.scrollIntoView({ behavior: 'smooth', block: 'center' });
             associatedLabeler.classList.add('pulsing');
@@ -739,16 +740,12 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
     private _onClassificationLabelButtonClick(associatedLabelList: (LabelSchema | TextLabelSchema)[], labelName: string, labelType: "classification_multiple" | "classification_single"): EventListener {
         return (event: Event) => {
-            event.stopPropagation();
             const labelButton = event.currentTarget as LabelButton;
-
             if (!labelButton) {
                 throw new Error("Label button not found in the event target.");
             }
 
-            const currentStatus = labelButton.getAttribute('active') || false;
-
-            if (currentStatus === 'true') {
+            if (labelButton.active) {
                 let i = 0;
                 while (i < associatedLabelList.length) {
                     if (associatedLabelList[i].name === labelName) {
@@ -757,7 +754,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                         i++;
                     }
                 }
-                labelButton.setAttribute('active', 'false');
+                labelButton.active = false;
             } else {
                 associatedLabelList.push({
                     name: labelName,
@@ -776,29 +773,30 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                     for (const sibling of siblings || []) {
                         if (sibling instanceof LabelButton &&
                             sibling !== labelButton) {
-                            sibling.setAttribute('active', 'false');
+                            sibling.active = false;
                         }
                     }
                 }
-                labelButton.setAttribute('active', 'true');
-
+                labelButton.active = true;
             }
-
         }
     }
 
     private _onTextLabelButtonClick(associatedLabelList: (LabelSchema | TextLabelSchema)[], associatedLabeler: TextLabeler, associatedBlock: BlockLabelDataSchema, labelDefinitions: LabelDefinitionSchema[], labelName: string): EventListener {
         return (event: Event) => {
-            event.stopPropagation();
-
             const selection = associatedLabeler.getSelection();
-
             if (!selection || !selection.text || selection.text === '') {
                 (document.querySelector('message-box') as MessageBox)?.showMessage(`Please select text first and then click on the label button`, 'info');
                 return;
             }
 
-            // todo: avoid duplicates! This would lead to the delete button not work anymore
+            const existingLabel = associatedLabelList.find(label => label.name === labelName && 'start' in label && 'end' in label &&
+                label.start === selection.start && label.end === selection.end);
+
+            if (existingLabel) {
+                (document.querySelector('message-box') as MessageBox)?.showMessage(`Label "${labelName}" already exists for the selected text.`, 'info');
+                return;
+            }
 
             const labelId = (crypto as any).randomUUID();
 
@@ -825,10 +823,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
     private _onTextLabelDeleteButtonClick(associatedBlock: BlockLabelDataSchema, labelDefinitions: LabelDefinitionSchema[], associatedLabeler: TextLabeler, associatedLabelItem: HTMLDivElement, associatedLabelList: (LabelSchema | TextLabelSchema)[], associatedId: string): EventListener {
         return (event: Event) => {
-            event.stopPropagation();
-
             const label = associatedLabelList.find(item => item.id === associatedId)
-
             if (!label)
                 throw new Error(`Label with id ${associatedId} not found in the associated label list.`);
 
@@ -837,15 +832,11 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             associatedLabelList.splice(index, 1);
             associatedLabelItem.remove();
             associatedLabeler.addText(this._formatBlockText(associatedBlock, labelDefinitions));
-
-
         }
     }
 
     private _onPageViewButtonClick(page: number): EventListener {
         return (event: Event) => {
-            event.stopPropagation();
-
             const pageElement = this._documentViewer.getPage(page);
             if (!pageElement) {
                 throw new Error(`Page ${page} not found in the document viewer.`);
@@ -856,63 +847,45 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             pageElement.addEventListener('animationend', () => {
                 pageElement.classList.remove('pulsing');
             }, { once: true });
-
         }
     }
 
     private _onBlockViewButtonClick(associatedViewerElement: HTMLElement): EventListener {
         return (event: Event) => {
-            event.stopPropagation();
-
             associatedViewerElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
             associatedViewerElement.classList.add('pulsing');
             associatedViewerElement.addEventListener('animationend', () => {
                 associatedViewerElement.classList.remove('pulsing');
             }, { once: true });
-
         }
     }
 
     private _onBlockEditButtonClick(associatedLabeler: TextLabeler, associatedBlock: BlockLabelDataSchema, labelDefinitions: LabelDefinitionSchema[]): EventListener {
         return (event: Event) => {
-            event.stopPropagation();
-
             associatedLabeler.disableButtons();
-
-            // clear the label list in place
             associatedBlock.labels.length = 0;
             associatedLabeler.addText(this._formatBlockText(associatedBlock, labelDefinitions));
-
             associatedLabeler.makeTextEditable(this._onBlockTextBlur(associatedBlock, associatedLabeler, labelDefinitions));
-
             associatedLabeler.clearLabelList();
-
-
-
         }
     }
 
     private _onBlockTextBlur(associatedBlock: BlockLabelDataSchema, associatedLabeler: TextLabeler, labelDefinitions: LabelDefinitionSchema[]) {
         return (text: string) => {
-            associatedBlock.labels.length = 0; // todo: only remove text labels, not classification? Otherwise also unactivate the classification buttons!
+            associatedBlock.labels.length = 0;
             associatedBlock.content = text.trim();
-
-            // for good measure
             associatedLabeler.addText(this._formatBlockText(associatedBlock, labelDefinitions));
-
             associatedLabeler.enableButtons();
         }
     }
 
     private _onCheckButtonClick(associatedItem: DocumentLabelDataSchema | PageLabelDataSchema | BlockLabelDataSchema, associatedLabeler: ClassificationLabeler | TextLabeler): EventListener {
         return (event: Event) => {
-            event.stopPropagation();
-
             if (associatedItem.label_status === 'done') {
-                associatedLabeler.setAttribute("done", "false");
+                associatedLabeler.done = false;
                 associatedItem.label_status = 'open';
             } else {
-                associatedLabeler.setAttribute("done", "true");
+                associatedLabeler.done = true;
                 associatedItem.label_status = 'done';
             }
         }
@@ -920,13 +893,11 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
     private _onSubmitButtonClick(): EventListener {
         return (event: Event) => {
-            event.stopPropagation();
-
-            this._submitButton?.setAttribute('disabled', 'true');
+            (this._submitButton as StyledButton).disabled = true;
             this._submitLabelData()
                 .then((success: boolean) => {
                     if (success) {
-                        (document.querySelector('message-box') as MessageBox)?.showMessage(`Label data submitted successfully.`, 'info');
+                        (document.querySelector('message-box') as MessageBox)?.showMessage(`Label data submitted successfully.`, 'success');
                     } else {
                         (document.querySelector('message-box') as MessageBox)?.showMessage(`Unable to submit label data.`, 'error', 'Server Error');
                     }
@@ -935,7 +906,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                     (document.querySelector('message-box') as MessageBox)?.showMessage(`Unable to submit label data.`, 'error', error.message);
                 })
                 .finally(() => {
-                    this._submitButton?.removeAttribute('disabled');
+                    (this._submitButton as StyledButton).disabled = false;
                 });
         }
     }
