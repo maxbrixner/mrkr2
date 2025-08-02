@@ -339,7 +339,6 @@ export class TextLabeler extends ClassificationLabeler implements Classification
         }
     }
 
-    /* todo */
     public makeTextEditable(onBlurCallback: CallableFunction | null = null): void {
         this._textContainer.contentEditable = 'true';
         this._textContainer.focus();
@@ -351,22 +350,12 @@ export class TextLabeler extends ClassificationLabeler implements Classification
             this._textContainer.contentEditable = 'false';
 
             let text = "";
-            const spanNodes = this._textContainer.childNodes;
-            for (let spanNode of spanNodes) {
-                const textNodes = spanNode.childNodes;
-
-                // in empty nodes, if user adds text, the text idiotically gets inserted before the span.
-                if (spanNode.nodeType == Node.TEXT_NODE) {
-                    text += spanNode.textContent;
-                    continue;
-                }
-
-                for (let textNode of textNodes) {
-                    if (textNode.nodeType !== Node.TEXT_NODE) {
-                        text += "\n"
-                    } else {
-                        text += textNode.textContent;
-                    }
+            const textNodes = this._getTextNodes(this._textContainer);
+            for (let textNode of textNodes) {
+                if (textNode.nodeType !== Node.TEXT_NODE) {
+                    text += "\n"
+                } else {
+                    text += textNode.textContent;
                 }
             }
             if (onBlurCallback) {

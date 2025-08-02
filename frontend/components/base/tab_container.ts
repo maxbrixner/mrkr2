@@ -112,6 +112,15 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
                 width: var(--spinner-size-large, 30px);
             }
 
+            :host(.error)::before {
+                color: var(--styled-dialog-error-color, #000000);
+                content: var(--styled-dialog-error-message, 'Error loading content');
+                display: block;
+                font-size: var(--styled-dialog-error-font-size, 1rem);
+                margin: 4rem auto;
+                text-align: center;
+            }
+
             @keyframes spin {
                 0% {
                     transform: rotate(0deg);
@@ -125,6 +134,7 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
 
         this.shadowRoot?.appendChild(style);
 
+        this.classList.remove('error');
         this.classList.add('loading');
     }
 
@@ -141,6 +151,7 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
         this._TabContentElement.innerHTML = '';
         this._slots = [];
         this._tabs = [];
+        this.classList.remove('error');
         this.classList.add('loading');
     }
 
@@ -186,6 +197,11 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
             this._TabBarElement.appendChild(tab);
             this._tabs.push(tab);
         });
+    }
+
+    public showError() {
+        this.classList.remove('loading');
+        this.classList.add('error');
     }
 
     private _onTabClick(slot: HTMLSlotElement, tab: HTMLButtonElement) {

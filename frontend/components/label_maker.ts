@@ -135,10 +135,15 @@ interface ColoredSpan {
 /* -------------------------------------------------------------------------- */
 
 class LabelMaker extends HTMLElement implements LabelMakerAttributes {
-    public projectUrl?: string = undefined;
-    public documentUrl?: string = undefined;
-    public imageUrl?: string = undefined
-    public updateUrl?: string = undefined;
+    private _projectUrl?: string = undefined;
+    private _documentUrl?: string = undefined;
+    private _imageUrl?: string = undefined
+    private _updateUrl?: string = undefined;
+    private _viewIcon?: string = undefined;
+    private _openIcon?: string = undefined;
+    private _doneIcon?: string = undefined;
+    private _editIcon?: string = undefined;
+    private _deleteIcon?: string = undefined;
 
     private _document?: DocumentSchema = undefined;
     private _project?: ProjectSchema = undefined;
@@ -155,11 +160,77 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
     private _submitButton?: HTMLElement = undefined;
 
-    private _viewIcon?: string = undefined;
-    private _openIcon?: string = undefined;
-    private _doneIcon?: string = undefined;
-    private _editIcon?: string = undefined;
-    private _deleteIcon?: string = undefined;
+    get projectUrl(): string {
+        return this._projectUrl || '';
+    }
+
+    set projectUrl(value: string) {
+        this.setAttribute('project-url', value);
+    }
+
+    get documentUrl(): string {
+        return this._documentUrl || '';
+    }
+
+    set documentUrl(value: string) {
+        this.setAttribute('document-url', value);
+    }
+
+    get imageUrl(): string {
+        return this._imageUrl || '';
+    }
+
+    set imageUrl(value: string) {
+        this.setAttribute('image-url', value);
+    }
+
+    get updateUrl(): string {
+        return this._updateUrl || '';
+    }
+
+    set updateUrl(value: string) {
+        this.setAttribute('update-url', value);
+    }
+
+    get viewIcon(): string {
+        return this._viewIcon || '';
+    }
+
+    set viewIcon(value: string) {
+        this.setAttribute('view-icon', value);
+    }
+
+    get openIcon(): string {
+        return this._openIcon || '';
+    }
+
+    set openIcon(value: string) {
+        this.setAttribute('open-icon', value);
+    }
+
+    get doneIcon(): string {
+        return this._doneIcon || '';
+    }
+
+    set doneIcon(value: string) {
+        this.setAttribute('done-icon', value);
+    }
+
+    get editIcon(): string {
+        return this._editIcon || '';
+    }
+
+    set editIcon(value: string) {
+        this.setAttribute('edit-icon', value);
+    }
+
+    set deleteIcon(value: string) {
+        this.setAttribute('delete-icon', value);
+    }
+
+    get deleteIcon(): string {
+        return this._deleteIcon || '';
+    }
 
     constructor() {
         super();
@@ -176,15 +247,14 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         if (oldValue === newValue) return;
 
         if (propertyName === 'document-url') {
-            this.documentUrl = newValue || undefined;
+            this._documentUrl = newValue || '';
         } else if (propertyName === 'project-url') {
-            this.projectUrl = newValue || undefined;
+            this._projectUrl = newValue || '';
         } else if (propertyName === 'image-url') {
-            this.imageUrl = newValue || undefined;
-            if (this.imageUrl)
-                this._documentViewer.setAttribute("url", this.imageUrl);
+            this._imageUrl = newValue || ''
+            this._documentViewer.url = this._imageUrl;
         } else if (propertyName === 'update-url') {
-            this.updateUrl = newValue || undefined;
+            this._updateUrl = newValue || '';
         } else if (propertyName === 'view-icon') {
             this._viewIcon = newValue || '';
         } else if (propertyName === 'open-icon') {
@@ -199,18 +269,20 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
     }
 
     connectedCallback() {
-        this._addEventListeners();
-        this._submitButton = document.getElementById('submit_labels') || undefined;
+        this._submitButton = document.getElementById('submit-labels') || undefined;
+        this._submitButton?.addEventListener('click', this._onSubmitButtonClick());
 
-        if (!this._submitButton) {
-            throw new Error("Submit button not found in the document.");
-        }
-
-        this._submitButton.addEventListener('click', this._onSubmitButtonClick());
+        this.shadowRoot?.addEventListener('pages-created', this._onPagesCreated.bind(this));
+        this.shadowRoot?.addEventListener('pages-load-error', this._onPagesLoadError.bind(this));
+        this.shadowRoot?.addEventListener('page-clicked', this._onPageClicked.bind(this));
     }
 
     disconnectedCallback() {
-        this._removeEventListeners();
+        this._submitButton?.removeEventListener('click', this._onSubmitButtonClick());
+
+        this.shadowRoot?.removeEventListener('pages-created', this._onPagesCreated.bind(this));
+        this.shadowRoot?.addEventListener('pages-load-error', this._onPagesLoadError.bind(this));
+        this.shadowRoot?.removeEventListener('page-clicked', this._onPageClicked.bind(this));
     }
 
     private _populateShadowRoot() {
@@ -262,9 +334,8 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
 
         this.shadowRoot.appendChild(style);
 
-        this._resizablePanes.setAttribute('orientation', 'vertical');
-        this._resizablePanes.setAttribute('minsize', '400px');
-        this._resizablePanes.setAttribute('startsize', '50%');
+        this._resizablePanes.orientation = 'vertical';
+        this._resizablePanes.startsize = '50%';
 
         this._documentViewer.slot = 'first';
         this._resizablePanes.appendChild(this._documentViewer);
@@ -275,76 +346,35 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         this.shadowRoot.appendChild(this._resizablePanes);
     }
 
-    private _addEventListeners() {
-        if (!this.shadowRoot) {
-            throw new Error("Shadow Root is not initialized.");
-        }
-
-        this.shadowRoot.addEventListener('pages-created', this._onPagesCreated.bind(this));
-        this.shadowRoot.addEventListener('page-clicked', this._onPageClicked.bind(this));
-    }
-
-    private _removeEventListeners() {
-        if (!this.shadowRoot) {
-            throw new Error("Shadow Root is not initialized.");
-        }
-
-        this.shadowRoot.removeEventListener('pages-created', this._onPagesCreated.bind(this));
-        this.shadowRoot.removeEventListener('page-clicked', this._onPageClicked.bind(this));
-    }
-
     private _onPagesCreated(event: Event) {
-        event.stopPropagation();
-        const customEvent = event as CustomEvent<PagesCreatedEvent>;
-        this._queryContent(this._populateContent.bind(this));
-    }
-
-    private _onPageClicked(event: Event) {
-        event.stopPropagation();
-        const customEvent = event as CustomEvent<PageClickedEvent>;
-        this._tabContainer.switchToTab("Page");
-        const associatedLabeler = this._pageLabelers[customEvent.detail.page];
-        if (!associatedLabeler) {
-            throw new Error(`Page labeler for page ${customEvent.detail.page} not found.`);
-        }
-        associatedLabeler.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        associatedLabeler.classList.add('pulsing');
-        associatedLabeler.addEventListener('animationend', () => {
-            associatedLabeler.classList.remove('pulsing');
-        }, { once: true });
-    }
-
-    private _queryContent(callback: CallableFunction) {
         this._queryDocument()
             .then((document: DocumentSchema) => {
                 this._document = document;
                 if (this._document && this._project) {
-                    callback();
+                    this._addTabsToTabContainer();
                 }
             })
             .catch((error: Error) => {
-                (document.querySelector('message-box') as MessageBox)?.showMessage(`Unable to fetch document.`, 'error', error.message);
+                (document.querySelector('message-box') as MessageBox)?.showMessage(`Unable to fetch document data.`, 'error', error.message);
+                this._tabContainer.showError();
             });
 
         this._queryProject()
             .then((project: ProjectSchema) => {
                 this._project = project;
                 if (this._document && this._project) {
-                    callback();
+                    this._addTabsToTabContainer();
                 }
             })
             .catch((error: Error) => {
-                (document.querySelector('message-box') as MessageBox)?.showMessage(`Unable to fetch project.`, 'error', error.message);
+                (document.querySelector('message-box') as MessageBox)?.showMessage(`Unable to fetch project data.`, 'error', error.message);
+                this._tabContainer.showError();
             });
     }
 
-    private _populateContent() {
-        if (!this._document || !this._project) {
-            throw new Error("Document or project data is not available.");
-        }
-
-        this._addTabsToTabContainer();
-        this._submitButton?.removeAttribute('disabled');
+    private _onPagesLoadError(event: Event) {
+        this._tabContainer.showError();
+        (document.querySelector('message-box') as MessageBox)?.showMessage(`Unable to load document content.`, 'error');
     }
 
     private _addTabsToTabContainer() {
@@ -380,7 +410,10 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         }
 
         this._tabContainer.updateTabs();
+        this._submitButton?.removeAttribute('disabled');
     }
+
+    /* todo: from here */
 
     private _addDocumentLabelers() {
         if (!this._document || !this._project) {
@@ -673,6 +706,21 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             deleteButton.addEventListener("click", this._onTextLabelDeleteButtonClick(block, labelDefinitions, labeler, labelItem, block.labels, labelId))
         }
 
+    }
+
+    private _onPageClicked(event: Event) {
+        event.stopPropagation();
+        const customEvent = event as CustomEvent<PageClickedEvent>;
+        this._tabContainer.switchToTab("Page");
+        const associatedLabeler = this._pageLabelers[customEvent.detail.page];
+        if (!associatedLabeler) {
+            throw new Error(`Page labeler for page ${customEvent.detail.page} not found.`);
+        }
+        associatedLabeler.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        associatedLabeler.classList.add('pulsing');
+        associatedLabeler.addEventListener('animationend', () => {
+            associatedLabeler.classList.remove('pulsing');
+        }, { once: true });
     }
 
     private _onHighlightClick(associatedTab: string, associatedLabeler: HTMLElement): EventListener {
