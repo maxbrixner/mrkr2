@@ -82,13 +82,10 @@ export class ProjectSettingsForm extends HTMLElement implements ProjectSettingsF
         } else if (propertyName === 'update-project-config-url') {
             this._updateProjectConfigUrl = newValue || '';
         } else if (propertyName === 'existing-name') {
-            console.log('Setting existing name:', newValue);
             this._nameInput.value = newValue || '';
         } else if (propertyName === 'existing-config') {
-            console.log('Setting existing config:', newValue);
             try {
                 const config = JSON.parse(newValue?.replace(/'/g, '"') || '{}');
-                console.log('Setting existing config:', config);
                 this._configTextarea.value = JSON.stringify(config, null, 2);
             } catch (e) {
                 console.error('Invalid JSON format for existing config:', e);

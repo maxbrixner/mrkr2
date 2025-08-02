@@ -165,7 +165,6 @@ export class ProjectsContent extends ListBasedContent implements ProjectsContent
 
     private _onupdateButtonClick(event: Event) {
         const selectedRows = this._table.getSelectedRows();
-        console.log(selectedRows);
         if (selectedRows.length !== 1 || !selectedRows[0] || !selectedRows[0].id) {
             return;
         }

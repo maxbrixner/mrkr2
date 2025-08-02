@@ -4,6 +4,33 @@ A tool to label pages, blocks, and text within images and PDF files.
 
 The backend is built with FastAPI, and the frontend uses WebComponents written in TypeScript.
 
+## Table of Contents
+
+- [1. Getting Started with Development](#1-getting-started-with-development-)
+  - [1.1. Set Up the Environment](#11-set-up-the-environment)
+  - [1.2. Compile TypeScript Components](#12-compile-typescript-components)
+  - [1.3. Start the Test Database](#13-start-the-test-database)
+  - [1.4. Build Mrkr](#14-build-mrkr)
+  - [1.5. Run Mrkr](#15-run-mrkr)
+- [2. Using Mrkr](#2-using-mrkr-)
+  - [2.1. Run Mrkr with Docker](#21-run-mrkr-with-docker)
+  - [2.2. Use the API-SDK](#22-use-the-api-sdk)
+    - [2.2.1. List Users](#221-list-users)
+    - [2.2.2. Create a User](#222-create-a-user)
+    - [2.2.3. List Projects](#223-list-projects)
+    - [2.2.4. List Documents](#224-list-documents)
+    - [2.2.5. Export a Project (with configurations)](#225-export-a-project-with-configurations)
+    - [2.2.6. Update a Project's Name](#226-update-a-projects-name)
+    - [2.2.7. Export a Document (with labels)](#227-export-a-document-with-labels)
+    - [2.2.8. Create a Project](#228-create-a-project)
+    - [2.2.9. Update a Project's Configuration](#229-update-a-projects-configuration)
+  - [2.3. Use the Database-SDK](#23-use-the-database-sdk)
+    - [2.3.1. List Projects](#231-list-projects)
+    - [2.3.2. List Documents](#232-list-documents)
+    - [2.3.3. Export a Project (with configurations)](#233-export-a-project-with-configurations)
+    - [2.3.4. Export a Document (with labels)](#234-export-a-document-with-labels)
+- [3. Sample Configurations](#3-sample-configurations)
+
 ## 1. Getting Started with Development 🚀
 
 ### 1.1. Set Up the Environment
@@ -476,4 +503,189 @@ with sdk.MrkrDatabaseClient(env_file=".env") as client:
         for block in page.blocks:
             print(f"Block contents: {block.content}")
             print(f"Block labels: {block.labels}")
+```
+
+## 3. Sample Configurations
+
+### 3.1. A Local Configuration
+
+This configuration uses local files and Google's Tesseract to perform local OCR:
+
+```json
+{
+  "label_definitions": [
+    {
+      "type": "classification_single",
+      "target": "document",
+      "name": "Customer Letter",
+      "color": "#4CAF50"
+    },
+    {
+      "type": "classification_single",
+      "target": "document",
+      "name": "Clerk Letter",
+      "color": "#2196F3"
+    },
+    {
+      "type": "classification_multiple",
+      "target": "page",
+      "name": "Cover Page",
+      "color": "#FF9800"
+    },
+    {
+      "type": "classification_multiple",
+      "target": "page",
+      "name": "Letter Content",
+      "color": "#2f37b1"
+    },
+    {
+      "type": "classification_multiple",
+      "target": "page",
+      "name": "Attachment",
+      "color": "#F44336"
+    },
+    {
+      "type": "classification_multiple",
+      "target": "block",
+      "name": "Address Header",
+      "color": "#F44336"
+    },
+    {
+      "type": "classification_multiple",
+      "target": "block",
+      "name": "Body",
+      "color": "#2f37b1"
+    },
+    {
+      "type": "text",
+      "target": "block",
+      "name": "Name",
+      "color": "#6cd158"
+    },
+    {
+      "type": "text",
+      "target": "block",
+      "name": "Phone Number",
+      "color": "#d13f1a"
+    },
+    {
+      "type": "text",
+      "target": "block",
+      "name": "Street",
+      "color": "#3F51B5"
+    }
+  ],
+  "file_provider": {
+    "type": "local",
+    "config": {
+      "path": "demos",
+      "pdf_dpi": 200,
+      "image_format": "WebP"
+    }
+  },
+  "ocr_provider": {
+    "type": "tesseract",
+    "config": {
+      "language": "eng"
+    }
+  }
+}
+```
+
+### 3.2. An AWS Configuration
+
+This configuration uses an S3 bucket for storage and AWS Textract for OCR.
+
+Please note that you should never use authentication secrets in the configuration. Instead use double curled brackets ``{{...}}`` to refer to environment variables.
+
+```json
+{
+  "label_definitions": [
+    {
+      "type": "classification_single",
+      "target": "document",
+      "name": "Customer Letter",
+      "color": "#4CAF50"
+    },
+    {
+      "type": "classification_single",
+      "target": "document",
+      "name": "Clerk Letter",
+      "color": "#2196F3"
+    },
+    {
+      "type": "classification_multiple",
+      "target": "page",
+      "name": "Cover Page",
+      "color": "#FF9800"
+    },
+    {
+      "type": "classification_multiple",
+      "target": "page",
+      "name": "Letter Content",
+      "color": "#2f37b1"
+    },
+    {
+      "type": "classification_multiple",
+      "target": "page",
+      "name": "Attachment",
+      "color": "#F44336"
+    },
+    {
+      "type": "classification_multiple",
+      "target": "block",
+      "name": "Address Header",
+      "color": "#F44336"
+    },
+    {
+      "type": "classification_multiple",
+      "target": "block",
+      "name": "Body",
+      "color": "#2f37b1"
+    },
+    {
+      "type": "text",
+      "target": "block",
+      "name": "Name",
+      "color": "#6cd158"
+    },
+    {
+      "type": "text",
+      "target": "block",
+      "name": "Phone Number",
+      "color": "#d13f1a"
+    },
+    {
+      "type": "text",
+      "target": "block",
+      "name": "Street",
+      "color": "#3F51B5"
+    }
+  ],
+  "file_provider": {
+    "type": "s3",
+    "config": {
+      "aws_access_key_id": "{{AWS_ACCESS_KEY_ID}}",
+      "aws_account_id": "{{AWS_ACCOUNT_ID}}",
+      "aws_region_name": "{{AWS_REGION_NAME}}",
+      "aws_role_name": "{{AWS_ROLE_NAME}}",
+      "aws_secret_access_key": "{{AWS_SECRET_ACCESS_KEY}}",
+      "aws_bucket_name": "{{AWS_BUCKET_NAME}}",
+      "path": "demos",
+      "pdf_dpi": 200,
+      "image_format": "WebP"
+    }
+  },
+  "ocr_provider": {
+    "type": "textract",
+    "config": {
+      "aws_access_key_id": "{{AWS_ACCESS_KEY_ID}}",
+      "aws_account_id": "{{AWS_ACCOUNT_ID}}",
+      "aws_region_name": "{{AWS_REGION_NAME}}",
+      "aws_role_name": "{{AWS_ROLE_NAME}}",
+      "aws_secret_access_key": "{{AWS_SECRET_ACCESS_KEY}}",
+      "image_format": "JPEG"
+    }
+  }
+}
 ```
