@@ -414,8 +414,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         this._submitButton?.removeAttribute('disabled');
     }
 
-    /* todo: from here */
-
     private _addDocumentLabelers() {
         if (!this._document || !this._project) {
             throw new Error("Document or project data is not available.");
@@ -425,13 +423,12 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         }
 
         const classificationLabeler = new ClassificationLabeler();
-        classificationLabeler.setAttribute('heading', 'Document');
+        classificationLabeler.heading = 'Document';
         classificationLabeler.viewIcon = this._viewIcon || '';
         classificationLabeler.openIcon = this._openIcon || '';
         classificationLabeler.doneIcon = this._doneIcon || '';
-
         if (this._document.data.label_status === 'done') {
-            classificationLabeler.setAttribute('done', 'true');
+            classificationLabeler.done = true;
         }
 
         const checkButton = classificationLabeler.addCheckButton();
@@ -444,11 +441,9 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
         for (const definition of labelDefinitions) {
             if (definition.target !== 'document')
                 continue;
-
             if (definition.type === 'text') {
-                continue; // Text labels are not permitted for documents
+                continue;
             }
-
 
             const labelStatus = this._document.data.labels.some(label => label.name === definition.name);
 
@@ -474,35 +469,31 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             throw new Error("Page tab is not initialized.");
         }
 
+        const labelDefinitions = this._project.config.label_definitions;
         for (const page of this._document.data.pages) {
             const classificationLabeler = new ClassificationLabeler();
-            classificationLabeler.setAttribute('heading', `Page ${page.page}`);
+            classificationLabeler.heading = `Page ${page.page}`;
             classificationLabeler.viewIcon = this._viewIcon || '';
             classificationLabeler.openIcon = this._openIcon || '';
             classificationLabeler.doneIcon = this._doneIcon || '';
-            this._pageLabelers[page.page] = classificationLabeler;
-            this._pageTab.appendChild(classificationLabeler);
-
             if (page.label_status === 'done') {
-                classificationLabeler.setAttribute('done', 'true');
+                classificationLabeler.done = true;
             }
+            this._pageLabelers[page.page] = classificationLabeler;
 
             const viewButton = classificationLabeler.addViewButton();
             viewButton.addEventListener('click', this._onPageViewButtonClick(page.page));
 
-
             const checkButton = classificationLabeler.addCheckButton();
             checkButton.addEventListener('click', this._onCheckButtonClick(page, classificationLabeler));
 
-
-            const labelDefinitions = this._project.config.label_definitions;
+            this._pageTab.appendChild(classificationLabeler);
 
             for (const definition of labelDefinitions) {
                 if (definition.target !== 'page')
                     continue;
-
                 if (definition.type === 'text') {
-                    continue; // Text labels are not permitted for pages
+                    continue;
                 }
 
                 const labelStatus = page.labels.some(label => label.name === definition.name);
@@ -528,9 +519,11 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
             throw new Error("Document or project data is not available.");
         }
 
+        if (!this._blockTab) {
+            throw new Error("Block tab is not initialized.");
+        }
+
         const labelDefinitions = this._project.config.label_definitions;
-
-
         for (const page of this._document.data.pages) {
             for (const block of page.blocks) {
                 const highlight = this._documentViewer.addHighlight(
@@ -544,19 +537,15 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 );
 
                 const textLabeler = new TextLabeler();
-                textLabeler.setAttribute('heading', `Block`);
+                textLabeler.heading = `Block`;
                 textLabeler.viewIcon = this._viewIcon || '';
                 textLabeler.openIcon = this._openIcon || '';
                 textLabeler.doneIcon = this._doneIcon || '';
                 textLabeler.editIcon = this._editIcon || '';
                 textLabeler.deleteIcon = this._deleteIcon || '';
-
-                this._blockTab?.appendChild(textLabeler);
-
                 if (block.label_status === 'done') {
-                    textLabeler.setAttribute('done', 'true');
+                    textLabeler.done = true;
                 }
-
 
                 const editButton = textLabeler.addEditButton();
                 editButton.addEventListener('click', this._onBlockEditButtonClick(textLabeler, block, labelDefinitions));
@@ -567,8 +556,9 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                 const checkButton = textLabeler.addCheckButton();
                 checkButton.addEventListener('click', this._onCheckButtonClick(block, textLabeler));
 
-
                 textLabeler.addText(this._formatBlockText(block, labelDefinitions));
+
+                this._blockTab.appendChild(textLabeler);
 
                 highlight.addEventListener('click', this._onHighlightClick(textLabeler));
 
@@ -578,9 +568,7 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                     if (definition.target !== 'block')
                         continue;
 
-
                     if (definition.type === 'classification_single' || definition.type === 'classification_multiple') {
-
                         const labelStatus = block.labels.some(label => label.name === definition.name);
 
                         const button = textLabeler.addClassificationButton(
@@ -598,7 +586,6 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                             false,
                         )
 
-
                         button.addEventListener('click', this._onTextLabelButtonClick(
                             block.labels,
                             textLabeler,
@@ -606,14 +593,11 @@ class LabelMaker extends HTMLElement implements LabelMakerAttributes {
                             labelDefinitions,
                             definition.name,
                         ));
-
                     }
                 }
             }
         }
     }
-
-    /* todo: to here */
 
     private _formatBlockText(block: BlockLabelDataSchema, labelDefinitions: LabelDefinitionSchema[]): string {
         let content = block.content
