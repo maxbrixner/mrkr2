@@ -113,10 +113,10 @@ export class TabContainer extends HTMLElement implements TabContainerAttributes 
             }
 
             :host(.error)::before {
-                color: var(--styled-dialog-error-color, #000000);
-                content: var(--styled-dialog-error-message, 'Error loading content');
+                color: var(--tab-container-error-color, #000000);
+                content: var(--tab-container-error-message, 'Error loading content');
                 display: block;
-                font-size: var(--styled-dialog-error-font-size, 1rem);
+                font-size: var(--tab-container-error-font-size, 1rem);
                 margin: 4rem auto;
                 text-align: center;
             }

@@ -119,3 +119,15 @@ main.project-main>div.toolbar>input {
     border-radius: var(--border-radius-medium);
     outline: none;
 }
+
+main.settings-main {
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr;
+    align-items: center;
+    justify-items: center;
+}
+
+main.settings-main>project-settings-form {
+    max-width: 800px;
+}

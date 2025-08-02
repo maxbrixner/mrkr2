@@ -75,3 +75,63 @@ async def project_documents_page(
     )
 
 # ---------------------------------------------------------------------------- #
+
+
+@router.get(
+    "/create",
+    summary="GUI to create a new project",
+    response_class=fastapi.responses.HTMLResponse
+)
+async def create_project_page(
+    request: fastapi.Request,
+    templates: services.TemplatesDependency,
+    session: database.DatabaseDependency
+) -> fastapi.responses.HTMLResponse:
+    """
+    GUI to list a project's documents.
+    """
+    return templates.TemplateResponse(
+        "create_project.html",
+        context={
+            "request": request,
+            "config_template": "hallo"
+        }
+    )
+
+# ---------------------------------------------------------------------------- #
+
+
+@router.get(
+    "/{project_id}/edit",
+    summary="GUI to edit an existing project",
+    response_class=fastapi.responses.HTMLResponse
+)
+async def update_project_page(
+    project_id: int,
+    request: fastapi.Request,
+    templates: services.TemplatesDependency,
+    session: database.DatabaseDependency
+) -> fastapi.responses.HTMLResponse:
+    """
+    GUI to update an existing project.
+    """
+    project = crud.get_project(
+        session=session,
+        id=project_id
+    )
+
+    if not project:
+        raise fastapi.HTTPException(
+            status_code=fastapi.status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
+
+    return templates.TemplateResponse(
+        "update_project.html",
+        context={
+            "request": request,
+            "project": project
+        }
+    )
+
+# ---------------------------------------------------------------------------- #

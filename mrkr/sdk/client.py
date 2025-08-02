@@ -4,12 +4,17 @@ import requests
 import logging
 import time
 import functools
+import pathlib
+import sqlmodel
+import dotenv
 from typing import Any, Callable, Dict, Optional, Self, List
 
 # ---------------------------------------------------------------------------- #
 
 import mrkr.schemas as schemas
 import mrkr.models as models
+import mrkr.database as database
+import mrkr.crud as crud
 from mrkr.services import ColonLevelFormatter
 
 # ---------------------------------------------------------------------------- #
@@ -27,6 +32,7 @@ class MrkrClient():
     timeout: float
     retry_attemps: int
     retry_delay: float
+    _logger: logging.Logger
 
     def __init__(
         self,
@@ -276,6 +282,9 @@ class MrkrClient():
         self,
         project_id: int
     ) -> schemas.ProjectSchema:
+        """
+        Get a project (including its configuration) by its ID.
+        """
         response = self._call_api(
             method="GET",
             endpoint=f"/project/{project_id}"
@@ -287,6 +296,9 @@ class MrkrClient():
         self,
         document_id: int
     ) -> schemas.DocumentSchema:
+        """
+        Get a document (including its label data) by its ID.
+        """
         response = self._call_api(
             method="GET",
             endpoint=f"/document/{document_id}"
@@ -326,5 +338,167 @@ class MrkrClient():
         return [schemas.UserListSchema.model_validate(item)
                 for item in response.json()]
 
+
+# ---------------------------------------------------------------------------- #
+
+
+class MrkrDatabaseClient():
+    """
+    MrkrDatabaseClient is a client for the Mrkr database.
+    """
+    _database: database.Database
+    _session: sqlmodel.Session | None
+    _logger: logging.Logger
+
+    def __init__(
+        self,
+        env_file: Optional[pathlib.Path | str] = None
+    ) -> None:
+        """
+        Initialize the MrkrDatabaseClient.
+        """
+        self._session = None
+
+        self._setup_logger()
+        self._load_env_file(env_file=env_file)
+
+    def __enter__(self) -> Self:
+        """
+        Enter the runtime context related to this object.
+        """
+        self._connect()
+
+        return self
+
+    def __exit__(self, exc_type: Any, exc_value: Any, traceback: Any) -> None:
+        """
+        Exit the runtime context related to this object.
+        """
+        try:
+            if self._session:
+                self._session.close()
+            if self._database:
+                self._database.disconnect()
+        except Exception as exception:
+            self._logger.error(f"Error occurred during cleanup: {exception}")
+
+    def _setup_logger(self, level: str | int = logging.INFO) -> None:
+        """
+        Set up logging configuration.
+        """
+        self._logger = logging.getLogger("mrkr.sdk.client")
+        self._logger.setLevel(level=level)
+        handler = logging.StreamHandler()
+        handler.setLevel(level=level)
+        formatter = ColonLevelFormatter(
+            "\u001B[35m%(levelname)-9s\u001B[0m %(message)s")
+        handler.setFormatter(formatter)
+        self._logger.addHandler(handler)
+
+    def _load_env_file(
+        self,
+        env_file: Optional[pathlib.Path | str] = None
+    ) -> None:
+        """
+        Load environment variables from a .env file.
+        """
+        if not env_file:
+            return
+
+        if isinstance(env_file, str):
+            env_file = pathlib.Path(env_file)
+
+        if env_file.exists():
+            dotenv.load_dotenv(dotenv_path=env_file)
+        else:
+            raise FileNotFoundError(
+                f"Environment file '{env_file}' does not exist.")
+
+    def _connect(self) -> None:
+        """
+        Connect to the database.
+        """
+        try:
+            self._database = database.get_database()
+            self._database.connect()
+
+            self._session = next(self._database.get_session())
+            if self._session is None:
+                raise Exception("Failed to connect to the database.")
+        except Exception as exception:
+            self._logger.error(
+                f"Failed to connect to the database: {exception}")
+
+    def list_projects(
+        self
+    ) -> List[schemas.ProjectListSchema]:
+        """
+        List all projects.
+        """
+        if not self._session:
+            raise Exception("Database session is not initialized.")
+
+        db_projects = crud.get_projects(session=self._session)
+
+        return [schemas.ProjectListSchema(**project.model_dump())
+                for project in db_projects]
+
+    def get_project(
+        self,
+        project_id: int
+    ) -> schemas.ProjectSchema:
+        """
+        Get a project (including its configuration) by its ID.
+        """
+        if not self._session:
+            raise Exception("Database session is not initialized.")
+
+        db_project = crud.get_project(
+            session=self._session,
+            id=project_id
+        )
+
+        if not db_project:
+            raise Exception(f"Project {project_id} not found.")
+
+        return schemas.ProjectSchema(**db_project.model_dump())
+
+    def list_project_documents(
+        self,
+        project_id: int
+    ) -> List[schemas.DocumentListSchema]:
+        """
+        List all documents for a given project.
+        """
+        if not self._session:
+            raise Exception("Database session is not initialized.")
+
+        db_documents = crud.get_project_documents(
+            session=self._session,
+            project_id=project_id
+        )
+
+        return [schemas.DocumentListSchema(**doc.model_dump())
+                for doc in db_documents]
+
+    def get_document(
+        self,
+        document_id: int
+    ) -> schemas.DocumentSchema:
+        """
+        Get a document (including its label data) by its ID.
+        """
+        if not self._session:
+            raise Exception("Database session is not initialized.")
+
+        db_document = crud.get_document(
+            session=self._session,
+            id=document_id
+        )
+
+        if not db_document:
+            raise Exception(f"Document {document_id} not found.")
+
+        return schemas.DocumentSchema(**db_document.model_dump())
 
 # ---------------------------------------------------------------------------- #

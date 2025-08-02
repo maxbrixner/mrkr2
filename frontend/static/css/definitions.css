@@ -39,6 +39,7 @@
 
     /* Font Variables */
     --font-family: "Geist", sans-serif;
+    --mono-font-family: "GeistMono", monospace;
 
     /* Font sizes */
     --font-size-small: 0.8rem;
@@ -114,6 +115,7 @@
     --styled-input-border-color: var(--border-color);
     --styled-input-border-color-hover: var(--primary-color);
     --styled-input-color: var(--text-color);
+    --styled-input-scrollbar-color: var(--scrollbar-thumb) var(--background-color);
 
     /* Styled Link Variables */
     --styled-link-font-size: var(--font-size-medium);
@@ -194,6 +196,9 @@
     --tab-container-tab-active-background-color: var(--surface-color);
     --tab-container-tab-active-border-color: var(--border-color);
     --tab-container-content-background-color: var(--surface-color);
+    --tab-container-error-color: var(--disabled-text-color);
+    --tab-container-error-message: 'Error loading content';
+    --tab-container-error-font-size: var(--font-size-medium);
 
     /* Document Viewer Variables */
     --document-viewer-background: var(--background-color);
@@ -207,6 +212,9 @@
     --document-viewer-highlight-focus-outline-width: 2px;
     --document-viewer-page-focus-outline-color: var(--primary-color);
     --document-viewer-page-focus-outline-width: 2px;
+    --document-viewer-error-color: var(--disabled-text-color);
+    --document-viewer-error-message: 'Error loading content';
+    --document-viewer-error-font-size: var(--font-size-medium);
 
     /* Label Button Variables */
     --label-button-background-color-disabled: var(--disabled-color);

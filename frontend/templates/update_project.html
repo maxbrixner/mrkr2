@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+<script type="module" src="{{ url_for('static', path='/js/base/styled_link.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/base/styled_button.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/project_settings_form.js') }}"></script>
+
+{% endblock %}
+
+{% block header %}
+<header class="project-header">
+    <h1>mrkr</h1>
+    <span class="path">
+        <styled-link href="{{ url_for('projects_page') }}">Projects</styled-link>
+        &nbsp;&nbsp;/&nbsp;&nbsp;
+        <b>Edit Project #{{project.id}}</b>
+    </span>
+    <span class="buttons">
+        <styled-button id="update-project-button" mode="primary">Confirm</styled-button>
+    </span>
+</header>
+{% endblock %}
+
+{% block main %}
+<main class="settings-main">
+    <project-settings-form
+        update-project-config-url="{{ url_for('update_project_configuration', project_id=project.id) }}"
+        existing-name="{{ project.name }}" existing-config="{{ project.config }}"
+        existing="true"></project-settings-form>
+</main>
+{% endblock %}
