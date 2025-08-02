@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+<script type="module" src="{{ url_for('static', path='/js/base/styled_link.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/base/styled_button.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/project_settings_form.js') }}"></script>
+
+{% endblock %}
+
+{% block header %}
+<header class="project-header">
+    <h1>mrkr</h1>
+    <span class="path">
+        <styled-link href="{{ url_for('projects_page') }}">Projects</styled-link>
+        &nbsp;&nbsp;/&nbsp;&nbsp;
+        <b>Create Project</b>
+    </span>
+    <span class="buttons">
+        <styled-button id="create-project-button" mode="primary">Confirm</styled-button>
+    </span>
+</header>
+{% endblock %}
+
+{% block main %}
+<main class="settings-main">
+    <project-settings-form create-project-url="{{ url_for('create_project') }}"></project-settings-form>
+</main>
+{% endblock %}

@@ -10,6 +10,7 @@ import { RowClickedEvent, SelectionChangedEvent } from './base/filtered_table.js
 interface ProjectsContentAttributes extends ListBasedContentAttributes {
     projectGuiUrl?: string;
     scanUrl?: string;
+    createUrl?: string;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -17,8 +18,12 @@ interface ProjectsContentAttributes extends ListBasedContentAttributes {
 export class ProjectsContent extends ListBasedContent implements ProjectsContentAttributes {
     private _projectGuiUrl: string = '';
     private _scanUrl: string = '';
+    private _createUrl: string = '';
 
     private _scanButton: StyledButton = new StyledButton();
+    private _createButton: StyledButton = new StyledButton();
+    private _editButton: StyledButton = new StyledButton();
+
 
     get projectGuiUrl() {
         return this._projectGuiUrl;
@@ -36,6 +41,14 @@ export class ProjectsContent extends ListBasedContent implements ProjectsContent
         this.setAttribute('scan-url', value);
     }
 
+    get createUrl() {
+        return this._createUrl;
+    }
+
+    set createUrl(value: string) {
+        this.setAttribute('create-url', value);
+    }
+
     constructor() {
         super();
 
@@ -43,7 +56,7 @@ export class ProjectsContent extends ListBasedContent implements ProjectsContent
     }
 
     static get observedAttributes() {
-        return [...super.observedAttributes, 'project-gui-url', 'scan-url'];
+        return [...super.observedAttributes, 'project-gui-url', 'scan-url', 'create-url'];
     }
 
     attributeChangedCallback(propertyName: string, oldValue: string | null, newValue: string | null) {
@@ -55,6 +68,8 @@ export class ProjectsContent extends ListBasedContent implements ProjectsContent
             this._projectGuiUrl = newValue || '';
         } else if (propertyName === 'scan-url') {
             this._scanUrl = newValue || '';
+        } else if (propertyName === 'create-url') {
+            this._createUrl = newValue || '';
         }
     }
 
@@ -78,6 +93,17 @@ export class ProjectsContent extends ListBasedContent implements ProjectsContent
             throw new Error("Shadow Root is not initialized.");
         }
 
+        this._createButton.ariaLabel = "Create Project";
+        this._createButton.textContent = "Create";
+        this._createButton.addEventListener('click', (event: Event) => this._onCreateButtonClick(event));
+        this._buttonsDiv.appendChild(this._createButton);
+
+        this._editButton.ariaLabel = "Edit Project";
+        this._editButton.textContent = "Edit";
+        this._editButton.addEventListener('click', (event: Event) => this._onEditButtonClick(event));
+        this._editButton.disabled = true;
+        this._buttonsDiv.appendChild(this._editButton);
+
         this._scanButton.ariaLabel = "Schedule Scan";
         this._scanButton.textContent = "Schedule Scan";
         this._scanButton.disabled = true;
@@ -98,6 +124,7 @@ export class ProjectsContent extends ListBasedContent implements ProjectsContent
     protected _onSelectionChanged(event: CustomEvent<SelectionChangedEvent>) {
         const detail = event.detail;
         this._scanButton.disabled = detail.none;
+        this._editButton.disabled = !detail.one;
     }
 
     private _onScanButtonClick(event: Event) {
@@ -119,6 +146,14 @@ export class ProjectsContent extends ListBasedContent implements ProjectsContent
                 messageBox?.showMessage(`Unable to schedule scan.`, 'error', error.message);
             });
         });
+    }
+
+    private _onCreateButtonClick(event: Event) {
+        window.location.href = this._createUrl;
+    }
+
+    private _onEditButtonClick(event: Event) {
+        window.location.href = this._createUrl;
     }
 }
 

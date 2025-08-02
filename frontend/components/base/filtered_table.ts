@@ -28,6 +28,7 @@ export interface RowClickedEvent {
 export interface SelectionChangedEvent {
     selectedRows?: HTMLElement[];
     all: boolean;
+    one: boolean;
     none: boolean;
 }
 
@@ -323,7 +324,8 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
             detail: {
                 selectedRows: [],
                 all: false,
-                none: true
+                none: true,
+                one: false
             },
             bubbles: true,
             composed: true
@@ -496,7 +498,8 @@ export class FilteredTable extends HTMLElement implements FilteredTableAttribute
                 detail: {
                     selectedRows: checkboxes.filter(checkbox => checkbox.checked).map(checkbox => checkbox.parentElement?.parentElement || checkbox),
                     all: checkboxes.every(checkbox => checkbox.checked),
-                    none: checkboxes.every(checkbox => !checkbox.checked)
+                    none: checkboxes.every(checkbox => !checkbox.checked),
+                    one: checkboxes.filter(checkbox => checkbox.checked).length === 1
                 },
                 bubbles: true,
                 composed: true

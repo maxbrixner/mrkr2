@@ -75,3 +75,27 @@ async def project_documents_page(
     )
 
 # ---------------------------------------------------------------------------- #
+
+
+@router.get(
+    "/create",
+    summary="GUI to create a new project",
+    response_class=fastapi.responses.HTMLResponse
+)
+async def create_project_page(
+    request: fastapi.Request,
+    templates: services.TemplatesDependency,
+    session: database.DatabaseDependency
+) -> fastapi.responses.HTMLResponse:
+    """
+    GUI to list a project's documents.
+    """
+    return templates.TemplateResponse(
+        "create_project.html",
+        context={
+            "request": request,
+            "config_template": "hallo"
+        }
+    )
+
+# ---------------------------------------------------------------------------- #

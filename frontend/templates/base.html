@@ -32,6 +32,15 @@
             src: local('Geist'),
             url('{{ url_for("static", path="/font/Geist-VariableFont_wght.ttf") }}') format('woff2'),
         }
+
+        @font-face {
+            font-family: 'GeistMono';
+            font-style: normal;
+            font-weight: 100 900;
+            font-display: block;
+            src: local('GeistMono'),
+            url('{{ url_for("static", path="/font/GeistMono-VariableFont_wght.ttf") }}') format('woff2'),
+        }
     </style>
 </head>
 
