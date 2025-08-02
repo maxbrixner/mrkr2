@@ -167,6 +167,9 @@ class TextractOcrProvider(BaseOcrProvider):
         self,
         textract_type: str
     ) -> schemas.OcrItemType | None:
+        """
+        Maps Textract block types to internal OcrItemType.
+        """
         # 'KEY_VALUE_SET' | 'TABLE' | 'CELL' | 'SELECTION_ELEMENT' |
         # 'MERGED_CELL' | 'TITLE' | 'QUERY' | 'QUERY_RESULT' | 'SIGNATURE' |
         # 'TABLE_TITLE' | 'TABLE_FOOTER' | 'LAYOUT_TEXT' | 'LAYOUT_TITLE' |
@@ -187,6 +190,9 @@ class TextractOcrProvider(BaseOcrProvider):
         self,
         textract_type: str
     ) -> schemas.OcrRelationshipType | None:
+        """
+        Maps Textract relationship types to internal OcrRelationshipType.
+        """
         # 'VALUE'|'CHILD'|'COMPLEX_FEATURES'|'MERGED_CELL'| 'TITLE'|'ANSWER'|
         # 'TABLE'|'TABLE_TITLE'|'TABLE_FOOTER'
         match textract_type:
@@ -200,6 +206,9 @@ class TextractOcrProvider(BaseOcrProvider):
         textract_result: TextractResult,
         page: int
     ) -> List[schemas.OcrItemSchema]:
+        """
+        Converts TextractResult to a list of OcrItemSchema.
+        """
         items = []
         for block in textract_result.blocks:
             block_type = self.map_block_type(block.block_type)

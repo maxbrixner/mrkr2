@@ -282,6 +282,9 @@ class MrkrClient():
         self,
         project_id: int
     ) -> schemas.ProjectSchema:
+        """
+        Get a project (including its configuration) by its ID.
+        """
         response = self._call_api(
             method="GET",
             endpoint=f"/project/{project_id}"
@@ -293,6 +296,9 @@ class MrkrClient():
         self,
         document_id: int
     ) -> schemas.DocumentSchema:
+        """
+        Get a document (including its label data) by its ID.
+        """
         response = self._call_api(
             method="GET",
             endpoint=f"/document/{document_id}"
@@ -441,6 +447,9 @@ class MrkrDatabaseClient():
         self,
         project_id: int
     ) -> schemas.ProjectSchema:
+        """
+        Get a project (including its configuration) by its ID.
+        """
         if not self._session:
             raise Exception("Database session is not initialized.")
 
@@ -458,6 +467,9 @@ class MrkrDatabaseClient():
         self,
         project_id: int
     ) -> List[schemas.DocumentListSchema]:
+        """
+        List all documents for a given project.
+        """
         if not self._session:
             raise Exception("Database session is not initialized.")
 
@@ -473,6 +485,9 @@ class MrkrDatabaseClient():
         self,
         document_id: int
     ) -> schemas.DocumentSchema:
+        """
+        Get a document (including its label data) by its ID.
+        """
         if not self._session:
             raise Exception("Database session is not initialized.")
 
