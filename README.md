@@ -110,7 +110,7 @@ Alternatively, in Visual Studio Code, you can use `Terminal > Run Task` to execu
 
 The Swagger UI is available at [http://localhost:8000/docs](http://localhost:8000/docs), and the GUI is available at [http://localhost:8000/gui/project](http://localhost:8000/gui/project).
 
-### 2.2. Use the SDK
+### 2.2. Use the API-SDK
 
 Mrkr includes a Software Development Kit (SDK) that allows you to control the Mrkr instance from Python code.  
 To use it, simply import `mrkr.sdk`:
@@ -191,7 +191,7 @@ with sdk.MrkrClient(url="http://localhost:8000") as client:
 
 #### 2.2.5. Export a Project (with configurations)
 
-Export a project including its configuration:
+Export a project, including its configuration:
 
 ```python
 import mrkr.sdk as sdk
@@ -213,7 +213,7 @@ with sdk.MrkrClient(url="http://localhost:8000") as client:
 
 #### 2.2.7. Export a Document (with labels)
 
-Export a document including its labels:
+Export a document, including its labels:
 
 ```python
 import mrkr.sdk as sdk
@@ -293,7 +293,7 @@ with sdk.MrkrClient(url="http://localhost:8000") as client:
 
 Instead of passing a dictionary, you can also use ``sdk.schemas.ProjectCreateSchema`` to get type hints.
 
-#### 2.3. Update a Project's Configuration
+#### 2.2.9. Update a Project's Configuration
 
 Update the configuration of a project:
 
@@ -399,3 +399,81 @@ The following OCR providers are available:
 |-|-|-|
 |tesseract|Uses Google's tesseract for OCR.|Requires a ``language`` configuration variable, e.g., ``eng`` or ``deu``|
 |textract|Uses AWS's textract for OCR|Requires ``aws_access_key_id``, ``aws_secret_access_key``, ``aws_region_name``, ``aws_account_id``, ``aws_role_name``, ``aws_bucket_name`` configuration variables|
+
+### 2.3 Use the Database-SDK
+
+Mrkr also includes a basic database SDK for situations where you do not have access to a running Mrkr instance but do have access to a Mrkr database.
+
+To use it, simply import `mrkr.sdk`:
+
+```python
+import mrkr.sdk as sdk
+
+with sdk.MrkrDatabaseClient() as client:
+    # ...
+```
+
+The database client uses a Mrkr configuration file to establish the database connection. The location of the configuration file is specified in the ``CONFIG`` environment variable. If you need to load an environment file, Mrkr can do that for you:
+
+```python
+import mrkr.sdk as sdk
+
+with sdk.MrkrDatabaseClient(env_file=".env") as client:
+    # ...
+```
+
+#### 2.3.1. List Projects
+
+List all projects:
+
+```python
+import mrkr.sdk as sdk
+
+with sdk.MrkrDatabaseClient(env_file=".env") as client:
+    projects = client.list_projects()
+    print("projects:", projects)
+```
+
+#### 2.3.2. List Documents
+
+List the documents of a project:
+
+```python
+import mrkr.sdk as sdk
+
+with sdk.MrkrDatabaseClient(env_file=".env") as client:
+    documents = client.list_project_documents(project_id=1)
+    print("documents:", documents)
+```
+
+#### 2.3.3. Export a Project (with configurations)
+
+Export a project, including its configuration:
+
+```python
+import mrkr.sdk as sdk
+
+with sdk.MrkrDatabaseClient(env_file=".env") as client:
+    project = client.get_project(project_id=1)
+    print(f"Project name: {project.name}")
+    print(f"Project config: {project.config}")
+```
+
+#### 2.3.4. Export a Document (with labels)
+
+Export a document, including its labels:
+
+```python
+import mrkr.sdk as sdk
+
+with sdk.MrkrDatabaseClient(env_file=".env") as client:
+    document = client.get_document(document_id=1)
+    print(f"Document Labels: {document.data.labels}")
+
+    for page in document.data.pages:
+        print(f"Page {page.page} labels: {page.labels}")
+
+        for block in page.blocks:
+            print(f"Block contents: {block.content}")
+            print(f"Block labels: {block.labels}")
+```
