@@ -36,14 +36,14 @@ setup(
         "requests>=2.32.4",
         "uvicorn>=0.34.2",
         "bcrypt>=4.3.0",
-        "boto3>=1.39.13"
+        "boto3>=1.39.13",
+        "python-dotenv>=1.1.1"
     ],
     extras_require={
         "dev": [
             "build>=1.2.2",
             "mypy>=1.15.0",
             "setuptools>=59.0.1",
-            "setuptools_scm[toml]>=8.3.1"
         ]
     },
     url="https://github.com/maxbrixner/mrkr2",
