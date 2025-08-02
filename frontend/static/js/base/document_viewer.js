@@ -104,6 +104,15 @@ export class DocumentViewer extends HTMLElement {
                 width: var(--spinner-size-large, 30px);
             }
 
+            :host(.error)::before {
+                color: var(--styled-dialog-error-color, #000000);
+                content: var(--styled-dialog-error-message, 'Error loading content');
+                display: block;
+                font-size: var(--styled-dialog-error-font-size, 1rem);
+                margin: 2rem auto;
+                text-align: center;
+            }
+
             @keyframes spin {
                 0% {
                     transform: rotate(0deg);
@@ -133,10 +142,12 @@ export class DocumentViewer extends HTMLElement {
             }
         `;
         this.shadowRoot.appendChild(style);
+        this.classList.remove('error');
         this.classList.add('loading');
     }
     _reset() {
         this.innerHTML = '';
+        this.classList.remove('error');
         this.classList.add('loading');
         this._pages = {};
     }
@@ -150,11 +161,20 @@ export class DocumentViewer extends HTMLElement {
             this._dispatchPagesCreatedEvent();
         })
             .catch((error) => {
-            document.querySelector('message-box')?.showMessage(`Unable to load document content.`, 'error', error.message);
+            this._dispatchPagesLoadErrorEvent();
+            this.classList.remove('loading');
+            this.classList.add('error');
         });
     }
     _dispatchPagesCreatedEvent() {
         this.dispatchEvent(new CustomEvent('pages-created', {
+            detail: {},
+            bubbles: true,
+            composed: true
+        }));
+    }
+    _dispatchPagesLoadErrorEvent() {
+        this.dispatchEvent(new CustomEvent('pages-load-error', {
             detail: {},
             bubbles: true,
             composed: true

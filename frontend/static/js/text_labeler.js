@@ -217,7 +217,8 @@ export class TextLabeler extends ClassificationLabeler {
             endOffset = 0;
         }
         if (!textNodes.includes(startContainer) || !textNodes.includes(endContainer)) {
-            throw new Error("Start or end container is not a text node in the text container.");
+            document.querySelector('message-box')?.showMessage(`Invalid selection.`, 'error');
+            return null;
         }
         let startReached = false;
         let endReached = false;
@@ -275,20 +276,13 @@ export class TextLabeler extends ClassificationLabeler {
         return (event) => {
             this._textContainer.contentEditable = 'false';
             let text = "";
-            const spanNodes = this._textContainer.childNodes;
-            for (let spanNode of spanNodes) {
-                const textNodes = spanNode.childNodes;
-                if (spanNode.nodeType == Node.TEXT_NODE) {
-                    text += spanNode.textContent;
-                    continue;
+            const textNodes = this._getTextNodes(this._textContainer);
+            for (let textNode of textNodes) {
+                if (textNode.nodeType !== Node.TEXT_NODE) {
+                    text += "\n";
                 }
-                for (let textNode of textNodes) {
-                    if (textNode.nodeType !== Node.TEXT_NODE) {
-                        text += "\n";
-                    }
-                    else {
-                        text += textNode.textContent;
-                    }
+                else {
+                    text += textNode.textContent;
                 }
             }
             if (onBlurCallback) {
