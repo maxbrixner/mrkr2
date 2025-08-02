@@ -105,10 +105,10 @@ export class DocumentViewer extends HTMLElement {
             }
 
             :host(.error)::before {
-                color: var(--styled-dialog-error-color, #000000);
-                content: var(--styled-dialog-error-message, 'Error loading content');
+                color: var(--document-viewer-error-color, #000000);
+                content: var(--document-viewer-error-message, 'Error loading content');
                 display: block;
-                font-size: var(--styled-dialog-error-font-size, 1rem);
+                font-size: var(--document-viewer-error-font-size, 1rem);
                 margin: 2rem auto;
                 text-align: center;
             }

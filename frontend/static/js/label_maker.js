@@ -250,12 +250,12 @@ class LabelMaker extends HTMLElement {
             throw new Error("Document tab is not initialized.");
         }
         const classificationLabeler = new ClassificationLabeler();
-        classificationLabeler.setAttribute('heading', 'Document');
+        classificationLabeler.heading = 'Document';
         classificationLabeler.viewIcon = this._viewIcon || '';
         classificationLabeler.openIcon = this._openIcon || '';
         classificationLabeler.doneIcon = this._doneIcon || '';
         if (this._document.data.label_status === 'done') {
-            classificationLabeler.setAttribute('done', 'true');
+            classificationLabeler.done = true;
         }
         const checkButton = classificationLabeler.addCheckButton();
         checkButton.addEventListener('click', this._onCheckButtonClick(this._document.data, classificationLabeler));
@@ -279,22 +279,22 @@ class LabelMaker extends HTMLElement {
         if (!this._pageTab) {
             throw new Error("Page tab is not initialized.");
         }
+        const labelDefinitions = this._project.config.label_definitions;
         for (const page of this._document.data.pages) {
             const classificationLabeler = new ClassificationLabeler();
-            classificationLabeler.setAttribute('heading', `Page ${page.page}`);
+            classificationLabeler.heading = `Page ${page.page}`;
             classificationLabeler.viewIcon = this._viewIcon || '';
             classificationLabeler.openIcon = this._openIcon || '';
             classificationLabeler.doneIcon = this._doneIcon || '';
-            this._pageLabelers[page.page] = classificationLabeler;
-            this._pageTab.appendChild(classificationLabeler);
             if (page.label_status === 'done') {
-                classificationLabeler.setAttribute('done', 'true');
+                classificationLabeler.done = true;
             }
+            this._pageLabelers[page.page] = classificationLabeler;
             const viewButton = classificationLabeler.addViewButton();
             viewButton.addEventListener('click', this._onPageViewButtonClick(page.page));
             const checkButton = classificationLabeler.addCheckButton();
             checkButton.addEventListener('click', this._onCheckButtonClick(page, classificationLabeler));
-            const labelDefinitions = this._project.config.label_definitions;
+            this._pageTab.appendChild(classificationLabeler);
             for (const definition of labelDefinitions) {
                 if (definition.target !== 'page')
                     continue;
@@ -311,20 +311,22 @@ class LabelMaker extends HTMLElement {
         if (!this._document || !this._project) {
             throw new Error("Document or project data is not available.");
         }
+        if (!this._blockTab) {
+            throw new Error("Block tab is not initialized.");
+        }
         const labelDefinitions = this._project.config.label_definitions;
         for (const page of this._document.data.pages) {
             for (const block of page.blocks) {
                 const highlight = this._documentViewer.addHighlight(page.page, block.position.left, block.position.top, block.position.width, block.position.height, `Block ${block.id}`, block.id);
                 const textLabeler = new TextLabeler();
-                textLabeler.setAttribute('heading', `Block`);
+                textLabeler.heading = `Block`;
                 textLabeler.viewIcon = this._viewIcon || '';
                 textLabeler.openIcon = this._openIcon || '';
                 textLabeler.doneIcon = this._doneIcon || '';
                 textLabeler.editIcon = this._editIcon || '';
                 textLabeler.deleteIcon = this._deleteIcon || '';
-                this._blockTab?.appendChild(textLabeler);
                 if (block.label_status === 'done') {
-                    textLabeler.setAttribute('done', 'true');
+                    textLabeler.done = true;
                 }
                 const editButton = textLabeler.addEditButton();
                 editButton.addEventListener('click', this._onBlockEditButtonClick(textLabeler, block, labelDefinitions));
@@ -333,6 +335,7 @@ class LabelMaker extends HTMLElement {
                 const checkButton = textLabeler.addCheckButton();
                 checkButton.addEventListener('click', this._onCheckButtonClick(block, textLabeler));
                 textLabeler.addText(this._formatBlockText(block, labelDefinitions));
+                this._blockTab.appendChild(textLabeler);
                 highlight.addEventListener('click', this._onHighlightClick(textLabeler));
                 this._addTextLabelsToList(textLabeler, block, labelDefinitions);
                 for (const definition of labelDefinitions) {

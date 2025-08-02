@@ -1,5 +1,5 @@
-export class StyledInput extends HTMLElement {
-    _InputElement = document.createElement('input');
+export class StyledTextarea extends HTMLElement {
+    _InputElement = document.createElement('textarea');
     get autocapitalize() {
         const value = this.getAttribute('autocapitalize');
         return value === 'none' || value === 'off' || value === 'on' || value === 'sentences' || value === 'words' ? value : 'none';
@@ -80,9 +80,6 @@ export class StyledInput extends HTMLElement {
                 this._InputElement.removeAttribute('aria-disabled');
             }
         }
-        else if (propertyName === 'type') {
-            this._InputElement.type = newValue;
-        }
         else if (propertyName === 'placeholder') {
             this._InputElement.placeholder = newValue || '';
         }
@@ -107,7 +104,7 @@ export class StyledInput extends HTMLElement {
                 display: block;
             }
 
-            input {
+            textarea {
                 background-color: var(--styled-input-background-color, #ffffff);
                 border-color: var(--styled-input-border-color, #000000);
                 border-radius: var(--styled-input-border-radius, 0px);
@@ -118,19 +115,24 @@ export class StyledInput extends HTMLElement {
                 font-family: inherit;
                 font-size: var(--styled-input-font-size, 1rem);
                 font-weight: var(--styled-input-font-weight, normal);
+                height: 100%;
                 outline: none;
-                overflow: hidden;
+                overflow: auto;
                 padding: var(--styled-input-padding, 0.5rem 1rem);
+                resize: none;
+                scrollbar-color: var(--styled-input-scrollbar-color, inherit);
+                scrollbar-gutter: stable;
+                scrollbar-width: thin;
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 width: 100%;
             }
 
-            input:not(:disabled):focus {
+            textarea:not(:disabled):focus {
                 outline: var(--styled-input-focus-outline, 2px solid #000000);
             }
 
-            input:disabled {
+            textarea:disabled {
                 background-color: var(--styled-input-background-color-disabled, #f0f0f0);
                 border-color: var(--styled-input-border-color-disabled, #000000);
                 color: var(--styled-input-color-disabled, #888888);
@@ -138,7 +140,9 @@ export class StyledInput extends HTMLElement {
             }
         `;
         this.shadowRoot.appendChild(style);
+        const slot = document.createElement('slot');
+        this._InputElement.appendChild(slot);
         this.shadowRoot.appendChild(this._InputElement);
     }
 }
-customElements.define('styled-input', StyledInput);
+customElements.define('styled-textarea', StyledTextarea);

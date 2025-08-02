@@ -113,7 +113,6 @@ export class StyledInput extends HTMLElement {
                 border-radius: var(--styled-input-border-radius, 0px);
                 border-style: solid;
                 border-width: var(--styled-input-border-width, 1px);
-                box-sizing: border-box;
                 color: var(--styled-input-color, #000000);
                 font-family: inherit;
                 font-size: var(--styled-input-font-size, 1rem);
@@ -123,7 +122,6 @@ export class StyledInput extends HTMLElement {
                 padding: var(--styled-input-padding, 0.5rem 1rem);
                 text-overflow: ellipsis;
                 white-space: nowrap;
-                width: 100%;
             }
 
             input:not(:disabled):focus {
